@@ -1033,6 +1033,214 @@ class autodock(APIView):
         #     return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+class CatMec(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        command_tool_title = commandDetails_result.command_title
+        command_tool = commandDetails_result.command_tool
+        if command_tool_title == "Ligand_Parametrization":
+            print command_tool_title
+            inp_command_id = request.POST.get("command_id")
+            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+            project_id = commandDetails_result.project_id
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
+            # ligand_name = QzwProjectEssentials_res.command_key
+            # print "+++++++++++++++ligand name is++++++++++++"
+            # print ligand_name
+
+            primary_command_runnable = re.sub("%input_folder_name%", config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
+            print os.system("pwd")
+            print os.getcwd()
+            print "=========== title is =============="
+            print commandDetails_result.command_title
+            if commandDetails_result.command_title == "GromacsGenion":
+                group_value = sol_group_option()
+                ndx_file = "index.ndx"
+                print config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                dir_value = config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                os.system("rm " + dir_value + "/index.ndx")
+                primary_command_runnable = re.sub('%SOL_value%', group_value,
+                                                  primary_command_runnable)
+
+            if commandDetails_result.command_title == "Parameterize":
+                print config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                dir_value = config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                # os.system("rm "+dir_value+"/NEWPDB.PDB")
+
+            print(primary_command_runnable)
+
+            process_return = execute_command(primary_command_runnable, inp_command_id)
+
+            command_title_folder = commandDetails_result.command_title
+
+            out, err = process_return.communicate()
+            process_return.wait()
+            print "process return code is "
+            print process_return.returncode
+            if process_return.returncode == 0:
+                print "inside success"
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(out)
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                print "inside error"
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(err)
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+        elif command_tool_title == "MD_Simulation":
+            print command_tool_title
+        elif command_tool_title == "Docking":
+            print command_tool_title
+            print "tool before"
+            print command_tool_title
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            key_name = 'enzyme_file'
+            ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                   key_name=key_name).latest("entry_time")
+            enzyme_file_name = ProjectToolEssentials_res.values
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+
+            #shared_scripts
+            primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ +str(command_tool_title)+ "/pdb_to_pdbqt.py",primary_command_runnable)
+            primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%add_python_file_path%",config.PATH_CONFIG['add_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%make_gpf_dpf_python_file_path%",config.PATH_CONFIG['make_gpf_dpf_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%grid_dock_map_python_file_path%",config.PATH_CONFIG['grid_dock_map_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%multiple_distance_python_file_path%",config.PATH_CONFIG['multiple_distance_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%multiple_angle_python_file_path%",config.PATH_CONFIG['multiple_angle_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%multiple_torsion_python_file_path%",config.PATH_CONFIG['multiple_torsion_python_file_path'],primary_command_runnable)
+            primary_command_runnable = re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
+            primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
+                                              primary_command_runnable)
+
+            #rplace string / paths for normal mode analysis
+            primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/Tconcoord_no_threading.py',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%tconcoord_additional_dirpath%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tcc/',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%tconcoord_input_filepath%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/input3.cpf',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
+                                              primary_command_runnable)
+            #append mmtsb path to command for NMA
+            primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
+            primary_command_runnable = primary_command_runnable+" "+enzyme_file_name
+            print primary_command_runnable
+            print "working directory before"
+            print os.system("pwd")
+            '''check for command tool
+                split command tool
+               if command tool == NMA (normal mode analysis)
+                    change DIR to NMA
+                else
+                    change DIR to Autodock
+            '''
+            str_command_tool_title = str(command_tool_title)
+            print type(str_command_tool_title)
+            command_tool_title_split = str_command_tool_title.split('_')
+            print "split is----------------------------"
+            print type(command_tool_title_split)
+            print command_tool_title_split
+            if(command_tool_title_split[0] == "nma"):
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+            else:
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'+ commandDetails_result.command_title + '/')
+            print "working directory after changing CHDIR"
+            print os.system("pwd")
+            # process PDB file format with PDBFIXER(MMTSB)
+            if command_tool_title == "PdbtoPdbqt":
+                #split primary_command_runnable and get PDB file as input to PDBFIXER
+                primary_command_runnable_split = primary_command_runnable.split()
+                os.system(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
+                os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
+            #process_return = execute_command(primary_command_runnable)
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+            print "execute command"
+            out, err = process_return.communicate()
+            process_return.wait()
+            # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
+
+            command_title_folder = commandDetails_result.command_title
+            command_tool_title= commandDetails_result.command_tool
+            print "printing status ofprocess"
+            print process_return.returncode
+            print "printing output of process"
+            print out
+
+            if process_return.returncode == 0:
+                print "output of out is"
+                print out
+                fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+                fileobj.write(out)
+                status_id = config.CONSTS['status_success']
+                moveFile_source = config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+commandDetails_result.command_title+'/outputFiles/'
+                moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
+                #move_outputFiles(moveFile_source,moveFile_destination)
+                update_command_status(inp_command_id,status_id)
+                #move_files_(inp_command_id)
+                return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+            if process_return.returncode != 0:
+                fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+                #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
+                fileobj.write(err)
+                status_id = config.CONSTS['status_error']
+                moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/outputFiles/'
+                moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
+                #move_outputFiles(moveFile_source, moveFile_destination)
+                update_command_status(inp_command_id,status_id)
+                #move_files_(inp_command_id)
+                return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+
+
+
+
 #alter grid.gpf file with respective .PDBQT file paths
 def process_grid_file(commandDetails_result,QzwProjectDetails_res,request):
     enzyme_file_name =""
