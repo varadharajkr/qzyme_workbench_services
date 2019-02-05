@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^MakeSubstitution/', views.MakeSubstitution.as_view()),
     url(r'^Literature_Research/', views.Literature_Research.as_view()),
     url(r'^autodock/',views.autodock.as_view()),
+    url(r'^CatMec/',views.CatMec.as_view()),
     url(r'^grom/', views.grom),
     url(r'^get_activation_energy/', views.get_activation_energy.as_view()),
 ]
