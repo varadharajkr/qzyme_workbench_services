@@ -1094,7 +1094,8 @@ class CatMec(APIView):
 
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
-
+            print ("execute_command(primary_command_runnable, inp_command_id).......")
+            print (primary_command_runnable, inp_command_id)
             process_return = execute_command(primary_command_runnable, inp_command_id)
 
             command_title_folder = commandDetails_result.command_title
