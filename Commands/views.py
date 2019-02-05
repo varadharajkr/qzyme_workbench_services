@@ -1092,6 +1092,7 @@ class CatMec(APIView):
                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
                 # os.system("rm "+dir_value+"/NEWPDB.PDB")
 
+            print("primary_command_runnable.........................................")
             print(primary_command_runnable)
 
             process_return = execute_command(primary_command_runnable, inp_command_id)
