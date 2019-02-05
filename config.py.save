@@ -1,0 +1,29 @@
+PATH_CONFIG ={
+'shared_folder_path':"/home/qzyme/Desktop/Windows-Share/sharetest/",
+ 'local_shared_folder_path':"/home/qzyme/Desktop/Windows-Share/Project/",
+'local_shared_folder_path_project':"/home/qzyme/Desktop/Windows-Share/",
+||||||| .r110
+'shared_folder_path':"/run/user/1000/gvfs/smb-share:server=192.168.0.168,share=sharetest/",
+ 'local_shared_folder_path':"/home/ck/Desktop/Windows-Share/Project/",
+'local_shared_folder_path_project':"/home/ck/Desktop/Windows-Share/",
+======='shared_folder_path':"/run/user/1000/gvfs/smb-share:server=192.168.0.168,share=sharetest/",
+ 'local_shared_folder_path':"/home/ck/Desktop/Windows-Share/Project/",
+'make_gpf_dpf_python_file_path':"/run/user/1000/gvfs/smb-share:server=192.168.0.44,share=sharetest/Project/Takakura/Autodock/Test/",
+'local_shared_folder_path_project':"/home/ck/Desktop/Windows-Share/",
+>>>>>>> .r111
+ 'distance_python_file':"Distance/inputFiles/",
+ 'angle_python_file':"Angle/inputFiles/",
+'torsion_python_file':"Torsion/inputFiles/",
+'local_autodock_folder_path':"qzw/autodock/" ,
+'local_gromacs_folder_path':"qzw/gromacs/",
+'shared_folder_project_path':"/homw/qzyme/Desktop/Windows-Share/sharetest/Project/",
+'local_qzw_folder_path':"qzw/",
+'receptor_file_path':"/usr/local/MGLTools-1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/",
+'ligand_prepare_file_path':"/usr/local/MGLTools-1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/",
+ 'input_output_folder_name':"/home/qzyme/Desktop/Windows-Share/Project/"
+}
+
+CONSTS ={
+    'status_success':3,
+    'status_error':4
+}
