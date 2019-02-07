@@ -69,9 +69,9 @@ class QzwProjectDetails(models.Model):
         return u'%s %s %s %s %s %s %s %s' % (self.project_id,self.project_name,self.project_status,self.project_description,self.project_category,self.project_investigator,self.project_code,self.enabled)
 
 class ProjectToolEssentials(models.Model):
-    tool_title = models.CharField(max_length=45, blank=True, null=True)
+    tool_title = models.TextField(blank=True, null=True)
     project_id = models.IntegerField(blank=True, null=True)
-    key_name = models.CharField(max_length=45, blank=True, null=True)
+    key_name = models.TextField(blank=True, null=True)
     values = models.TextField(blank=True, null=True)
     entry_time = models.DateTimeField()
 
