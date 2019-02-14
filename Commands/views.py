@@ -452,7 +452,8 @@ class Literature_Research(APIView):
         #
         start_offset = '?qs=' + encoded_search_keyword + '&show=100&sortBy=relevance&offset=0'
         start_page = '?qs=' + encoded_search_keyword + '&show=100&sortBy=relevance&offset='
-        #result_crawlerdata_save = get_initial_crawler_data(start_offset,start_page,search_keyword)
+        # result_crawlerdata_save = get_initial_crawler_data(start_offset,start_page,search_keyword)
+        result_crawlerdata_save = get_crawler_data_gs(search_keyword,encoded_search_keyword)
         # paralleling functions
 
         get_initial_crawler_data(start_offset,start_page,search_keyword)
