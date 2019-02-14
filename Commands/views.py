@@ -457,6 +457,7 @@ class Literature_Research(APIView):
 
         get_initial_crawler_data(start_offset,start_page,search_keyword)
         get_crawler_data_pmd(search_keyword,encoded_search_keyword)
+        get_crawler_data_gs(search_keyword,encoded_search_keyword)
         if result_crawlerdata_save == True:
             print "inside success"
             status_id = config.CONSTS['status_success']
