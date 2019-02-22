@@ -357,7 +357,7 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(request, project_id, command_tool, command_title):
+def md_simulation_preparation(request):
     print "inside md_simulation_preparation function"
     user_id = request.user.id
     entry_time = datetime.now()
