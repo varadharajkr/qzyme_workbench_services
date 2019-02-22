@@ -367,7 +367,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
     #
     # md_run_no_of_conformation = ProjectToolEssentials_res.values
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project' + str(project_name) + '/' + str(command_tool) + '/'
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + str(command_tool) + '/'
     for i in range(5):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
