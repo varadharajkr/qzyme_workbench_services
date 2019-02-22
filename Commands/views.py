@@ -369,9 +369,9 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project' + str(project_name) + '/' + str(command_tool) + '/'
     for i in range(5):
-        print (source_file_path + '/md_run' + str(i + 1))
-        os.mkdir(source_file_path + '/md_run' + str(i + 1))
-        dest_file_path = source_file_path + '/md_run' + str(i + 1)
+        print (source_file_path + 'md_run' + str(i + 1))
+        os.mkdir(source_file_path + 'md_run' + str(i + 1))
+        dest_file_path = source_file_path + 'md_run' + str(i + 1)
         for file_name in os.listdir(source_file_path):
             try:
                 print "inside try"
