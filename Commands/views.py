@@ -357,15 +357,8 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(request):
+def md_simulation_preparation(project_id,project_name,command_tool,command_title):
     print "inside md_simulation_preparation function"
-    user_id = request.user.id
-    entry_time = datetime.now()
-    status = config.PATH_CONFIG['status']
-    QzwProjectDetails_res = \
-        QzwProjectDetails.objects.get(project_id=project_id)
-    project_name = QzwProjectDetails_res.project_name
-    project_name = str(project_name)
     # key_name = 'md_no_of_runs'
     #
     # ProjectToolEssentials_res = \
@@ -374,7 +367,7 @@ def md_simulation_preparation(request):
     #
     # md_run_no_of_conformation = ProjectToolEssentials_res.values
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project' + project_name + '/' + command_tool + '/'
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project' + str(project_name) + '/' + str(command_tool) + '/'
     for i in range(5):
         print (source_file_path + '/md_run' + str(i + 1))
         os.mkdir(source_file_path + '/md_run' + str(i + 1))
@@ -457,7 +450,7 @@ class Complex_Simulations(APIView):
             primary_command_runnable = re.sub('%SOL_value%',group_value,
                                               primary_command_runnable)
         if commandDetails_result.command_title == "md_run":
-            md_simulation_preparation(request)
+            md_simulation_preparation(project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
             # print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # os.system("rm "+dir_value+"/index.ndx")
