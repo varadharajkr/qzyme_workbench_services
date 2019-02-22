@@ -366,13 +366,13 @@ def md_simulation_preparation(request, project_id, command_tool, command_title):
         QzwProjectDetails.objects.get(project_id=project_id)
     project_name = QzwProjectDetails_res.project_name
     project_name = str(project_name)
-    key_name = 'md_no_of_runs'
-
-    ProjectToolEssentials_res = \
-        ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                   key_name=key_name).latest('entry_time')
-
-    md_run_no_of_conformation = ProjectToolEssentials_res.values
+    # key_name = 'md_no_of_runs'
+    #
+    # ProjectToolEssentials_res = \
+    #     ProjectToolEssentials.objects.all().filter(project_id=project_id,
+    #                                                key_name=key_name).latest('entry_time')
+    #
+    # md_run_no_of_conformation = ProjectToolEssentials_res.values
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project' + project_name + '/' + command_tool + '/'
     for i in range(5):
