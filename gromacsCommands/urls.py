@@ -33,6 +33,7 @@ urlpatterns = [
      url(r'^Loop_Modelling/', views.Loop_Modelling.as_view()),
     url(r'^Complex_Simulations/', views.Complex_Simulations.as_view()),
     # url(r'^Hello_World/', views.Hello_World.as_view()),
+    # url(r'^Hello_World/', views.Hello_World.as_view()),
     url(r'^MakeSubstitution/', views.MakeSubstitution.as_view()),
     url(r'^Literature_Research/', views.Literature_Research.as_view()),
     url(r'^autodock/',views.autodock.as_view()),

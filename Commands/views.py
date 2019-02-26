@@ -415,6 +415,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
 #     def post(self, request):
 #         print ("Hello World")
 #         return JsonResponse({'success':True})
+#         return JsonResponse({'success':True})
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
