@@ -406,17 +406,16 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
         os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         os.system(
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
-        return JsonResponse({'success' : True})
+    return JsonResponse({'success': True})
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
-    string_data = " SOL "
     def get(self,request):
         pass
 
 
     def post(self,request):
-
+        string_data = " SOL "
         #get command details from database
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
