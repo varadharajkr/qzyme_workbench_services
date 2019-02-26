@@ -367,7 +367,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
 
     md_run_no_of_conformation = ProjectToolEssentials_res.values
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + str(command_tool) + '/MD_Simulation/'
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/CatMec/MD_Simulation/'
     for i in range(md_run_no_of_conformation):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -444,7 +444,7 @@ class Complex_Simulations(APIView):
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
         primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/MD_Simulation/')
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
         print os.system("pwd")
         print os.getcwd()
         print "=========== title is =============="
