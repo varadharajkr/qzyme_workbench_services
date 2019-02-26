@@ -407,15 +407,6 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
         os.system(
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
 
-# class Hello_World(APIView):
-#     # def get(self,request):
-#     #     pass
-#     #
-#
-#     def post(self, request):
-#         print ("Hello World")
-#         return JsonResponse({'success':True})
-#         return JsonResponse({'success':True})
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
