@@ -1298,6 +1298,7 @@ class CatMec(APIView):
                                               primary_command_runnable)
             primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
+            print (os.getcwd())
             if commandDetails_result.command_title == "md_run":
                 md_simulation_preparation(project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title)
