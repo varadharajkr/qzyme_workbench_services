@@ -341,6 +341,7 @@ def sol_group_option():
     print os.getcwd()
     log_file = "gromacs_solve_gro_indexing.txt"
     string_data = " SOL "
+    matched_data = ""
 
     log_file_buffer = open(log_file, "r")
 
@@ -1296,10 +1297,10 @@ class CatMec(APIView):
             primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
                                               primary_command_runnable)
-            primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
             print (os.getcwd())
             if commandDetails_result.command_title == "md_run":
+                primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
                 md_simulation_preparation(project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title)
             print("primary_command_runnable.........................................")
