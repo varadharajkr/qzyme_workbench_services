@@ -365,12 +365,12 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = ProjectToolEssentials_res.values
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/CatMec/MD_Simulation/'
-    for i in range(md_run_no_of_conformation):
+    for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
         dest_file_path = source_file_path + 'md_run' + str(i + 1)
