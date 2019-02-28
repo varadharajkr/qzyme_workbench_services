@@ -353,8 +353,8 @@ def sol_group_option():
             print matched_data
     SOL_option_value = matched_data
     SOL_option_value = SOL_option_value.split()
-    print  SOL_option_value[0]
-    return SOL_option_value[0]
+    print  SOL_option_value
+    return SOL_option_value
 
 
 @csrf_exempt
