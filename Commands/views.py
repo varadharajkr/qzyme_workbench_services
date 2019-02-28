@@ -393,7 +393,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', group_value)
+        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
         print("printing group value in MD$$$$$$$$$$$$$$$$$$")
         print(group_value)
         print("printing after %SOL% replace")
