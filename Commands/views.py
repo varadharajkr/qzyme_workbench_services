@@ -239,6 +239,14 @@ class get_activation_energy(APIView):
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
+class Hello_World(APIView):
+    def get(self,request):
+        pass
+    def post(self,request):
+        print ("Hello World")
+
+        return JsonResponse({'success':True})
+
 
 class mmpbsa(APIView):
     def get(self,request):

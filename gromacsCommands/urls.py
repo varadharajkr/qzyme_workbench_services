@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^gromacs/', views.gromacs.as_view()),
     url(r'^pathanalysis/', views.pathanalysis.as_view()),
     url(r'^mmpbsa/', views.pathanalysis.as_view()),
+    url(r'^Hello_World/', views.Hello_World.as_view()),
     url(r'^NMA/', views.NMA.as_view()),
     url(r'^Contact_Score/', views.Contact_Score.as_view()),
     url(r'^Homology_Modelling/', views.Homology_Modelling.as_view()),
