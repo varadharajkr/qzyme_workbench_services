@@ -1025,6 +1025,7 @@ class autodock(APIView):
         if command_tool_title == "PdbtoPdbqt":
             #split primary_command_runnable and get PDB file as input to PDBFIXER
             primary_command_runnable_split = primary_command_runnable.split()
+            print(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
             os.system(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
             os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
         #process_return = execute_command(primary_command_runnable)
