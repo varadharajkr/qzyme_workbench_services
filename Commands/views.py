@@ -998,7 +998,7 @@ class autodock(APIView):
                                           primary_command_runnable)
         #append mmtsb path to command for NMA
         primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-        primary_command_runnable = primary_command_runnable+" "+enzyme_file_name
+        primary_command_runnable = primary_command_runnable+enzyme_file_name
         print primary_command_runnable
         print "working directory before"
         print os.system("pwd")
@@ -1038,6 +1038,7 @@ class autodock(APIView):
             shell=True
         )
         print "execute command"
+        print(primary_command_runnable)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
