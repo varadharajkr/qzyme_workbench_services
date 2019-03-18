@@ -1029,6 +1029,7 @@ class autodock(APIView):
             os.system(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
             print("mv fixer_test.pdb "+primary_command_runnable_split[2])
             os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
+            print("primary_command_runnable %%%%%%%%%%%%%%%%%%%%%%%%%%%% ^^^^^^^^^^^^^^^^^^^")
             print(primary_command_runnable)
         #process_return = execute_command(primary_command_runnable)
         process_return = Popen(
