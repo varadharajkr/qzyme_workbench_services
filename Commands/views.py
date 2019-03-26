@@ -149,16 +149,22 @@ class analyse_mmpbsa(APIView):
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
 
-        key_name = 'mmpbsa_index_file_dict'
+        key_name_indexfile_input = 'mmpbsa_index_file_dict'
 
-        ProjectToolEssentials_res = \
+        ProjectToolEssentials_res_indexfile_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                       key_name=key_name).latest('entry_time')
-        print type(ProjectToolEssentials_res.values)
-        print ProjectToolEssentials_res.values
+                                                       key_name=key_name_indexfile_input).latest('entry_time')
 
-        d = ast.literal_eval(ProjectToolEssentials_res.values)
-        print type(d)
+        key_name_xtcfile_input = 'mmpbsa_md_xtc_file_list'
+
+        ProjectToolEssentials_res_xtcfile_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_xtcfile_input).latest('entry_time')
+
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        print type(indexfile_input_dict)
+        print type(indexfile_input_dict)
         return JsonResponse({"success": True})
 
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
