@@ -131,6 +131,69 @@ class gromacs(APIView):
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+#analyse_mmpsa
+class analyse_mmpbsa(APIView):
+    def get(self,request):
+        pass
+
+
+    def post(self,request):
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        primary_command_runnable = commandDetails_result.primary_command
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
+
+        key_name = 'mmpbsa_index_file_dict'
+
+        ProjectToolEssentials_res = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name).latest('entry_time')
+        print ProjectToolEssentials_res
+        return JsonResponse({"success": True})
+
+        primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
+        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
+        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
+        primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
+        #MD simulations shared path
+        md_simulations_sharedpath = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' +"Analysis/mmpbsa" + '/')
+        print os.system("pwd")
+        print os.getcwd()
+        print "=========== title is =============="
+        print commandDetails_result.command_title
+
+
+        process_return = execute_command(primary_command_runnable,inp_command_id)
+
+        command_title_folder = commandDetails_result.command_title
+
+        out, err = process_return.communicate()
+        process_return.wait()
+        print "process return code is "
+        print process_return.returncode
+        if process_return.returncode == 0:
+            print "inside success"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        if process_return.returncode != 0:
+            print "inside error"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+
+
 
 class pathanalysis(APIView):
     def get(self,request):
