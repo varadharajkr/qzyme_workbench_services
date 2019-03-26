@@ -162,9 +162,9 @@ class analyse_mmpbsa(APIView):
                                                        key_name=key_name_xtcfile_input).latest('entry_time')
 
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
-        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        xtcfile_input_dict = list(ProjectToolEssentials_res_xtcfile_input.values)
         print type(indexfile_input_dict)
-        print type(indexfile_input_dict)
+        print type(xtcfile_input_dict)
         return JsonResponse({"success": True})
 
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
