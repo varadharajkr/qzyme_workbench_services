@@ -165,6 +165,10 @@ class analyse_mmpbsa(APIView):
         xtcfile_input_dict = list(ProjectToolEssentials_res_xtcfile_input.values)
         print type(indexfile_input_dict)
         print type(xtcfile_input_dict)
+        for xtc_file in xtcfile_input_dict:
+            print xtc_file
+        for indexfile_input in indexfile_input_dict:
+            print indexfile_input
         return JsonResponse({"success": True})
 
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
