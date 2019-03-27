@@ -165,8 +165,8 @@ class analyse_mmpbsa(APIView):
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
         print type(indexfile_input_dict)
         print type(xtcfile_input_dict)
-        for xtcfile_input in xtcfile_input_dict:
-            print xtcfile_input
+        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
+            print xtcfile_inputvalue
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
 
