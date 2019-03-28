@@ -151,10 +151,12 @@ class analyse_mmpbsa(APIView):
 
         key_name_indexfile_input = 'mmpbsa_index_file_dict'
 
+        #get list of index file options for gmx input
         ProjectToolEssentials_res_indexfile_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_indexfile_input).latest('entry_time')
 
+        #get list of .XTC files from different MD runs to execute "gmx trjcat " command
         key_name_xtcfile_input = 'mmpbsa_md_xtc_file_list'
 
         ProjectToolEssentials_res_xtcfile_input = \
@@ -163,10 +165,25 @@ class analyse_mmpbsa(APIView):
 
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
-        print type(indexfile_input_dict)
-        print type(xtcfile_input_dict)
+
+        '''
+                                                                  .                o8o                         .        
+                                                        .o8                `"'                       .o8        
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .oooo.   .o888oo      
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 `P  )88b    888        
+        888   888   888   888   888     Y888'           888    888         888 888        .oP"888    888        
+        `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 d8(  888    888 .      
+        `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y888""8o   "888"      
+        d"     YD                                                          888                                  
+        "Y88888P'                                                      .o. 88P                                  
+                                                                       `Y888P                                           
+        '''
+        #if len(xtcfile_input_dict) > 1:
+        md_xtc_files_str = ""
+
         for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
-            print xtcfile_inputvalue
+            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['md_simulations_path']+xtcfile_inputvalue+ " "
+        gmx_trjcat_cmd = "gmx trjcat -f "+md_xtc_files_str+" -o merged.xtc -dt 100 -keeplast -cat"
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
 
