@@ -180,10 +180,11 @@ class analyse_mmpbsa(APIView):
         '''
         #if len(xtcfile_input_dict) > 1:
         md_xtc_files_str = ""
-
+        #mmpbsa_project_path
         for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
-            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['md_simulations_path']+xtcfile_inputvalue+ " "
-        gmx_trjcat_cmd = "gmx trjcat -f "+md_xtc_files_str+" -o merged.xtc -dt 100 -keeplast -cat"
+            xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
+            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['md_simulations_path']+xtcfile_inputvalue_formatted+ " "
+        gmx_trjcat_cmd = "gmx trjcat -f "+md_xtc_files_str+" -o "+config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['mmpbsa_project_path']+"merged.xtc -dt 100 -keeplast -cat"
         print gmx_trjcat_cmd
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
