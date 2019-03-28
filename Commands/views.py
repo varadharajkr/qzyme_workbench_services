@@ -163,6 +163,22 @@ class analyse_mmpbsa(APIView):
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_xtcfile_input).latest('entry_time')
 
+        #get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_tpr_file = 'mmpbsa_tpr_file'
+
+        ProjectToolEssentials_res_tpr_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_tpr_file).latest('entry_time')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+
+        # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_ndx_file = 'mmpbsa_index_file'
+
+        ProjectToolEssentials_res_ndx_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ndx_file).latest('entry_time')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
 
@@ -183,12 +199,37 @@ class analyse_mmpbsa(APIView):
         #mmpbsa_project_path
         for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
             xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
-            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['md_simulations_path']+xtcfile_inputvalue_formatted+ " "
-        gmx_trjcat_cmd = "gmx trjcat -f "+md_xtc_files_str+" -o "+config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['mmpbsa_project_path']+"merged.xtc -dt 100 -keeplast -cat"
+            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + \
+                                config.PATH_CONFIG['md_simulations_path'] + xtcfile_inputvalue_formatted + " "
+        gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                             'mmpbsa_project_path'] + "merged.xtc -dt 100 -keeplast -cat"
         print gmx_trjcat_cmd
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
 
+        '''
+                                                                  .                o8o                                             
+                                                        .o8                `"'                                             
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo 
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'  
+        888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'   
+        `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'    
+        `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'     
+        d"     YD                                                          888                                             
+        "Y88888P'                                                      .o. 88P                                             
+                                                                       `Y888P                                              
+        '''
+        gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] +md_simulations_tpr_file +" -pbc mol -ur compact -o " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                             'mmpbsa_project_path'] + "merged-recentered.xtc -center -n "+config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] +md_simulations_ndx_file +" "
+
+        print gmx_trjconv
         return JsonResponse({"success": True})
 
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
