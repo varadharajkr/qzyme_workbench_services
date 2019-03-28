@@ -184,6 +184,7 @@ class analyse_mmpbsa(APIView):
         for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
             md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+config.PATH_CONFIG['md_simulations_path']+xtcfile_inputvalue+ " "
         gmx_trjcat_cmd = "gmx trjcat -f "+md_xtc_files_str+" -o merged.xtc -dt 100 -keeplast -cat"
+        print gmx_trjcat_cmd
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
 
