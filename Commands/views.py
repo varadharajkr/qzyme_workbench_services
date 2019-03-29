@@ -203,7 +203,7 @@ class analyse_mmpbsa(APIView):
                                 config.PATH_CONFIG['md_simulations_path'] + xtcfile_inputvalue_formatted + " "
         gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                             'mmpbsa_project_path'] + "merged.xtc -dt 100 -keeplast -cat"
+                             'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
         print gmx_trjcat_cmd
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
@@ -220,6 +220,12 @@ class analyse_mmpbsa(APIView):
         "Y88888P'                                                      .o. 88P                                             
                                                                        `Y888P                                              
         '''
+        # create input file for trjconv command
+        file_gmx_trjconv_input = open(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
+        file_gmx_trjconv_input.write("1\n0")
+
         gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                       config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
@@ -227,9 +233,15 @@ class analyse_mmpbsa(APIView):
             'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                              'mmpbsa_project_path'] + "merged-recentered.xtc -center -n "+config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +md_simulations_ndx_file +" "
+                          'md_simulations_path'] +md_simulations_ndx_file +" < "+config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + "gmx_trjconv_input.txt"
 
         print gmx_trjconv
+
+
+
+
         return JsonResponse({"success": True})
 
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
