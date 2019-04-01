@@ -187,9 +187,9 @@ class analyse_mmpbsa(APIView):
                                                        key_name=key_name_CatMec_input).latest('entry_time')
         CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
         # if User has only one ligand as input
-        multiple_ligand_input = True
+        multiple_ligand_input = False
         if len(CatMec_input_dict) > 1:
-            multiple_ligand_input = False
+            multiple_ligand_input = True
 
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
