@@ -276,7 +276,13 @@ class analyse_mmpbsa(APIView):
             print "ligand name is ---"
             print ligand_name
             #prepare input file for gmx make_ndx command
-
+            #for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems():
+            maximum_key_ndx_input = max(indexfile_input_dict,key=indexfile_input_dict.get)
+            print maximum_key_ndx_input
+            file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
+            file_gmx_make_ndx_input.write("1\n")
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
