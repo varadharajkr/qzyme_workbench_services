@@ -179,8 +179,20 @@ class analyse_mmpbsa(APIView):
                                                        key_name=key_name_ndx_file).latest('entry_time')
         md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
 
+        key_name_CatMec_input = 'substrate_input'
+        command_tootl_title = "CatMec"
+        # get list of ligand inputs
+        ProjectToolEssentials_res_CatMec_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                       key_name=key_name_CatMec_input).latest('entry_time')
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        # if User has only one ligand as input
+        if len(CatMec_input_dict) > 1:
+            multiple_ligand_input = False
+
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+
 
         '''
                                                                   .                o8o                         .        
@@ -211,8 +223,8 @@ class analyse_mmpbsa(APIView):
         '''
                                                                   .                o8o                                             
                                                         .o8                `"'                                             
-         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo 
-        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'  
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'
         888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'   
         `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'    
         `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'     
@@ -238,6 +250,42 @@ class analyse_mmpbsa(APIView):
                         'md_simulations_path'] + "gmx_trjconv_input.txt"
 
         print gmx_trjconv
+
+        '''
+                                                                                          oooo                                                .o8              
+                                                                                  `888                                               "888              
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      ooo. .oo.  .oo.    .oooo.    888  oooo   .ooooo.              ooo. .oo.    .oooo888  oooo    ooo 
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'       `888P"Y88bP"Y88b  `P  )88b   888 .8P'   d88' `88b             `888P"Y88b  d88' `888   `88b..8P'  
+        888   888   888   888   888     Y888'          888   888   888   .oP"888   888888.    888ooo888              888   888  888   888     Y888'    
+        `88bod8P'   888   888   888   .o8"'88b         888   888   888  d8(  888   888 `88b.  888    .o              888   888  888   888   .o8"'88b   
+        `8oooooo.  o888o o888o o888o o88'   888o      o888o o888o o888o `Y888""8o o888o o888o `Y8bod8P' ooooooooooo o888o o888o `Y8bod88P" o88'   888o 
+        d"     YD                                                                                                                                      
+        "Y88888P'                                                                                                                                      
+        '''
+        if multiple_ligand_input:
+            #for multiple ligand input
+            print "for multiple ligand input"
+        else:
+            #for single ligand input
+            print "for single ligand input"
+            #get ligand name
+            ligand_name = ""
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name = ligand_inputkey[:-4]
+            print "ligand name is ---"
+            print ligand_name
+            #prepare input file for gmx make_ndx command
+
+            gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                               'mmpbsa_project_path'] + "complex_index.ndx "
+
+            print " make index command"
+            print gmx_make_ndx
 
 
 
