@@ -281,7 +281,7 @@ class analyse_mmpbsa(APIView):
             for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems(): #key is index option text and value is index number
                 if ligand_name in indexfile_inputkey:
                     ligandname_index = indexfile_inputvalue
-                if "Protein" in indexfile_inputkey:
+                if "[ Protein ]" == indexfile_inputkey:
                     protein_index = indexfile_inputvalue
             maximum_key_ndx_input = max(indexfile_input_dict,key=indexfile_input_dict.get)
             print indexfile_input_dict[maximum_key_ndx_input]
