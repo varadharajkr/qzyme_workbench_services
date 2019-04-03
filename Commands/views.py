@@ -24,6 +24,7 @@ import shutil
 import re
 import config
 import os
+import ast
 import glob
 import urllib2
 import json
@@ -115,6 +116,229 @@ class gromacs(APIView):
 
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
+
+        out, err = process_return.communicate()
+        process_return.wait()
+        print "process return code is "
+        print process_return.returncode
+        if process_return.returncode == 0:
+            print "inside success"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        if process_return.returncode != 0:
+            print "inside error"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+
+
+#analyse_mmpsa
+class analyse_mmpbsa(APIView):
+    def get(self,request):
+        pass
+
+
+    def post(self,request):
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        primary_command_runnable = commandDetails_result.primary_command
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
+
+        key_name_indexfile_input = 'mmpbsa_index_file_dict'
+
+        #get list of index file options for gmx input
+        ProjectToolEssentials_res_indexfile_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_indexfile_input).latest('entry_time')
+
+        #get list of .XTC files from different MD runs to execute "gmx trjcat " command
+        key_name_xtcfile_input = 'mmpbsa_md_xtc_file_list'
+
+        ProjectToolEssentials_res_xtcfile_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_xtcfile_input).latest('entry_time')
+
+        #get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_tpr_file = 'mmpbsa_tpr_file'
+
+        ProjectToolEssentials_res_tpr_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_tpr_file).latest('entry_time')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+
+        # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_ndx_file = 'mmpbsa_index_file'
+
+        ProjectToolEssentials_res_ndx_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ndx_file).latest('entry_time')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+
+        key_name_CatMec_input = 'substrate_input'
+        command_tootl_title = "CatMec"
+        # get list of ligand inputs
+        ProjectToolEssentials_res_CatMec_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                       key_name=key_name_CatMec_input).latest('entry_time')
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        # if User has only one ligand as input
+        multiple_ligand_input = False
+        if len(CatMec_input_dict) > 1:
+            multiple_ligand_input = True
+
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+
+
+        '''
+                                                                  .                o8o                         .        
+                                                        .o8                `"'                       .o8        
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .oooo.   .o888oo      
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 `P  )88b    888        
+        888   888   888   888   888     Y888'           888    888         888 888        .oP"888    888        
+        `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 d8(  888    888 .      
+        `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y888""8o   "888"      
+        d"     YD                                                          888                                  
+        "Y88888P'                                                      .o. 88P                                  
+                                                                       `Y888P                                           
+        '''
+        #if len(xtcfile_input_dict) > 1:
+        md_xtc_files_str = ""
+        #mmpbsa_project_path
+        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
+            xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
+            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + \
+                                config.PATH_CONFIG['md_simulations_path'] + xtcfile_inputvalue_formatted + " "
+        gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                             'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
+        print gmx_trjcat_cmd
+        # for indexfile_input in indexfile_input_dict:
+        #     print indexfile_input
+
+        '''
+                                                                  .                o8o                                             
+                                                        .o8                `"'                                             
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'
+        888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'   
+        `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'    
+        `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'     
+        d"     YD                                                          888                                             
+        "Y88888P'                                                      .o. 88P                                             
+                                                                       `Y888P                                              
+        '''
+        # create input file for trjconv command
+        file_gmx_trjconv_input = open(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
+        file_gmx_trjconv_input.write("1\n0")
+
+        gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] +md_simulations_tpr_file +" -pbc mol -ur compact -o " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                             'mmpbsa_project_path'] + "merged-recentered.xtc -center -n "+config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] +md_simulations_ndx_file +" < "+config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + "gmx_trjconv_input.txt"
+
+        print gmx_trjconv
+
+        '''
+                                                                                          oooo                                                .o8              
+                                                                                  `888                                               "888              
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      ooo. .oo.  .oo.    .oooo.    888  oooo   .ooooo.              ooo. .oo.    .oooo888  oooo    ooo 
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'       `888P"Y88bP"Y88b  `P  )88b   888 .8P'   d88' `88b             `888P"Y88b  d88' `888   `88b..8P'  
+        888   888   888   888   888     Y888'          888   888   888   .oP"888   888888.    888ooo888              888   888  888   888     Y888'    
+        `88bod8P'   888   888   888   .o8"'88b         888   888   888  d8(  888   888 `88b.  888    .o              888   888  888   888   .o8"'88b   
+        `8oooooo.  o888o o888o o888o o88'   888o      o888o o888o o888o `Y888""8o o888o o888o `Y8bod8P' ooooooooooo o888o o888o `Y8bod88P" o88'   888o 
+        d"     YD                                                                                                                                      
+        "Y88888P'                                                                                                                                      
+        '''
+        if multiple_ligand_input:
+            #for multiple ligand input
+            print "for multiple ligand input"
+            #get user input ligand name from DB
+            key_name_ligand_input = 'mmpbsa_input_ligand'
+
+            ProjectToolEssentials_res_ligand_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_ligand_input).latest('entry_time')
+            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name = ligand_inputkey[:-4]
+                if "[ "+ligand_name+" ]" in indexfile_input_dict.keys():
+                    print indexfile_input_dict["[ "+ligand_name+" ]"]
+        else:
+            #for single ligand input
+            #get ligand name
+            ligand_name = ""
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name = ligand_inputkey[:-4]
+            #prepare input file for gmx make_ndx command
+            protein_index = 0
+            ligandname_index = 0
+            for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems(): # key is index option text and value is index number
+                if ligand_name in indexfile_inputkey:
+                    ligandname_index = indexfile_inputvalue
+                if "[ Protein ]" == indexfile_inputkey:
+                    protein_index = indexfile_inputvalue
+            maximum_key_ndx_input = max(indexfile_input_dict,key=indexfile_input_dict.get)
+            #print indexfile_input_dict[maximum_key_ndx_input]
+            receptor_index = indexfile_input_dict[maximum_key_ndx_input] +1
+            protien_ligand_complex_index = receptor_index + 1
+            file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
+            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex")
+            gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                               'mmpbsa_project_path'] + "complex_index.ndx <"+config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'md_simulations_path'] + "gmx_make_ndx_input.txt"
+
+            print " make index command"
+            print gmx_make_ndx
+
+
+
+
+        return JsonResponse({"success": True})
+
+        primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
+        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
+        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
+        primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
+        #MD simulations shared path
+        md_simulations_sharedpath = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' +"Analysis/mmpbsa" + '/')
+        print os.system("pwd")
+        print os.getcwd()
+        print "=========== title is =============="
+        print commandDetails_result.command_title
+
+
+        process_return = execute_command(primary_command_runnable,inp_command_id)
+
+        command_title_folder = commandDetails_result.command_title
 
         out, err = process_return.communicate()
         process_return.wait()
