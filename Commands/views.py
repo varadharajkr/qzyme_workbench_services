@@ -266,15 +266,20 @@ class analyse_mmpbsa(APIView):
         if multiple_ligand_input:
             #for multiple ligand input
             print "for multiple ligand input"
+            #get user input ligand name from DB
+            key_name_ligand_input = 'mmpbsa_input_ligand'
+
+            ProjectToolEssentials_res_ligand_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_ligand_input).latest('entry_time')
+            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            print (key, value) in CatMec_input_dict.viewitems()
         else:
             #for single ligand input
-            print "for single ligand input"
             #get ligand name
             ligand_name = ""
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
                 ligand_name = ligand_inputkey[:-4]
-            print "ligand name is ---"
-            print ligand_name
             #prepare input file for gmx make_ndx command
             protein_index = 0
             ligandname_index = 0
@@ -284,7 +289,7 @@ class analyse_mmpbsa(APIView):
                 if "[ Protein ]" == indexfile_inputkey:
                     protein_index = indexfile_inputvalue
             maximum_key_ndx_input = max(indexfile_input_dict,key=indexfile_input_dict.get)
-            print indexfile_input_dict[maximum_key_ndx_input]
+            #print indexfile_input_dict[maximum_key_ndx_input]
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] +1
             protien_ligand_complex_index = receptor_index + 1
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
@@ -297,7 +302,9 @@ class analyse_mmpbsa(APIView):
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                               'mmpbsa_project_path'] + "complex_index.ndx "
+                               'mmpbsa_project_path'] + "complex_index.ndx <"+config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'md_simulations_path'] + "gmx_make_ndx_input.txt"
 
             print " make index command"
             print gmx_make_ndx
