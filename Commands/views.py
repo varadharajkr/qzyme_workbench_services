@@ -96,6 +96,11 @@ class gromacs(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
+        
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
@@ -147,6 +152,11 @@ class pathanalysis(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
+
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
@@ -213,7 +223,10 @@ class get_activation_energy(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
         print(primary_command_runnable)
+
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
         print os.system("pwd")
         process_return = execute_command(primary_command_runnable,inp_command_id)
@@ -263,6 +276,10 @@ class mmpbsa(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
@@ -315,7 +332,10 @@ class Contact_Score(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
         print(primary_command_runnable)
+
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
         print os.system("pwd")
         process_return = execute_command(primary_command_runnable,inp_command_id)
@@ -436,6 +456,10 @@ class Complex_Simulations(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
         # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
         # ligand_name = QzwProjectEssentials_res.command_key
         # print "+++++++++++++++ligand name is++++++++++++"
@@ -539,6 +563,10 @@ class Literature_Research(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
         print os.system("pwd")
@@ -583,6 +611,11 @@ class MakeSubstitution(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
+
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
@@ -651,6 +684,10 @@ class NMA(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
+
         primary_command_runnable = re.sub("%tconcoord_python_filepath%",config.PATH_CONFIG['local_shared_folder_path'] +  project_name + '/' + commandDetails_result.command_tool + '/Tconcoord.py',primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_additional_dirpath%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tcc/',primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_input_filepath%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/input3.cpf', primary_command_runnable)
@@ -704,6 +741,9 @@ class Homology_Modelling(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
 
         primary_command_runnable = re.sub("%build_profile_python_file_path%", config.PATH_CONFIG[
             'shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
@@ -797,6 +837,9 @@ class Loop_Modelling(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
+
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
 
         primary_command_runnable = re.sub("%build_profile_python_file_path%", config.PATH_CONFIG[
             'shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
@@ -967,7 +1010,8 @@ class autodock(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
-
+        print('before replacing primary_command_runnable')
+        print(primary_command_runnable)
         #shared_scripts
         primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
         primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
