@@ -273,7 +273,10 @@ class analyse_mmpbsa(APIView):
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
             ligand_name = ProjectToolEssentials_res_ligand_input.values
-            print (key, value) in CatMec_input_dict.viewitems()
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name = ligand_inputkey[:-4]
+                if "[ "+ligand_name+" ]" in indexfile_input_dict.keys():
+                    print indexfile_input_dict.keys()[indexfile_input_dict.values("[ "+ligand_name+" ]")]
         else:
             #for single ligand input
             #get ligand name
