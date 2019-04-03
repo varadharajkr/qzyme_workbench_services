@@ -276,7 +276,7 @@ class analyse_mmpbsa(APIView):
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
                 ligand_name = ligand_inputkey[:-4]
                 if "[ "+ligand_name+" ]" in indexfile_input_dict.keys():
-                    print indexfile_input_dict.keys()[indexfile_input_dict.values("[ "+ligand_name+" ]")]
+                    print indexfile_input_dict["[ "+ligand_name+" ]"]
         else:
             #for single ligand input
             #get ligand name
@@ -286,7 +286,7 @@ class analyse_mmpbsa(APIView):
             #prepare input file for gmx make_ndx command
             protein_index = 0
             ligandname_index = 0
-            for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems(): #key is index option text and value is index number
+            for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems(): # key is index option text and value is index number
                 if ligand_name in indexfile_inputkey:
                     ligandname_index = indexfile_inputvalue
                 if "[ Protein ]" == indexfile_inputkey:
