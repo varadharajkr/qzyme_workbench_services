@@ -294,8 +294,16 @@ class analyse_mmpbsa(APIView):
             if "[ Protein ]" in indexfile_input_dict.keys():
                 indexfile_complex_option_input += str(indexfile_input_dict["[ Protein ]"])
                 indexfile_receptor_option_input += str(indexfile_input_dict["[ Protein ]"])
-            print indexfile_complex_option_input
-            print indexfile_receptor_option_input
+            #reverse the strings
+            indexfile_complex_option_input = indexfile_complex_option_input.split(" | ")
+            indexfile_complex_option_input = indexfile_complex_option_input[-1::-1]
+            reversed_indexfile_complex_option_input = ' | '.join(indexfile_complex_option_input)
+
+            indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
+            indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
+            reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
+            print reversed_indexfile_complex_option_input
+            print reversed_indexfile_receptor_option_input
         else:
             #for single ligand input
             #get ligand name
