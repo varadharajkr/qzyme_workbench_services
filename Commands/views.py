@@ -279,7 +279,13 @@ class analyse_mmpbsa(APIView):
                                                            key_name=key_name_ligand_input).latest('entry_time')
             ligand_name = ProjectToolEssentials_res_ligand_input.values
             indexfile_complex_option_input = ""
-
+            indexfile_receptor_option_input = ""
+            #prepare receptor option input string
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                dict_ligand_name = ligand_inputkey[:-4]
+                if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys() and dict_ligand_name != ligand_name:
+                    indexfile_receptor_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
+             #prepare complex option input string
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
                 dict_ligand_name = ligand_inputkey[:-4]
                 if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys():
@@ -287,7 +293,9 @@ class analyse_mmpbsa(APIView):
 
             if "[ Protein ]" in indexfile_input_dict.keys():
                 indexfile_complex_option_input += str(indexfile_input_dict["[ Protein ]"])
+                indexfile_receptor_option_input += str(indexfile_input_dict["[ Protein ]"])
             print indexfile_complex_option_input
+            print indexfile_receptor_option_input
         else:
             #for single ligand input
             #get ligand name
