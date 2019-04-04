@@ -304,6 +304,14 @@ class analyse_mmpbsa(APIView):
             reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
             print reversed_indexfile_complex_option_input
             print reversed_indexfile_receptor_option_input
+            maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
+            receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
+            protien_ligand_complex_index = receptor_index + 1
+            file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                               'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
+            file_gmx_make_ndx_input.write(
+                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex")
         else:
             #for single ligand input
             #get ligand name
