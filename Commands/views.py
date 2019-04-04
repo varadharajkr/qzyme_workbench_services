@@ -283,10 +283,10 @@ class analyse_mmpbsa(APIView):
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
                 dict_ligand_name = ligand_inputkey[:-4]
                 if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys():
-                    indexfile_complex_option_input += indexfile_input_dict["[ "+dict_ligand_name+" ]"] +" | "
+                    indexfile_complex_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
 
             if "[ Protein ]" in indexfile_input_dict.keys():
-                indexfile_complex_option_input += indexfile_input_dict["[ Protein ]"]
+                indexfile_complex_option_input += str(indexfile_input_dict["[ Protein ]"])
             print indexfile_complex_option_input
         else:
             #for single ligand input
