@@ -203,8 +203,8 @@ class analyse_mmpbsa(APIView):
         print xtcfile_input_dict
         for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
             print xtcfile_inputvalue
-        #for count,(xtcfile_inputkey, xtcfile_inputvalue) in enumerate(xtcfile_input_dict.iteritems(),1):
-        #   print count
+        for count,(xtcfile_inputkey, xtcfile_inputvalue) in enumerate(xtcfile_input_dict.iteritems(),1):
+            print count
         return True
         '''
                                                                   .                o8o                         .        
