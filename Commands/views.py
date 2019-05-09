@@ -199,7 +199,13 @@ class analyse_mmpbsa(APIView):
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
 
-
+        print "xtc file dict"
+        print xtcfile_input_dict
+        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
+            print xtcfile_inputvalue
+        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems()[:0]:
+            print xtcfile_inputvalue
+        return True
         '''
                                                                   .                o8o                         .        
                                                         .o8                `"'                       .o8        
@@ -312,6 +318,17 @@ class analyse_mmpbsa(APIView):
                                                'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
             file_gmx_make_ndx_input.write(
                 str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex")
+
+
+            gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                               'mmpbsa_project_path'] + "index.ndx <" + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'md_simulations_path'] + "gmx_make_ndx_input.txt"
         else:
             #for single ligand input
             #get ligand name
