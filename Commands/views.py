@@ -202,7 +202,7 @@ class analyse_mmpbsa(APIView):
         #loop thru dict with loop count
         #for count,(xtcfile_inputkey, xtcfile_inputvalue) in enumerate(xtcfile_input_dict.iteritems(),1):
 
-        #move MD .tpr file to MMPBSA working directory
+        #copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                           'md_simulations_path'] +md_simulations_tpr_file
@@ -212,13 +212,20 @@ class analyse_mmpbsa(APIView):
 
         shutil.copyfile(source_tpr_md_file,  dest_tpr_md_file)
 
-        # move topology file from MS to MMPBSA working directory
+        # copy topology file from MS to MMPBSA working directory
         source_topology_file = config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/topology.top"
+                          'md_simulations_path'] +tpr_file_split[0]+"/topol.top"
         dest_topology_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] +"topology.top"
+                            config.PATH_CONFIG['mmpbsa_project_path'] +"topol.top"
         shutil.copyfile(source_topology_file,dest_topology_file)
+
+        #copy ligand .itp files
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            print "ligabd-------------------------------key"
+            print ligand_inputkey
+            print "ligand --------------------------------value"
+            print ligand_inputvalue
         return True
         '''
                                                                   .                o8o                         .        
