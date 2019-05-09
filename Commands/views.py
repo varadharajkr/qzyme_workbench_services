@@ -199,12 +199,16 @@ class analyse_mmpbsa(APIView):
         indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
         xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
 
-        print "xtc file dict"
-        print xtcfile_input_dict
-        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
-            print xtcfile_inputvalue
-        for count,(xtcfile_inputkey, xtcfile_inputvalue) in enumerate(xtcfile_input_dict.iteritems(),1):
-            print count
+        #loop thru dict with loop count
+        #for count,(xtcfile_inputkey, xtcfile_inputvalue) in enumerate(xtcfile_input_dict.iteritems(),1):
+
+        #move MD .tpr file to MMPBSA
+        source_tpr_md_file = config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] +md_simulations_tpr_file
+        dest_tpr_md_file =config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                      config.PATH_CONFIG['mmpbsa_project_path'] +md_simulations_tpr_file
+        shutil.move( source_tpr_md_file,  dest_tpr_md_file)
         return True
         '''
                                                                   .                o8o                         .        
