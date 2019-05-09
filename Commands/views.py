@@ -210,7 +210,7 @@ class analyse_mmpbsa(APIView):
         dest_tpr_md_file =config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                       config.PATH_CONFIG['mmpbsa_project_path'] +tpr_file_split[1]
 
-        shutil.copy2(source_tpr_md_file,  dest_tpr_md_file)
+        shutil.copyfile(source_tpr_md_file,  dest_tpr_md_file)
 
         # move topology file from MS to MMPBSA working directory
         source_topology_file = config.PATH_CONFIG[
@@ -218,7 +218,7 @@ class analyse_mmpbsa(APIView):
                           'md_simulations_path'] +"topology.top"
         dest_topology_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                             config.PATH_CONFIG['mmpbsa_project_path'] +"topology.top"
-        shutil.copy2(source_topology_file,dest_topology_file)
+        shutil.copyfile(source_topology_file,dest_topology_file)
         return True
         '''
                                                                   .                o8o                         .        
