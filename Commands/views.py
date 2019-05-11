@@ -331,47 +331,7 @@ class analyse_mmpbsa(APIView):
             print gmx_make_ndx
             os.system(gmx_make_ndx)
 
-        '''
-                                                                          .                o8o                                             
-                                                                .o8                `"'                                             
-                 .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo
-                888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'
-                888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'   
-                `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'    
-                `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'     
-                d"     YD                                                          888                                             
-                "Y88888P'                                                      .o. 88P                                             
-                                                                               `Y888P                                              
-                '''
-        # create input file for trjconv command
-        file_gmx_trjconv_input = open(config.PATH_CONFIG[
-                                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                                          'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
-        file_gmx_trjconv_input.write("1 \n24 \n ")
-        time.sleep(3)
-        '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                      config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
-                      config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                          'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + "gmx_trjconv_input.txt"'''
-
-        os.system("gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                      config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
-                      config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                          'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + "gmx_trjconv_input.txt")
+        perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file)
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
@@ -490,6 +450,49 @@ class analyse_mmpbsa(APIView):
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
+
+def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
+    '''
+                                                                              .                o8o
+                                                                    .o8                `"'
+                     .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo
+                    888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'
+                    888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'
+                    `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'
+                    `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'
+                    d"     YD                                                          888
+                    "Y88888P'                                                      .o. 88P
+                                                                                   `Y888P
+                    '''
+    # create input file for trjconv command
+    file_gmx_trjconv_input = open(config.PATH_CONFIG[
+                                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                      'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
+    file_gmx_trjconv_input.write("1 \n24 \n ")
+    time.sleep(3)
+    '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+                  config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                      'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + "gmx_trjconv_input.txt"'''
+
+    os.system("gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+              config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                  'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'md_simulations_path'] + "gmx_trjconv_input.txt")
 
 def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input):
 
