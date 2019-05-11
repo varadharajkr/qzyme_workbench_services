@@ -362,7 +362,7 @@ class analyse_mmpbsa(APIView):
             print " make index command"
             print gmx_make_ndx
             os.system(gmx_make_ndx)
-
+        return True
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
