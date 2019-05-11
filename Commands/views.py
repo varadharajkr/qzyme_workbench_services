@@ -347,9 +347,9 @@ class analyse_mmpbsa(APIView):
         file_gmx_trjconv_input = open(config.PATH_CONFIG[
                                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                           'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
-        file_gmx_trjconv_input.write("1\n24\n")
+        file_gmx_trjconv_input.write("1 \n24 \n ")
         time.sleep(3)
-        gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+        '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                       config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                           'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
@@ -359,9 +359,19 @@ class analyse_mmpbsa(APIView):
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                           'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] + "gmx_trjconv_input.txt"
+                          'md_simulations_path'] + "gmx_trjconv_input.txt"'''
 
-        os.system(gmx_trjconv)
+        os.system("gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+                      config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                          'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'md_simulations_path'] + "gmx_trjconv_input.txt")
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
