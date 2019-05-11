@@ -245,6 +245,9 @@ class analyse_mmpbsa(APIView):
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
             ligand_name = ProjectToolEssentials_res_ligand_input.values
+            #extract ligand number
+            if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
+                ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
             indexfile_complex_option_input = ""
             indexfile_receptor_option_input = ""
             #prepare receptor option input string
@@ -275,11 +278,12 @@ class analyse_mmpbsa(APIView):
             maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
             protien_ligand_complex_index = receptor_index + 1
+            ligand_name_index = protien_ligand_complex_index + 1
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                                'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
             file_gmx_make_ndx_input.write(
-                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\nq\n")
+                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\n"+str(ligand_name_input)+"\nname "+str(ligand_name_index)+" ligand"+ "\nq\n")
             file_gmx_make_ndx_input.close()
 
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
