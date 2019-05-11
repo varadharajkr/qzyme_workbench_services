@@ -255,8 +255,9 @@ class analyse_mmpbsa(APIView):
                         'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                         'md_simulations_path'] + "gmx_trjconv_input.txt"
 
+        print gmx_trjconv
         os.system(gmx_trjconv)
-        #print gmx_trjconv
+        return True
 
         '''
                                                                                           oooo                                                .o8              
