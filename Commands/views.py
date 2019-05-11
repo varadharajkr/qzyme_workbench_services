@@ -257,7 +257,7 @@ class analyse_mmpbsa(APIView):
 
         print gmx_trjconv
         os.system(gmx_trjconv)
-
+        return True
         '''
                                                                                           oooo                                                .o8              
                                                                                   `888                                               "888              
