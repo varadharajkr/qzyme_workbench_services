@@ -501,8 +501,9 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             if line.strip() == '[ bonds ]':
                 break
             count_line += 1
-            line_list.append(line)  # line[:-1]
-    atoms_final_count = line_list[-2].split()[0]
+            if line not in ['\n', '\r\n']: # remove new lines and empty lines
+                line_list.append(line)  # line[:-1]
+    atoms_final_count = line_list[-1].split()[0]
     #==================== End of get ATOMS final count  ===========================
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
         if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
