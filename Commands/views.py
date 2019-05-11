@@ -222,9 +222,6 @@ class analyse_mmpbsa(APIView):
             'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                              'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
         os.system(gmx_trjcat_cmd)
-        #print gmx_trjcat_cmd
-        # for indexfile_input in indexfile_input_dict:
-        #     print indexfile_input
 
         '''
                                                                   .                o8o                                             
@@ -255,9 +252,7 @@ class analyse_mmpbsa(APIView):
                         'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                         'md_simulations_path'] + "gmx_trjconv_input.txt"
 
-        print gmx_trjconv
-        #os.system(gmx_trjconv)
-        return True
+        os.system(gmx_trjconv)
         '''
                                                                                           oooo                                                .o8              
                                                                                   `888                                               "888              
