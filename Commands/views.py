@@ -323,6 +323,10 @@ class analyse_mmpbsa(APIView):
                                'mmpbsa_project_path'] + "index.ndx <" + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + "gmx_make_ndx_input.txt"
+
+            print " make index command"
+            print gmx_make_ndx
+            os.system(gmx_make_ndx)
         else:
             #for single ligand input
             #get ligand name
@@ -357,7 +361,7 @@ class analyse_mmpbsa(APIView):
 
             print " make index command"
             print gmx_make_ndx
-
+            os.system(gmx_make_ndx)
 
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
