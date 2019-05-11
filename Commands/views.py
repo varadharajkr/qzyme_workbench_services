@@ -528,7 +528,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     line_list = []
     with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/topol.top") as topol_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/topol1.top") as topol_file:
         for line in topol_file:
             if line.strip() == '[ atoms ]':  # start from atoms section
                 break
