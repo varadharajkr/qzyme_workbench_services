@@ -775,6 +775,25 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                             config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
+    #--------------------   update INPUT.dat file ---------------------------------
+    new_input_lines = ""
+    itp_ligand = "ligand.itp"
+    itp_receptor = "complex.itp"
+    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                            config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat") as mmpbsa_input_file:
+        for line in mmpbsa_input_file:
+            if ("\titp_ligand" in line):
+                line = "\titp_ligand  " + itp_ligand + "\n"
+                new_input_lines += line
+            elif ("\titp_receptor" in line):
+                line = "\titp_receptor  " + itp_receptor + "\n"
+                new_input_lines += line
+            else:
+                new_input_lines += line
+
+    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                            config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat", "w") as mmpbsa_input_file_update:
+        mmpbsa_input_file_update.write(new_input_lines)
 
 class pathanalysis(APIView):
     def get(self,request):
