@@ -25,6 +25,7 @@ import re
 import config
 import os
 import ast
+import time
 import glob
 import urllib2
 import json
@@ -240,7 +241,7 @@ class analyse_mmpbsa(APIView):
                         'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                         'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
         file_gmx_trjconv_input.write("1\n24\n")
-
+        time.sleep(3)
         gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                       config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
