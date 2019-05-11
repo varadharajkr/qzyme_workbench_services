@@ -257,7 +257,7 @@ class analyse_mmpbsa(APIView):
 
         print gmx_trjconv
         os.system(gmx_trjconv)
-        
+
         '''
                                                                                           oooo                                                .o8              
                                                                                   `888                                               "888              
@@ -322,7 +322,7 @@ class analyse_mmpbsa(APIView):
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                               'mmpbsa_project_path'] + "index.ndx <" + config.PATH_CONFIG[
+                               'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + "gmx_make_ndx_input.txt"
 
