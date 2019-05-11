@@ -403,7 +403,7 @@ class analyse_mmpbsa(APIView):
                         config.PATH_CONFIG['mmpbsa_project_path'] + "trial/npt.xtc")
 
         # copy other input files for MMPBSA
-        for file_name in os.listdir(+config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+        for file_name in os.listdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path']):
             # copy .TPR file
             if file_name.endswith(".tpr"):
