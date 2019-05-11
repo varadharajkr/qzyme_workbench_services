@@ -365,7 +365,8 @@ class analyse_mmpbsa(APIView):
         key_name_ligand_input = 'mmpbsa_input_ligand'
         # processing itp files
         pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input)
-        # make a "trail" directory for MMPBSA
+
+        # ----------------------   make a "trail" directory for MMPBSA   -----------------------
         os.system("mkdir " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                   config.PATH_CONFIG['mmpbsa_project_path'] + "trial")
         # copying MMPBSA input files to trail directory
@@ -390,6 +391,13 @@ class analyse_mmpbsa(APIView):
                                 config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
                                 config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                 config.PATH_CONFIG['mmpbsa_project_path'] + "trial/index.ndx")
+
+            # copy .TOP file
+            if file_name.endswith(".top"):
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/"+file_name)
             # copy .ITP files
             if file_name.endswith(".itp"):
                 # renaming user input ligand as LIGAND
@@ -410,11 +418,12 @@ class analyse_mmpbsa(APIView):
                                     config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
 
-
-
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                                    config.PATH_CONFIG['mmpbsa_project_path'])
+        os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
         return JsonResponse({"success": True})
 
-        primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
+        '''primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
         primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
@@ -449,7 +458,7 @@ class analyse_mmpbsa(APIView):
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
             update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})'''
 
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):

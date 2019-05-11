@@ -23,7 +23,10 @@ PATH_CONFIG ={
 'mmtsb_path':"/home/qzyme/toolset/perl/",
 'shared_scripts':"/home/qzyme/Desktop/Windows-Share/QZW-scripts/",
 'mmpbsa_project_path':'Analysis/MMPBSA/',
-'md_simulations_path':'CatMec/MD_Simulation/'
+'md_simulations_path':'CatMec/MD_Simulation/',
+'GMX_run_file_one': '/home/GMXPBSAtool/gmxpbsa0.sh',
+'GMX_run_file_two': '/home/GMXPBSAtool/gmxpbsa1.sh',
+'GMX_run_file_three': '/home/GMXPBSAtool/gmxpbsa2.sh'
 }
 
 CONSTS ={
