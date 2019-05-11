@@ -416,6 +416,10 @@ class analyse_mmpbsa(APIView):
                                     config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
                                     config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'] + "trial/ligand.itp")
+                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                                    config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                    config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                                    config.PATH_CONFIG['mmpbsa_project_path'] + "trial/"+file_name)
                 else:
                     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
