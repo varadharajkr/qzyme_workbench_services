@@ -254,6 +254,7 @@ class analyse_mmpbsa(APIView):
                         'md_simulations_path'] + "gmx_trjconv_input.txt"
 
         print os.system(gmx_trjconv)
+        return True
         '''
                                                                                           oooo                                                .o8              
                                                                                   `888                                               "888              
