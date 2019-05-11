@@ -280,7 +280,7 @@ class analyse_mmpbsa(APIView):
                                                'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
             file_gmx_make_ndx_input.write(
                 str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\nq\n")
-
+            file_gmx_make_ndx_input.close()
 
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
@@ -317,6 +317,7 @@ class analyse_mmpbsa(APIView):
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
             file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex")
+            file_gmx_make_ndx_input.close()
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
@@ -469,6 +470,7 @@ def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simu
                                       'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                       'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
     file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.close()
     time.sleep(3)
     '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                   config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
