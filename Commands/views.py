@@ -311,7 +311,7 @@ class analyse_mmpbsa(APIView):
                                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                                'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
             file_gmx_make_ndx_input.write(
-                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex")
+                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\nq\n")
 
 
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
@@ -326,7 +326,7 @@ class analyse_mmpbsa(APIView):
 
             print " make index command"
             print gmx_make_ndx
-            #os.system(gmx_make_ndx)
+            os.system(gmx_make_ndx)
         else:
             #for single ligand input
             #get ligand name
@@ -361,8 +361,7 @@ class analyse_mmpbsa(APIView):
 
             print " make index command"
             print gmx_make_ndx
-            #os.system(gmx_make_ndx)
-        return True
+            os.system(gmx_make_ndx)
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
