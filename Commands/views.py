@@ -221,7 +221,7 @@ class analyse_mmpbsa(APIView):
         gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                              'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
-        print gmx_trjcat_cmd
+        #print gmx_trjcat_cmd
         # for indexfile_input in indexfile_input_dict:
         #     print indexfile_input
 
@@ -254,7 +254,7 @@ class analyse_mmpbsa(APIView):
                         'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                         'md_simulations_path'] + "gmx_trjconv_input.txt"
 
-        print gmx_trjconv
+        #print gmx_trjconv
 
         '''
                                                                                           oooo                                                .o8              
@@ -326,7 +326,7 @@ class analyse_mmpbsa(APIView):
 
             print " make index command"
             print gmx_make_ndx
-            os.system(gmx_make_ndx)
+            #os.system(gmx_make_ndx)
         else:
             #for single ligand input
             #get ligand name
@@ -361,7 +361,7 @@ class analyse_mmpbsa(APIView):
 
             print " make index command"
             print gmx_make_ndx
-            os.system(gmx_make_ndx)
+            #os.system(gmx_make_ndx)
         return True
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
