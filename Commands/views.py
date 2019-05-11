@@ -242,7 +242,7 @@ class analyse_mmpbsa(APIView):
         file_gmx_trjconv_input = open(config.PATH_CONFIG[
                         'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                         'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
-        file_gmx_trjconv_input.write("1\n24")
+        file_gmx_trjconv_input.write("1\n24\n")
 
         gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                       config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
