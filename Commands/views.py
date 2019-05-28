@@ -366,6 +366,7 @@ class analyse_mmpbsa(APIView):
                             config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
             shutil.copyfile(source_itp_file, dest_itp_file)
 
+
         key_name_ligand_input = 'mmpbsa_input_ligand'
         # processing itp files
         pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input)
@@ -1079,7 +1080,9 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(project_id,project_name,command_tool,command_title):
+def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool='CatMec/MD_Simulation',command_title=""):
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
     print "inside md_simulation_preparation function"
     key_name = 'md_simulation_no_of_runs'
 
@@ -1091,7 +1094,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/CatMec/MD_Simulation/'
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -1177,7 +1180,7 @@ class Complex_Simulations(APIView):
             primary_command_runnable = re.sub('%SOL_value%',group_value,
                                               primary_command_runnable)
         if commandDetails_result.command_title == "md_run":
-            md_simulation_preparation(project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
+            md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
             # print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # os.system("rm "+dir_value+"/index.ndx")
@@ -2042,7 +2045,7 @@ class CatMec(APIView):
             print (os.getcwd())
             if commandDetails_result.command_title == "md_run":
                 primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-                md_simulation_preparation(project_id, project_name, commandDetails_result.command_tool,
+                md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title)
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
@@ -2195,6 +2198,52 @@ class CatMec(APIView):
 
 
 
+class Designer(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        command_tool_title = commandDetails_result.command_title
+        command_tool = commandDetails_result.command_tool
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
+        print os.system("pwd")
+        primary_command_runnable = commandDetails_result.primary_command
+        if primary_command_runnable.strip() == "python run_md.py":
+            #execute MD simulations
+            primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
+            md_simulation_preparation(inp_command_id,project_id, project_name, command_tool = commandDetails_result.command_tool,
+                                      command_title = commandDetails_result.command_title)
+
+        else:
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+
+        print "execute command"
+        out, err = process_return.communicate()
+        process_return.wait()
+        if process_return.returncode == 0:
+            print "output of out is"
+            print out
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+        if process_return.returncode != 0:
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
 #alter grid.gpf file with respective .PDBQT file paths
 def process_grid_file(commandDetails_result,QzwProjectDetails_res,request):
