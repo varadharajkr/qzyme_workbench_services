@@ -1080,7 +1080,9 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(project_id,project_name,command_tool='CatMec/MD_Simulation',command_title=""):
+def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool='CatMec/MD_Simulation',command_title=""):
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
     print "inside md_simulation_preparation function"
     key_name = 'md_simulation_no_of_runs'
 
@@ -1178,7 +1180,7 @@ class Complex_Simulations(APIView):
             primary_command_runnable = re.sub('%SOL_value%',group_value,
                                               primary_command_runnable)
         if commandDetails_result.command_title == "md_run":
-            md_simulation_preparation(project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
+            md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
             # print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # os.system("rm "+dir_value+"/index.ndx")
@@ -2053,7 +2055,7 @@ class CatMec(APIView):
             print (os.getcwd())
             if commandDetails_result.command_title == "md_run":
                 primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-                md_simulation_preparation(project_id, project_name, commandDetails_result.command_tool,
+                md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title)
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
@@ -2226,15 +2228,12 @@ class Designer(APIView):
         if primary_command_runnable.strip() == "python run_md.py":
             #execute MD simulations
             primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-            md_simulation_preparation(project_id, project_name, command_tool = commandDetails_result.command_tool,
+            md_simulation_preparation(inp_command_id,project_id, project_name, command_tool = commandDetails_result.command_tool,
                                       command_title = commandDetails_result.command_title)
-            process_return = Popen(
-                args=primary_command_runnable,
-                stdout=PIPE,
-                stderr=PIPE,
-                shell=True
-            )
+
         else:
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
