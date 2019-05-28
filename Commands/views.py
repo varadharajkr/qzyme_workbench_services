@@ -1092,7 +1092,10 @@ def md_simulation_preparation(project_id,project_name,command_tool='CatMec/MD_Si
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool +"/"
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"
+    print "source_file_path-------------------------------"
+    print source_file_path
+    return True
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
