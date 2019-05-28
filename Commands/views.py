@@ -366,6 +366,7 @@ class analyse_mmpbsa(APIView):
                             config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
             shutil.copyfile(source_itp_file, dest_itp_file)
 
+
         key_name_ligand_input = 'mmpbsa_input_ligand'
         # processing itp files
         pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input)
@@ -2204,6 +2205,24 @@ class CatMec(APIView):
                 return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+
+class Designer(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        command_tool_title = commandDetails_result.command_title
+        command_tool = commandDetails_result.command_tool
+        print "commandDetails_result"
+        print commandDetails_result.primary_command
+        print "command_tool_title"
+        print command_tool_title
+        print "command_tool"
+        print command_tool
 
 
 #alter grid.gpf file with respective .PDBQT file paths
