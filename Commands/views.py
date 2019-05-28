@@ -2034,20 +2034,10 @@ class CatMec(APIView):
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
-            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
+            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(ppartial_charge_selection_nameroject_id=project_id)
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
             # print ligand_name
-
-            primary_command_runnable = re.sub("%input_folder_name%", config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
-            primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
-            primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
             print (os.getcwd())
             if commandDetails_result.command_title == "md_run":
