@@ -1080,7 +1080,7 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(project_id,project_name,command_tool,command_title):
+def md_simulation_preparation(project_id,project_name,command_tool='/CatMec/MD_Simulation/',command_title=""):
     print "inside md_simulation_preparation function"
     key_name = 'md_simulation_no_of_runs'
 
@@ -1092,7 +1092,7 @@ def md_simulation_preparation(project_id,project_name,command_tool,command_title
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/CatMec/MD_Simulation/'
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + command_tool
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -2223,12 +2223,25 @@ class Designer(APIView):
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
         print os.system("pwd")
         primary_command_runnable = commandDetails_result.primary_command
-        process_return = Popen(
-            args=primary_command_runnable,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True
-        )
+        if primary_command_runnable.strip() == "python run_md.py":
+            #execute MD simulations
+            primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
+            md_simulation_preparation(project_id, project_name, command_tool = commandDetails_result.command_tool,
+                                      command_title = commandDetails_result.command_title)
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+        else:
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+
         print "execute command"
         out, err = process_return.communicate()
         process_return.wait()
