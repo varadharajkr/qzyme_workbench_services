@@ -2217,13 +2217,31 @@ class Designer(APIView):
         project_id = commandDetails_result.project_id
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
-        print "commandDetails_result"
-        print commandDetails_result.primary_command
-        print "command_tool_title"
-        print command_tool_title
-        print "command_tool"
-        print command_tool
-
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
+        print os.system("pwd")
+        primary_command_runnable = commandDetails_result.primary_command
+        process_return = Popen(
+            args=primary_command_runnable,
+            stdout=PIPE,
+            stderr=PIPE,
+            shell=True
+        )
+        print "execute command"
+        out, err = process_return.communicate()
+        process_return.wait()
+        if process_return.returncode == 0:
+            print "output of out is"
+            print out
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+        if process_return.returncode != 0:
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
 #alter grid.gpf file with respective .PDBQT file paths
 def process_grid_file(commandDetails_result,QzwProjectDetails_res,request):
