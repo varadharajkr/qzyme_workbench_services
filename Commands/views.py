@@ -1758,6 +1758,14 @@ class autodock(APIView):
         print command_tool_title_split
         if(command_tool_title_split[0] == "nma"):
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+
+        elif(command_tool_title_split[0] == "tconcord_dlg"):
+            enzyme_file_key = 'autodock_nma_final_protein_conformation'
+            ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
+                project_id=project_id, key_name=enzyme_file_key)
+            nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
+            nma_path = nma_enzyme_file[:-4]
+            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
         print "working directory after changing CHDIR"
