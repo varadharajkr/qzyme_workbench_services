@@ -24,6 +24,8 @@ import shutil
 import re
 import config
 import os
+from os import listdir
+import errno
 import ast
 import time
 import glob
@@ -278,6 +280,15 @@ class analyse_mmpbsa(APIView):
             maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
             protien_ligand_complex_index = receptor_index + 1
+            #write protien ligand complex index number to DB
+            entry_time = datetime.now()
+            key_name_protien_ligand_complex_index = 'mmpbsa_index_file_protien_ligand_complex_number'
+            ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
+                                                                                      project_id=project_id,
+                                                                                      key_name=key_name_protien_ligand_complex_index,
+                                                                                      values=protien_ligand_complex_index,
+                                                                                      entry_time=entry_time)
+            result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             ligand_name_index = protien_ligand_complex_index + 1
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
@@ -299,6 +310,7 @@ class analyse_mmpbsa(APIView):
             print " make index command"
             print gmx_make_ndx
             os.system(gmx_make_ndx)
+
         else:
             #for single ligand input
             #get ligand name
@@ -430,6 +442,8 @@ class analyse_mmpbsa(APIView):
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'])
         os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
         return JsonResponse({"success": True})
 
         '''primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
@@ -513,6 +527,7 @@ def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simu
                   'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                   'md_simulations_path'] + "gmx_trjconv_input.txt")
+
 
 def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input):
 
@@ -831,6 +846,371 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                             config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat", "w") as mmpbsa_input_file_update:
         mmpbsa_input_file_update.write(new_input_lines)
 
+
+#Designer trajconv
+def perform__designer_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
+    '''
+                                                                              .                o8o
+                                                                    .o8                `"'
+                     .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .ooooo.  ooo. .oo.   oooo    ooo
+                    888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 d88' `88b `888P"Y88b   `88.  .8'
+                    888   888   888   888   888     Y888'           888    888         888 888       888   888  888   888    `88..8'
+                    `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 888   888  888   888     `888'
+                    `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y8bod8P' o888o o888o     `8'
+                    d"     YD                                                          888
+                    "Y88888P'                                                      .o. 88P
+                                                                                   `Y888P
+                    '''
+    # create input file for trjconv command
+    file_gmx_trjconv_input = open(config.PATH_CONFIG[
+                                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                      'designer_md_simulations_path'] + "gmx_trjconv_input.txt", "w")
+    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.close()
+    time.sleep(3)
+    '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+                  config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                      'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + "gmx_trjconv_input.txt"'''
+
+    os.system("gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+              config.PATH_CONFIG['designer_mmpbsa_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'designer_md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/Designer/' + config.PATH_CONFIG[
+                  'designer_mmpbsa_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'designer_md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                  'designer_md_simulations_path'] + "gmx_trjconv_input.txt")
+
+#designer module process mmpbsa input file
+def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input):
+
+    #=======================  get user input ligand  ============================
+    ProjectToolEssentials_res_ligand_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_ligand_input).latest('entry_time')
+    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    #======================= End of get user input ligand  ======================
+
+
+    #==================  get [ ATOMS ] section final atom count  =================
+    count_line = 0
+    line_list = []
+    with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/topol.top") as topol_file:
+        for line in topol_file:
+            if line.strip() == '[ atoms ]':  # start from atoms section
+                break
+        for line in topol_file:  # End at bonds sections
+            if line.strip() == '[ bonds ]':
+                break
+            count_line += 1
+            if line not in ['\n', '\r\n']: # remove new lines and empty lines
+                line_list.append(line)  # line[:-1]
+    atoms_final_count = line_list[-1].split()[0]
+    #==================== End of get ATOMS final count  ===========================
+    for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+            initial_text_content = ""
+            topology_file_atoms_content = ""
+            topology_file_bonds_content = ""
+            topology_file_pairs_content = ""
+            topology_file_angles_content = ""
+            topology_file_dihedrals_content = ""
+            topology_content_atoms = ""
+            topology_content_bonds = ""
+            topology_content_pairs = ""
+            topology_content_angles = ""
+            topology_content_dihedrals = ""
+            topology_initial_content = ""
+
+            atoms_lastcount = atoms_final_count
+            # initial_text_content = initial_text_content+itp_file_inp[:-4]
+            with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ atoms ]':
+                        initial_text_content += line2
+                        break
+                    initial_text_content += line2
+                for line2 in itp_file:
+                    if line2.strip() == '[ bonds ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            atoms_lastcount = int(line2.split()[0]) + int(atoms_final_count)
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_atoms_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_atoms_content += line2
+                    except IndexError:
+                        pass
+
+            # append edited data fo bonds section
+            with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ bonds ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ pairs ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_bonds_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_bonds_content += line2
+                    except IndexError:
+                        pass
+
+            # append edited data for pairs section
+            with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ pairs ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ angles ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_pairs_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_pairs_content += line2
+                    except IndexError:
+                        pass
+
+                        # append edited data for angles section
+            with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ angles ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_angles_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_angles_content += line2
+                    except IndexError:
+                        pass
+
+                        # apend edited data for dihedrals section
+            with open(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        initial_text_content += "\n" + line2
+                        break
+
+                for line2 in itp_file:
+                    if line2.strip() == '\n':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[3] + " ",
+                                                  str(int(line2.split()[3]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_dihedrals_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_dihedrals_content += line2
+                    except IndexError:
+                        pass
+
+            # ================================================================================================
+            # ====================================== TOPOLOGY FILE ===========================================
+            # ================================================================================================
+            # write respective contents to topology file
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ atoms ]':
+                        topology_content_atoms += line2
+                        break
+                    topology_initial_content += line2
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_atoms += "    " + line2
+                        else:
+                            topology_content_atoms += line2
+                    except IndexError:
+                        pass
+
+            # ===================  bonds content  ===========================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ bonds ]':
+                        topology_content_bonds += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_bonds += "    " + line2
+                        else:
+                            topology_content_bonds += line2
+                    except IndexError:
+                        pass
+
+            # ==================   pairs content  ===============================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ pairs ]':
+                        topology_content_pairs += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_pairs += "    " + line2
+                        else:
+                            topology_content_pairs += line2
+                    except IndexError:
+                        pass
+
+            # =======================   angles content   ==============================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ pairs ]':
+                        topology_content_angles += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_angles += "    " + line2
+                        else:
+                            topology_content_angles += line2
+                    except IndexError:
+                        pass
+
+            # ======================   dihedrals content   ========================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        topology_content_dihedrals += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if line2.strip() == "\n":
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_dihedrals += "    " + line2
+                        else:
+                            topology_content_dihedrals += line2
+                    except IndexError:
+                        pass
+            print "adding topology file contents are"
+            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+ "complex.itp", "w") as new_topology_file:
+                new_topology_file.write(topology_initial_content + "\n" +
+                                        topology_content_atoms + topology_file_atoms_content + "\n" +
+                                        topology_content_bonds + topology_file_bonds_content + "\n" +
+                                        topology_content_pairs + topology_file_pairs_content + "\n" +
+                                        topology_content_angles + topology_file_angles_content + "\n" +
+                                        topology_content_dihedrals + topology_file_dihedrals_content)
+
+            atoms_final_count = atoms_lastcount
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+                new_itp_file.write(initial_text_content)
+
+    #--------------------   update INPUT.dat file ---------------------------------
+    new_input_lines = ""
+    itp_ligand = "ligand.itp"
+    itp_receptor = "complex.itp"
+    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+"INPUT.dat") as mmpbsa_input_file:
+        for line in mmpbsa_input_file:
+            if ("\titp_ligand" in line):
+                line = "\titp_ligand  " + itp_ligand + "\n"
+                new_input_lines += line
+            elif ("\titp_receptor" in line):
+                line = "\titp_receptor  " + itp_receptor + "\n"
+                new_input_lines += line
+            else:
+                new_input_lines += line
+
+    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path']+"INPUT.dat", "w") as mmpbsa_input_file_update:
+        mmpbsa_input_file_update.write(new_input_lines)
+
+
 class pathanalysis(APIView):
     def get(self,request):
         pass
@@ -843,63 +1223,72 @@ class pathanalysis(APIView):
         project_id = commandDetails_result.project_id
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
-        primary_command_runnable = commandDetails_result.primary_command
-        status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id)
 
-        print('before replacing primary_command_runnable')
-        print(primary_command_runnable)
+        # Path analysis for CatMec and Designer modules
+        # Check for Command Title
+        if commandDetails_result.command_title == "CatMec":
+            # Execute for CatMec module
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            # change working directory
+            try:
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except OSError as e:  # except path error
+                error_num, error_msg = e
+                if error_msg.strip() == "The system cannot find the file specified":
+                    # create directory
+                    os.system("mkdir " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                    # change directory
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            #copy PDB frames from CatMec Analysis Contact Score module
+            #catmec contact score path
+            catmec_contact_score_path = config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/Contact_Score/'
+            for dir_files in listdir(catmec_contact_score_path):
+                if dir_files.endswith(".pdb"):  # applying .tpr file filter
+                    shutil.copyfile(catmec_contact_score_path+dir_files,config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/"+dir_files)
 
+            #copy execution files (scripts)
+            for script_dir_file in listdir(config.PATH_CONFIG['shared_scripts'] + 'Path_Analysis/'):
+                shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Path_Analysis/'+script_dir_file,config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/"+script_dir_file)
 
-        primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
-        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
-        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
-        #primary_command_runnable = re.sub('%input_folder_name%',config.PATH_CONFIG['shared_folder_path'],primary_command_runnable)
-        #primary_command_runnable = re.sub('%distance_python_file%',config.PATH_CONFIG['shared_folder_path']+'Project/Project1/'+commandDetails_result.command_tool+'/'+config.PATH_CONFIG['distance_python_file'],primary_command_runnable)
-        #primary_command_runnable = re.sub('%output_folder_name%',config.PATH_CONFIG['shared_folder_path'],primary_command_runnable)
-        print(primary_command_runnable)
-        #serializer = SnippetSerializer(commandDetails_result, many=True)
-        # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
-        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+            # execute PathAnalysis command
+            process_return = execute_command(primary_command_runnable, inp_command_id)
+            out, err = process_return.communicate()
+            process_return.wait()
+            if process_return.returncode == 0:
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
-        shared_folder_path = config.PATH_CONFIG['shared_folder_path']
-
-        command_title_folder = commandDetails_result.command_title
-        command_tool_title= commandDetails_result.command_tool
-
-        out, err = process_return.communicate()
-        process_return.wait()
-        print "process return code is "
-        print process_return.returncode
-        if process_return.returncode == 0:
-            print "inside success"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            # moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
-            # moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-            # move_outputFiles(moveFile_source, moveFile_destination)
-            # if commandDetails_result.command_title == 'Solvate':
-            #     topolfile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/GmxtoPdb/outputFiles/topol.top'
-            #     topolfile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-            #     move_topolfile_(topolfile_source,topolfile_destination)
-            update_command_status(inp_command_id,status_id)
-            #move_files_(inp_command_id)
-            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
-        if process_return.returncode != 0:
-            print "inside error"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
-            #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
-            fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
-            # moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
-            # moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-            # move_outputFiles(moveFile_source, moveFile_destination)
-            #move_files_(inp_command_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+        else:
+            # Execute for Designer module
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            # change working directory
+            try:
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except OSError as e:  # excep path error
+                error_num, error_msg = e
+                if error_msg.strip() == "The system cannot find the file specified":
+                    # create directory
+                    os.system("mkdir " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                    # change directory
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
 
 #Extract Activation energy
@@ -951,7 +1340,14 @@ class Hello_World(APIView):
         pass
     def post(self,request):
         print ("Hello World")
-
+        time.sleep(300)
+        inp_command_id = 167
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        print "project name after sleep is "
+        print project_name
         return JsonResponse({'success':True})
 
 
@@ -1023,40 +1419,99 @@ class Contact_Score(APIView):
         project_id = commandDetails_result.project_id
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
-        primary_command_runnable = commandDetails_result.primary_command
-        status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id)
 
-        print('before replacing primary_command_runnable')
-        print(primary_command_runnable)
+        #Contact Score calculation for CatMec and Designer modules
+        #Check for Command Title
+        if commandDetails_result.command_title == "CatMec":
+            #Execute for CatMec module
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            #change working directory
+            try:
+                os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
+            except OSError as e: #excep path error
+                error_num, error_msg = e
+                if error_msg.strip() == "The system cannot find the file specified":
+                    #create directory
+                    os.system("mkdir "+config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
+                    #change directory
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
-        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+            #------   create PDBS folder -----------
+            os.system("mkdir " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/pdbs")
 
-        shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
-        command_title_folder = commandDetails_result.command_title
-        command_tool_title= commandDetails_result.command_tool
+            #---------  generate PDB frames from .XTC file   ----------------
+            key_name_protien_ligand_complex_index_number = 'mmpbsa_index_file_protien_ligand_complex_number'
+            ProjectToolEssentials_protien_ligand_complex_index_number = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_protien_ligand_complex_index_number).latest('entry_time')
+            index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
 
-        out, err = process_return.communicate()
-        process_return.wait()
-        print "process return code is "
-        print process_return.returncode
-        if process_return.returncode == 0:
-            print "inside success"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
-        if process_return.returncode != 0:
-            print "inside error"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
-            fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+            #------   get TPR file   ------
+            # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+            key_name_tpr_file = 'mmpbsa_tpr_file'
+
+            ProjectToolEssentials_res_tpr_file_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_tpr_file).latest('entry_time')
+            md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+            os.system(
+                "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                    'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n")
+
+            os.system(
+                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
+                config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n")
+
+            os.system(
+                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_fit.xtc -s " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                    'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n")
+
+            #execute contact score command
+            process_return = execute_command(primary_command_runnable, inp_command_id)
+            out, err = process_return.communicate()
+            process_return.wait()
+            if process_return.returncode == 0:
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+
+        else:
+            #Execute for Designer module
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            # change working directory
+            try:
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except OSError as e:  # excep path error
+                error_num, error_msg = e
+                if error_msg.strip() == "The system cannot find the file specified":
+                    # create directory
+                    os.system("mkdir " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                    # change directory
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+
 
 def sol_group_option():
     print "=====================working directory in function is =============="
@@ -2254,6 +2709,368 @@ class Designer(APIView):
             status_id = config.CONSTS['status_error']
             update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+
+
+#Designer MMPBSA module
+class Designer_Mmpbsa_analyse(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        primary_command_runnable = commandDetails_result.primary_command
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
+
+        makdir_designer_analysis(project_name,project_id)
+
+        key_name_indexfile_input = 'designer_mmpbsa_index_file_dict'
+
+        #get list of index file options for gmx input
+        ProjectToolEssentials_res_indexfile_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_indexfile_input).latest('entry_time')
+
+        #get list of .XTC files from different MD runs to execute "gmx trjcat " command
+        key_name_xtcfile_input = 'designer_mmpbsa_md_xtc_file_list'
+
+        ProjectToolEssentials_res_xtcfile_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_xtcfile_input).latest('entry_time')
+
+        #get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_tpr_file = 'designer_mmpbsa_tpr_file'
+
+        ProjectToolEssentials_res_tpr_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_tpr_file).latest('entry_time')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+
+        # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
+        key_name_ndx_file = 'designer_mmpbsa_index_file'
+
+        ProjectToolEssentials_res_ndx_file_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ndx_file).latest('entry_time')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+
+        key_name_CatMec_input = 'substrate_input'
+        command_tootl_title = "CatMec"
+        # get list of ligand inputs
+        ProjectToolEssentials_res_CatMec_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                       key_name=key_name_CatMec_input).latest('entry_time')
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        # if User has only one ligand as input
+        multiple_ligand_input = False
+        if len(CatMec_input_dict) > 1:
+            multiple_ligand_input = True
+
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+
+        '''
+                                                                  .                o8o                         .        
+                                                        .o8                `"'                       .o8        
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .oooo.   .o888oo      
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 `P  )88b    888        
+        888   888   888   888   888     Y888'           888    888         888 888        .oP"888    888        
+        `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 d8(  888    888 .      
+        `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y888""8o   "888"      
+        d"     YD                                                          888                                  
+        "Y88888P'                                                      .o. 88P                                  
+                                                                       `Y888P                                           
+        '''
+        #if len(xtcfile_input_dict) > 1:
+        md_xtc_files_str = ""
+        #mmpbsa_project_path
+        for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
+            xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
+            md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + \
+                                config.PATH_CONFIG['designer_md_simulations_path'] + xtcfile_inputvalue_formatted + " "
+        gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/Designer/' + config.PATH_CONFIG[
+                             'designer_mmpbsa_path'] + "merged.xtc -keeplast -cat"
+        os.system(gmx_trjcat_cmd)
+
+        '''
+                                                                                          oooo                                                .o8              
+                                                                                  `888                                               "888              
+         .oooooooo ooo. .oo.  .oo.   oooo    ooo      ooo. .oo.  .oo.    .oooo.    888  oooo   .ooooo.              ooo. .oo.    .oooo888  oooo    ooo 
+        888' `88b  `888P"Y88bP"Y88b   `88b..8P'       `888P"Y88bP"Y88b  `P  )88b   888 .8P'   d88' `88b             `888P"Y88b  d88' `888   `88b..8P'  
+        888   888   888   888   888     Y888'          888   888   888   .oP"888   888888.    888ooo888              888   888  888   888     Y888'    
+        `88bod8P'   888   888   888   .o8"'88b         888   888   888  d8(  888   888 `88b.  888    .o              888   888  888   888   .o8"'88b   
+        `8oooooo.  o888o o888o o888o o88'   888o      o888o o888o o888o `Y888""8o o888o o888o `Y8bod8P' ooooooooooo o888o o888o `Y8bod88P" o88'   888o 
+        d"     YD                                                                                                                                      
+        "Y88888P'                                                                                                                                      
+        '''
+        if multiple_ligand_input:
+            #for multiple ligand input
+            print "for multiple ligand input"
+            #get user input ligand name from DB
+            key_name_ligand_input = 'designer_mmpbsa_input_ligand'
+
+            ProjectToolEssentials_res_ligand_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_ligand_input).latest('entry_time')
+            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            #extract ligand number
+            if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
+                ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
+            indexfile_complex_option_input = ""
+            indexfile_receptor_option_input = ""
+            #prepare receptor option input string
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name_split = ligand_inputvalue.split("_")
+                dict_ligand_name = ligand_name_split[0]
+                if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys() and dict_ligand_name != ligand_name:
+                    indexfile_receptor_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
+             #prepare complex option input string
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                dict_ligand_name = ligand_inputkey[:-4]
+                if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys():
+                    indexfile_complex_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
+
+            if "[ Protein ]" in indexfile_input_dict.keys():
+                indexfile_complex_option_input += str(indexfile_input_dict["[ Protein ]"])
+                indexfile_receptor_option_input += str(indexfile_input_dict["[ Protein ]"])
+            #reverse the strings
+            indexfile_complex_option_input = indexfile_complex_option_input.split(" | ")
+            indexfile_complex_option_input = indexfile_complex_option_input[-1::-1]
+            reversed_indexfile_complex_option_input = ' | '.join(indexfile_complex_option_input)
+
+            indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
+            indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
+            reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
+            print reversed_indexfile_complex_option_input
+            print reversed_indexfile_receptor_option_input
+            maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
+            receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
+            protien_ligand_complex_index = receptor_index + 1
+            #write protien ligand complex index number to DB
+            entry_time = datetime.now()
+            key_name_protien_ligand_complex_index = 'designer_mmpbsa_index_file_protien_ligand_complex_number'
+            ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
+                                                                                      project_id=project_id,
+                                                                                      key_name=key_name_protien_ligand_complex_index,
+                                                                                      values=protien_ligand_complex_index,
+                                                                                      entry_time=entry_time)
+            result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
+            ligand_name_index = protien_ligand_complex_index + 1
+            file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                               'designer_md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
+            file_gmx_make_ndx_input.write(
+                str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(reversed_indexfile_complex_option_input) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\n"+str(ligand_name_input)+"\nname "+str(ligand_name_index)+" ligand"+ "\nq\n")
+            file_gmx_make_ndx_input.close()
+
+            gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'designer_md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'designer_md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/Designer/' + config.PATH_CONFIG[
+                               'designer_mmpbsa_path'] + "index.ndx < " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'designer_md_simulations_path'] + "gmx_make_ndx_input.txt"
+
+            print " make index command"
+            print gmx_make_ndx
+            os.system(gmx_make_ndx)
+
+        else:
+            #for single ligand input
+            #get ligand name
+            ligand_name = ""
+            for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                ligand_name = ligand_inputkey[:-4]
+            #prepare input file for gmx make_ndx command
+            protein_index = 0
+            ligandname_index = 0
+            for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems(): # key is index option text and value is index number
+                if ligand_name in indexfile_inputkey:
+                    ligandname_index = indexfile_inputvalue
+                if "[ Protein ]" == indexfile_inputkey:
+                    protein_index = indexfile_inputvalue
+            maximum_key_ndx_input = max(indexfile_input_dict,key=indexfile_input_dict.get)
+            #print indexfile_input_dict[maximum_key_ndx_input]
+            receptor_index = indexfile_input_dict[maximum_key_ndx_input] +1
+            protien_ligand_complex_index = receptor_index + 1
+            file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'designer_md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
+            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex")
+            file_gmx_make_ndx_input.close()
+            gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'designer_md_simulations_path'] + md_simulations_tpr_file + " -n " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                               'designer_md_simulations_path'] + md_simulations_ndx_file + " -o " + config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/Designer/' + config.PATH_CONFIG[
+                               'designer_mmpbsa_path'] + "complex_index.ndx <"+config.PATH_CONFIG[
+                                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                              'designer_md_simulations_path'] + "gmx_make_ndx_input.txt"
+
+            print " make index command"
+            print gmx_make_ndx
+            os.system(gmx_make_ndx)
+
+        perform__designer_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file)
+        #===================   post processing after make index  ===============================
+        # copy MD .tpr file to MMPBSA working directory
+        source_tpr_md_file = config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                 'designer_md_simulations_path'] + md_simulations_tpr_file
+        tpr_file_split = md_simulations_tpr_file.split("/")
+        dest_tpr_md_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                           config.PATH_CONFIG['designer_mmpbsa_path'] + tpr_file_split[1]
+
+        shutil.copyfile(source_tpr_md_file, dest_tpr_md_file)
+
+        # copy topology file from MS to MMPBSA working directory
+        source_topology_file = config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                   'designer_md_simulations_path'] + tpr_file_split[0] + "/topol.top"
+        dest_topology_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                             config.PATH_CONFIG['designer_mmpbsa_path'] + "topol.top"
+        shutil.copyfile(source_topology_file, dest_topology_file)
+
+        # copy ligand .itp files
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            ligand_name_split = ligand_inputvalue.split("_")
+            source_itp_file = config.PATH_CONFIG[
+                                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                                  'designer_md_simulations_path'] + tpr_file_split[0] + "/" + ligand_name_split[0] + ".itp"
+            dest_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                            config.PATH_CONFIG['designer_mmpbsa_path'] + ligand_name_split[0] + ".itp"
+            shutil.copyfile(source_itp_file, dest_itp_file)
+
+
+        key_name_ligand_input = 'designer_mmpbsa_input_ligand'
+        # processing itp files
+        pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input)
+
+        # ----------------------   make a "trail" directory for MMPBSA   -----------------------
+        os.system("mkdir " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                  config.PATH_CONFIG['designer_mmpbsa_path'] + "trial")
+        # copying MMPBSA input files to trail directory
+        # copy .XTC file
+        shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                        config.PATH_CONFIG['designer_mmpbsa_path'] + "merged-recentered.xtc",
+                        config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                        config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/npt.xtc")
+
+        # copy other input files for MMPBSA
+        for file_name in os.listdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path']):
+            # copy .TPR file
+            if file_name.endswith(".tpr"):
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/npt.tpr")
+            # copy .NDX file
+            if file_name.endswith(".ndx"):
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/index.ndx")
+
+            # copy .TOP file
+            if file_name.endswith(".top"):
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/"+file_name)
+            # copy .ITP files
+            if file_name.endswith(".itp"):
+                # renaming user input ligand as LIGAND
+                key_name_ligand_input = 'designer_mmpbsa_input_ligand'
+
+                ProjectToolEssentials_res_ligand_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_ligand_input).latest('entry_time')
+                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                if file_name[:-4] == ligand_name:
+                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                    config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/ligand.itp")
+                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                    config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/"+file_name)
+                else:
+                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
+                                    config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'] + "trial/" + file_name)
+
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
+                                    config.PATH_CONFIG['designer_mmpbsa_path'])
+        os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
+        return JsonResponse({"success": True})
+
+        '''primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
+        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
+        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
+        primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
+        #MD simulations shared path
+        md_simulations_sharedpath = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' +"Analysis/mmpbsa" + '/')
+        print os.system("pwd")
+        print os.getcwd()
+        print "=========== title is =============="
+        print commandDetails_result.command_title
+
+
+        process_return = execute_command(primary_command_runnable,inp_command_id)
+
+        command_title_folder = commandDetails_result.command_title
+
+        out, err = process_return.communicate()
+        process_return.wait()
+        print "process return code is "
+        print process_return.returncode
+        if process_return.returncode == 0:
+            print "inside success"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        if process_return.returncode != 0:
+            print "inside error"
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})'''
+
+
+def makdir_designer_analysis(project_name,project_id):
+    # create analysis directory for MMPBSA , Contact Score and PathAnalysis execution
+
+    try:
+        os.system("mkdir " + config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                     'designer_md_simulations_path'] + "Analysis/")
+    except OSError as e:  # except path error
+        if e.errno != os.errno.EEXIST:
+            # directory already exists
+            pass
+        else:
+            print e.errno
+            pass
+
 
 #alter grid.gpf file with respective .PDBQT file paths
 def process_grid_file(commandDetails_result,QzwProjectDetails_res,request):
