@@ -1340,8 +1340,11 @@ class Hello_World(APIView):
         pass
     def post(self,request):
         print ("Hello World")
-        time.sleep(300)
         inp_command_id = 167
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
+        time.sleep(300)
+
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
