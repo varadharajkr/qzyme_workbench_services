@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^gcommands/', views.gromacsSample.as_view()),
     url(r'^serverdetails/', views.getserverDetails.as_view()),
     url(r'^gromacs/', views.gromacs.as_view()),
-    url(r'^pathanalysis/', views.pathanalysis.as_view()),
+    url(r'^Path_Analysis/', views.pathanalysis.as_view()),
     url(r'^mmpbsa/', views.pathanalysis.as_view()),
     url(r'^analyse_mmpbsa/', views.analyse_mmpbsa.as_view()),
     url(r'^Hello_World/', views.Hello_World.as_view()),
@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^autodock/',views.autodock.as_view()),
     url(r'^CatMec/',views.CatMec.as_view()),
     url(r'^Designer/',views.Designer.as_view()),
+    url(r'^Designer_Mmpbsa_analyse/',views.Designer_Mmpbsa_analyse.as_view()),
     url(r'^grom/', views.grom),
     url(r'^get_activation_energy/', views.get_activation_energy.as_view()),
 ]

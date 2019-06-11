@@ -2688,6 +2688,18 @@ class Designer(APIView):
             md_simulation_preparation(inp_command_id,project_id, project_name, command_tool = commandDetails_result.command_tool,
                                       command_title = commandDetails_result.command_title)
 
+        elif primary_command_runnable.strip() == "python create_mutation.py":
+            # execute Designer Mutations
+            #get python scripts
+            shutil.copyfile(
+                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/create_mutation.py',
+                config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/create_mutation.py')
+            shutil.copyfile(
+                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/pymol_mutate.py',
+                config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/pymol_mutate.py')
+            os.system(primary_command_runnable)
         else:
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
