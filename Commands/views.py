@@ -2688,7 +2688,7 @@ class Designer(APIView):
             md_simulation_preparation(inp_command_id,project_id, project_name, command_tool = commandDetails_result.command_tool,
                                       command_title = commandDetails_result.command_title)
 
-        elif primary_command_runnable.strip() == "python create_mutation.py":
+        elif command_tool_title == "Designer_Mutations":
             # execute Designer Mutations
             #get python scripts
             shutil.copyfile(
