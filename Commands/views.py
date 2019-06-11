@@ -2699,7 +2699,13 @@ class Designer(APIView):
                 config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/pymol_mutate.py',
                 config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/pymol_mutate.py')
-            os.system(primary_command_runnable)
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+
         else:
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
