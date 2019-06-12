@@ -2684,6 +2684,7 @@ class Designer(APIView):
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
         print os.system("pwd")
         primary_command_runnable = commandDetails_result.primary_command
+        primary_command_runnable_split = primary_command_runnable.split(" ")
         if primary_command_runnable.strip() == "python run_md.py":
             #execute MD simulations
             primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
@@ -2722,6 +2723,32 @@ class Designer(APIView):
                 update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
+        elif primary_command_runnable_split[1] == "make_complex.py":
+            #Make Complex Execution
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'+command_tool_title)
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            process_return = Popen(
+                args=primary_command_runnable,
+                stdout=PIPE,
+                stderr=PIPE,
+                shell=True
+            )
+
+            print "execute command"
+            out, err = process_return.communicate()
+            process_return.wait()
+            if process_return.returncode == 0:
+                print "output of out is"
+                print out
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         else:
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
@@ -2771,7 +2798,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             aminoacids_list = []
             # prepare a text file of all amino acids with residue number and serial number from PDB file
             with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +'/'+line+ 'variant_'+str(variant_index_count)+'.pdb', 'r'
+                      + project_name + '/' + command_tool +'/'+line.strip()+ '/variant_'+str(variant_index_count)+'.pdb', 'r'
                       ) as fp_variant_pdb:
                 variant_pdb_lines = fp_variant_pdb.readlines()
                 for line_pdb in variant_pdb_lines:
@@ -2786,9 +2813,9 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             for atoms_name in protonation_ac_list:
                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                       + project_name + '/CatMec/MD_Simulation/'+atoms_name+"_protonate.txt",config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +"/"+line+"/"+atoms_name+"_protonate.txt")
+                      + project_name + '/' + command_tool +"/"+line.strip()+"/"+atoms_name+"_protonate.txt")
                 with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool + '/' +line+"/"+ atoms_name + '_protonate.txt', 'r'
+                          + project_name + '/' + command_tool + '/' +line.strip()+"/"+ atoms_name + '_protonate.txt', 'r'
                           ) as file_pointer:
                     lines = file_pointer.readlines()
                     for line in lines:
@@ -2800,16 +2827,16 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             # remove protonations input and matrix files if exsist
             try:
                 os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool +"/"+line+'/designer_final_matrix_pdb_pqr_protonate.txt')
+                          + project_name + '/' + command_tool +"/"+line.strip()+'/designer_final_matrix_pdb_pqr_protonate.txt')
                 os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool +"/"+ line+'/protonate_input.txt')
+                          + project_name + '/' + command_tool +"/"+ line.strip()+'/protonate_input.txt')
             except:
                 pass
 
             # prepare final matrix file of protonation values
             try:
                 outFile = open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                               + project_name + '/' + command_tool +"/"+ line +'/designer_final_matrix_pdb_pqr_protonate.txt',
+                               + project_name + '/' + command_tool +"/"+ line.strip() +'/designer_final_matrix_pdb_pqr_protonate.txt',
                                'w+')
                 outFile.write(designer_protonation_matrix)
                 outFile.close()
@@ -2818,10 +2845,10 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
             # prepare final protonation input text file
             with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +"/"+line+ '/protonate_input.txt', 'w+'
+                      + project_name + '/' + command_tool + "/" + line.strip() + '/protonate_input.txt', 'w+'
                       ) as input_file_ptr:
                 with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool + "/" + line + '/designer_final_matrix_pdb_pqr_protonate.txt', 'r'
+                          + project_name + '/' + command_tool + "/" + line.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt', 'r'
                           ) as matrix_file_ptr:
                     matrix_file_lines = matrix_file_ptr.readlines()
                     for matrix_file_line in matrix_file_lines:
@@ -2831,18 +2858,19 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                             + project_name + '/CatMec/MD_Simulation/' +"make_complex.py",
                             config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                            + project_name + '/' + command_tool + "/" + line + "/" +"make_complex.py")
+                            + project_name + '/' + command_tool + "/" + line.strip() + "/" +"make_complex.py")
             # queue command to database make_complex
             command_text_area = ""
             status = config.CONSTS['status_queued']
             comments = ""
+            command_title_as_variant = line.strip()
             session_values = ' '
             entry_time = datetime.now()
             result_insert_QZwProjectCommands = commandDetails(project_id=project_id, user_id=user_id,
                                                                   primary_command=command_text_area,
                                                                   entry_time=entry_time,
                                                                   status=status, command_tool=command_tool,
-                                                                  command_title=command_tool, comments=comments,
+                                                                  command_title=command_title_as_variant, comments=comments,
                                                                   session_values=session_values)
             result = result_insert_QZwProjectCommands.save()
 
