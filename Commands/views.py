@@ -2771,7 +2771,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             aminoacids_list = []
             # prepare a text file of all amino acids with residue number and serial number from PDB file
             with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +"/"+line+ +"variant_"+str(variant_index_count)+'.pdb', 'r'
+                      + project_name + '/' + command_tool +'/'+line+ +'variant_'+str(variant_index_count)+'.pdb', 'r'
                       ) as fp_variant_pdb:
                 variant_pdb_lines = fp_variant_pdb.readlines()
                 for line_pdb in variant_pdb_lines:
