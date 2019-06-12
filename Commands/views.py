@@ -2813,16 +2813,17 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             for atoms_name in protonation_ac_list:
                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                       + project_name + '/CatMec/MD_Simulation/'+atoms_name+"_protonate.txt",config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +"/"+line.strip()+"/"+atoms_name+"_protonate.txt")
+                      + project_name + '/' + command_tool +'/'+line.strip()+"/"+atoms_name+"_protonate.txt")
+            for atoms_name in protonation_ac_list:
                 with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                           + project_name + '/' + command_tool + '/' +line.strip()+"/"+ atoms_name + '_protonate.txt', 'r'
                           ) as file_pointer:
-                    lines = file_pointer.readlines()
-                    for line in lines:
-                        if line.split()[1] + "_" + line.split()[0] not in aminoacids_list:
+                    lines_protonation_atoms = file_pointer.readlines()
+                    for line_in_protonate_atoms in lines_protonation_atoms:
+                        if line_in_protonate_atoms.split()[1] + "_" + line_in_protonate_atoms.split()[0] not in aminoacids_list:
                             pass
                         else:
-                            designer_protonation_matrix += line
+                            designer_protonation_matrix += line_in_protonate_atoms
 
             # remove protonations input and matrix files if exsist
             try:
