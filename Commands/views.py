@@ -2870,6 +2870,19 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                             + project_name + '/CatMec/MD_Simulation/' +"make_complex.py",
                             config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                             + project_name + '/' + command_tool + "/" + line.strip() + "/" +"make_complex.py")
+
+            #get make_complex parameters from DB
+            make_complex_params_keyname = "make_complex_parameters"
+            ProjectToolEssentials_make_complex_params = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=make_complex_params_keyname).latest('entry_time')
+            make_complex_params = ProjectToolEssentials_make_complex_params.values
+
+            variant_protien_file = 'variant_'+str(variant_index_count)+'.pdb'
+            # replace protien file in make_complex_params
+            make_complex_params_replaced = re.sub(r'(\w+)(\.pdb)', variant_protien_file, make_complex_params)
+
+
             # queue command to database make_complex
             command_text_area = ""
             status = config.CONSTS['status_queued']
