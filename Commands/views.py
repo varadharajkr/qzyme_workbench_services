@@ -2884,7 +2884,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
 
             # queue command to database make_complex
-            command_text_area = ""
+            command_text_area = make_complex_params_replaced
             status = config.CONSTS['status_queued']
             comments = ""
             command_title_as_variant = line.strip()
