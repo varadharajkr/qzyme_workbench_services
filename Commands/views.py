@@ -2875,14 +2875,12 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             status = config.CONSTS['status_queued']
             comments = ""
             command_title_as_variant = line.strip()
-            session_values = ' '
             entry_time = datetime.now()
             result_insert_QZwProjectCommands = commandDetails(project_id=project_id, user_id=user_id,
                                                                   primary_command=command_text_area,
                                                                   entry_time=entry_time,
                                                                   status=status, command_tool=command_tool,
-                                                                  command_title=command_title_as_variant, comments=comments,
-                                                                  session_values=session_values)
+                                                                  command_title=command_title_as_variant, comments=comments)
             result = result_insert_QZwProjectCommands.save()
             variant_index_count +=1
 
