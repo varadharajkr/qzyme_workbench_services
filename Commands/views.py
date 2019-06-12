@@ -29,6 +29,7 @@ from os import listdir
 import errno
 import ast
 import time
+from datetime import datetime
 import glob
 import urllib2
 import json
@@ -2673,6 +2674,7 @@ class Designer(APIView):
 
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        user_id = commandDetails_result.user_id
         project_id = commandDetails_result.project_id
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
@@ -2705,6 +2707,20 @@ class Designer(APIView):
                 stderr=PIPE,
                 shell=True
             )
+            out, err = process_return.communicate()
+            process_return.wait()
+            if process_return.returncode == 0:
+                print "output of out is"
+                print out
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                #queue MAKE COMPLEX params to DB
+                queue_make_complex_params(request,project_id, user_id, command_tool_title, command_tool, project_name)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         else:
             status_id = config.CONSTS['status_initiated']
@@ -2716,20 +2732,119 @@ class Designer(APIView):
                 shell=True
             )
 
-        print "execute command"
-        out, err = process_return.communicate()
-        process_return.wait()
-        if process_return.returncode == 0:
-            print "output of out is"
-            print out
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id, status_id)
-            return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
-        if process_return.returncode != 0:
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id, status_id)
-            return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+            print "execute command"
+            out, err = process_return.communicate()
+            process_return.wait()
+            if process_return.returncode == 0:
+                print "output of out is"
+                print out
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
+
+#queue MAKE COMPLEX params command to DB
+def queue_make_complex_params(request,project_id, user_id,  command_tool_title, command_tool, project_name):
+    # open mutated text file and loop thru to prepare files for make_complex.py
+    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+              + project_name + '/' + command_tool + '/mutated_list.txt', 'r'
+              ) as fp_mutated_list:
+        mutated_list_lines = fp_mutated_list.readlines()
+        variant_index_count = 0
+        for line in mutated_list_lines:
+            # process  PDB file to get amino acids as python dict
+            ''' PDB PARSER
+                           ATOM / HETAATM  STRING line[0:6]
+                           INDEX           STRING line[6:11]
+                           ATOM TYPE       STRING line[12:16]
+                           AMINO ACID      STRING line[17:20]
+                           CHAIN ID        STRING line[21:22]
+                           RESIDUE NO      STRING line[22:26]
+                           X CO-ORDINATE   STRING line[30:38]
+                           Y CO-ORDINATE   STRING line[38:46]
+                           Z CO-ORDINATE   STRING line[46:54]
+                           '''
+            aminoacids_list = []
+            # prepare a text file of all amino acids with residue number and serial number from PDB file
+            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                      + project_name + '/' + command_tool +"/"+line+ +"variant_"+str(variant_index_count)+'.pdb', 'r'
+                      ) as fp_variant_pdb:
+                variant_pdb_lines = fp_variant_pdb.readlines()
+                for line_pdb in variant_pdb_lines:
+                    if line_pdb[0:6].strip() == "ATOM" or line_pdb[0:6].strip() == "HETAATM":
+                        if line_pdb[22:26].strip() + "_" + line_pdb[17:20].strip() not in aminoacids_list:
+                            # append all amino acids to list
+                            aminoacids_list.append(line_pdb[22:26].strip() + "_" + line_pdb[17:20].strip())
+
+            designer_protonation_matrix = ""
+            protonation_ac_list = ["ASP", "GLU", "HIS", "LYS"]
+            #copy protonation files from CatMex module to Designer
+            for atoms_name in protonation_ac_list:
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                      + project_name + '/CatMec/MD_Simulation/'+atoms_name+"_protonate.txt",config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                      + project_name + '/' + command_tool +"/"+line+"/"+atoms_name+"_protonate.txt")
+                with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/' + command_tool + '/' +line+"/"+ atoms_name + '_protonate.txt', 'r'
+                          ) as file_pointer:
+                    lines = file_pointer.readlines()
+                    for line in lines:
+                        if line.split()[1] + "_" + line.split()[0] not in aminoacids_list:
+                            pass
+                        else:
+                            designer_protonation_matrix += line
+
+            # remove protonations input and matrix files if exsist
+            try:
+                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/' + command_tool +"/"+line+'/designer_final_matrix_pdb_pqr_protonate.txt')
+                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/' + command_tool +"/"+ line+'/protonate_input.txt')
+            except:
+                pass
+
+            # prepare final matrix file of protonation values
+            try:
+                outFile = open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                               + project_name + '/' + command_tool +"/"+ line +'/designer_final_matrix_pdb_pqr_protonate.txt',
+                               'w+')
+                outFile.write(designer_protonation_matrix)
+                outFile.close()
+            except IOError as (errno, strerror):
+                print "I/O error({0}): {1}".format(errno, strerror)
+
+            # prepare final protonation input text file
+            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                      + project_name + '/' + command_tool +"/"+line+ '/protonate_input.txt', 'w+'
+                      ) as input_file_ptr:
+                with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/' + command_tool + "/" + line + '/designer_final_matrix_pdb_pqr_protonate.txt', 'r'
+                          ) as matrix_file_ptr:
+                    matrix_file_lines = matrix_file_ptr.readlines()
+                    for matrix_file_line in matrix_file_lines:
+                        input_file_ptr.write(matrix_file_line.split()[5] + '\n')
+
+            #get python script for make_compex execution
+            shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                            + project_name + '/CatMec/MD_Simulation/' +"make_complex.py",
+                            config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                            + project_name + '/' + command_tool + "/" + line + "/" +"make_complex.py")
+            # queue command to database make_complex
+            command_text_area = ""
+            status = config.CONSTS['status_queued']
+            comments = ""
+            session_values = ' '
+            entry_time = datetime.now()
+            result_insert_QZwProjectCommands = commandDetails(project_id=project_id, user_id=user_id,
+                                                                  primary_command=command_text_area,
+                                                                  entry_time=entry_time,
+                                                                  status=status, command_tool=command_tool,
+                                                                  command_title=command_tool, comments=comments,
+                                                                  session_values=session_values)
+            result = result_insert_QZwProjectCommands.save()
 
 #Designer MMPBSA module
 class Designer_Mmpbsa_analyse(APIView):
