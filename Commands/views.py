@@ -32,6 +32,7 @@ import time
 from datetime import datetime
 import glob
 import urllib2
+from urllib import urlopen
 import json
 import requests
 import MySQLdb
@@ -2811,19 +2812,28 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             protonation_ac_list = ["ASP", "GLU", "HIS", "LYS"]
             #copy protonation files from CatMex module to Designer
             for atoms_name in protonation_ac_list:
-                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/CatMec/MD_Simulation/'+atoms_name+"_protonate.txt",config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool +'/'+line.strip()+"/"+atoms_name+"_protonate.txt")
+                try:
+                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/CatMec/MD_Simulation/'+atoms_name+"_protonate.txt",config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                          + project_name + '/' + command_tool +'/'+line.strip()+"/"+atoms_name+"_protonate.txt")
+                except IOError as e:
+                    pass
+
             for atoms_name in protonation_ac_list:
-                with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                try:
+                    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                           + project_name + '/' + command_tool + '/' +line.strip()+"/"+ atoms_name + '_protonate.txt', 'r'
                           ) as file_pointer:
-                    lines_protonation_atoms = file_pointer.readlines()
-                    for line_in_protonate_atoms in lines_protonation_atoms:
-                        if line_in_protonate_atoms.split()[1] + "_" + line_in_protonate_atoms.split()[0] not in aminoacids_list:
-                            pass
-                        else:
-                            designer_protonation_matrix += line_in_protonate_atoms
+                        lines_protonation_atoms = file_pointer.readlines()
+                        for line_in_protonate_atoms in lines_protonation_atoms:
+                            if line_in_protonate_atoms.split()[1] + "_" + line_in_protonate_atoms.split()[0] not in aminoacids_list:
+                                pass
+                            else:
+                                designer_protonation_matrix += line_in_protonate_atoms
+                except IOError as e:
+                    pass
+
+
 
             # remove protonations input and matrix files if exsist
             try:
@@ -2874,6 +2884,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                                                                   command_title=command_title_as_variant, comments=comments,
                                                                   session_values=session_values)
             result = result_insert_QZwProjectCommands.save()
+            variant_index_count +=1
 
 #Designer MMPBSA module
 class Designer_Mmpbsa_analyse(APIView):
@@ -3378,6 +3389,7 @@ def get_crawler_data(start_offset,search_keyword):
     url = 'https://www.sciencedirect.com/search'+start_offset
     print "http URL is -"
     print url
+
     soup = BeautifulSoup(urlopen(url),"html.parser")
     for range_tag in soup.find_all('li', {'class': 'next-link'}):
         print "in first loop"
