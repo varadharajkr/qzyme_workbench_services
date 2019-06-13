@@ -1347,6 +1347,7 @@ class Hello_World(APIView):
         update_command_status(inp_command_id, status_id)
         time.sleep(360)
         try:
+            print "<<<<<<<<<<<<<<<<<<<<<<< in try >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
             QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
@@ -1357,6 +1358,7 @@ class Hello_World(APIView):
             update_command_status(inp_command_id, status_id)
             return JsonResponse({'success': True})
         except db.OperationalError as e:
+            print "<<<<<<<<<<<<<<<<<<<<<<< in except >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             db.close_old_connections()
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
