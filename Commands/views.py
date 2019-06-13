@@ -38,7 +38,7 @@ import MySQLdb
 from multiprocessing import Process
 from urlparse import urljoin
 from bs4 import BeautifulSoup
-
+from django import db
 # Create your views ere.
 
 # to run command in shell
@@ -1342,18 +1342,28 @@ class Hello_World(APIView):
         pass
     def post(self,request):
         print ("Hello World")
-        inp_command_id = 167
+        inp_command_id = 2599
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
         time.sleep(300)
-        django.db.close_old_connections()
-        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
-        project_id = commandDetails_result.project_id
-        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
-        project_name = QzwProjectDetails_res.project_name
-        print "project name after sleep is "
-        print project_name
-        return JsonResponse({'success':True})
+        try:
+            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+            project_id = commandDetails_result.project_id
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            print "project name after sleep is "
+            print project_name
+            return JsonResponse({'success': True})
+        except db.OperationalError as e:
+            db.close_old_connections()
+            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+            project_id = commandDetails_result.project_id
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            print "project name after sleep is "
+            print project_name
+            return JsonResponse({'success': True})
+
 
 
 class mmpbsa(APIView):
