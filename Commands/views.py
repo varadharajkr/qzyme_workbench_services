@@ -2787,16 +2787,31 @@ class Designer(APIView):
             out, err = process_return.communicate()
             process_return.wait()
             if process_return.returncode == 0:
-                print "output of out is"
-                print out
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
-                #queue MAKE COMPLEX params to DB
-                queue_make_complex_params(request,project_id, user_id, command_tool_title, command_tool, project_name)
+                # Execute MAKE COMPLEX
+                queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         elif primary_command_runnable_split[1] == "make_complex.py":
