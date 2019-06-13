@@ -1611,6 +1611,66 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
     return JsonResponse({'success': True})
 
+@csrf_exempt
+def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    key_name = 'md_simulation_no_of_runs'
+
+    ProjectToolEssentials_res = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name).latest('entry_time')
+
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
+    print md_run_no_of_conformation
+    # copy MDP files to working directory
+    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
+    for mdp_file in MDP_filelist:
+        shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + 'Project/'
+                        + project_name + '/CatMec/MD_Simulation/' + mdp_file + '.mdp',
+                        config.PATH_CONFIG['shared_folder_path'] + 'Project/'
+                        + project_name + '/' + command_tool + '/' +str(md_mutation_folder)+"/"+ mdp_file + '.mdp')
+
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"+str(md_mutation_folder)+"/"
+    for i in range(int(md_run_no_of_conformation)):
+        print (source_file_path + 'md_run' + str(i + 1))
+        os.mkdir(source_file_path + 'md_run' + str(i + 1))
+        dest_file_path = source_file_path + 'md_run' + str(i + 1)
+        for file_name in os.listdir(source_file_path):
+            try:
+                print "inside try"
+                shutil.copy(str(source_file_path) + file_name, dest_file_path)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
+                pass
+            except Exception:
+                print("Unexpected error:", sys.exc_info())
+                pass
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
+        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+        group_value = sol_group_option()
+        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
+        SOL_replace_str = SOL_replace_backup
+        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
+        print("printing group value in MD$$$$$$$$$$$$$$$$$$")
+        print(group_value)
+        print("printing after %SOL% replace")
+        print(SOL_replace_str)
+        os.system(SOL_replace_str)
+        os.system("echo q | gmx make_ndx -f solve_ions.gro")
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
+        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
+        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
+        os.system(
+            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+    return JsonResponse({'success': True})
+
 #Substrate Parameterization
 class Complex_Simulations(APIView):
     def get(self,request):
@@ -2916,8 +2976,13 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + str(
                                     value.split('_')[0]) + ".itp")
 
+            #change DIR to Mutations list
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + command_tool+ '/' +line.strip() +'/' )
+            #execute make_complex.py
+            os.system(make_complex_params_replaced)
             # queue command to database make_complex
-            command_text_area = make_complex_params_replaced
+            '''command_text_area = make_complex_params_replaced
             status = config.CONSTS['status_queued']
             comments = ""
             command_title_as_variant = line.strip()
@@ -2927,7 +2992,19 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                                                                   entry_time=entry_time,
                                                                   status=status, command_tool=command_tool,
                                                                   command_title=command_title_as_variant, comments=comments)
-            result = result_insert_QZwProjectCommands.save()
+            result = result_insert_QZwProjectCommands.save()'''
+            '''
+            ooooooooo.   ooooo     ooo ooooo      ooo      ooo        ooooo oooooooooo.         .oooooo..o ooooo ooo        ooooo ooooo     ooo ooooo              .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo  .oooooo..o 
+            `888   `Y88. `888'     `8' `888b.     `8'      `88.       .888' `888'   `Y8b       d8P'    `Y8 `888' `88.       .888' `888'     `8' `888'             .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
+             888   .d88'  888       8   8 `88b.    8        888b     d'888   888      888      Y88bo.       888   888b     d'888   888       8   888             .8"888.          888       888  888      888  8 `88b.    8  Y88bo.      
+             888ooo88P'   888       8   8   `88b.  8        8 Y88. .P  888   888      888       `"Y8888o.   888   8 Y88. .P  888   888       8   888            .8' `888.         888       888  888      888  8   `88b.  8   `"Y8888o.  
+             888`88b.     888       8   8     `88b.8        8  `888'   888   888      888           `"Y88b  888   8  `888'   888   888       8   888           .88ooo8888.        888       888  888      888  8     `88b.8       `"Y88b 
+             888  `88b.   `88.    .8'   8       `888        8    Y     888   888     d88'      oo     .d8P  888   8    Y     888   `88.    .8'   888       o  .8'     `888.       888       888  `88b    d88'  8       `888  oo     .d8P 
+            o888o  o888o    `YbodP'    o8o        `8       o8o        o888o o888bood8P'        8""88888P'  o888o o8o        o888o    `YbodP'    o888ooooood8 o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  8""88888P'  
+            '''
+
+            md_mutation_folder = line.strip()
+            execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
             variant_index_count +=1
 
 #Designer MMPBSA module
