@@ -1345,7 +1345,7 @@ class Hello_World(APIView):
         inp_command_id = 2599
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
-        time.sleep(300)
+        time.sleep(360)
         try:
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -1353,6 +1353,8 @@ class Hello_World(APIView):
             project_name = QzwProjectDetails_res.project_name
             print "project name after sleep is "
             print project_name
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
             return JsonResponse({'success': True})
         except db.OperationalError as e:
             db.close_old_connections()
@@ -1362,6 +1364,8 @@ class Hello_World(APIView):
             project_name = QzwProjectDetails_res.project_name
             print "project name after sleep is "
             print project_name
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
             return JsonResponse({'success': True})
 
 
