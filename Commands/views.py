@@ -2325,6 +2325,7 @@ class autodock(APIView):
         )
         print "execute command"
         print(primary_command_runnable)
+
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -2337,28 +2338,54 @@ class autodock(APIView):
         print out
 
         if process_return.returncode == 0:
-            print "output of out is"
-            print out
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            moveFile_source = config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+commandDetails_result.command_title+'/outputFiles/'
-            moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-            #move_outputFiles(moveFile_source,moveFile_destination)
-            update_command_status(inp_command_id,status_id)
-            #move_files_(inp_command_id)
-            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
-            fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/outputFiles/'
-            moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-            #move_outputFiles(moveFile_source, moveFile_destination)
-            update_command_status(inp_command_id,status_id)
-            #move_files_(inp_command_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(out)
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(err)
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+
+            return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+
+        # before trying t solve lost connection issue
+        # if process_return.returncode == 0:
+        #     print "output of out is"
+        #     print out
+        #     fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+        #     fileobj.write(out)
+        #     status_id = config.CONSTS['status_success']
+        #     update_command_status(inp_command_id,status_id)
+        #     return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        # if process_return.returncode != 0:
+        #     fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+        #     fileobj.write(err)
+        #     status_id = config.CONSTS['status_error']
+        #     update_command_status(inp_command_id,status_id)
+        #     return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
         #get command details from database
         # inp_command_id = request.POST.get("command_id")
