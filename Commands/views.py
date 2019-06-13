@@ -2866,8 +2866,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                         input_file_ptr.write(matrix_file_line.split()[5] + '\n')
 
             #get python script for make_compex execution
-            shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                            + project_name + '/CatMec/MD_Simulation/' +"make_complex.py",
+            shutil.copyfile(config.PATH_CONFIG['shared_scripts'] +'/CatMec/MD_Simulation/' +"make_complex.py",
                             config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                             + project_name + '/' + command_tool + "/" + line.strip() + "/" +"make_complex.py")
 
@@ -2882,6 +2881,25 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             # replace protien file in make_complex_params
             make_complex_params_replaced = re.sub(r'(\w+)(\.pdb)', variant_protien_file, make_complex_params)
 
+            #copy ligand .GRO files and .ITP files from CatMec module
+            ligands_key_name = 'substrate_input'
+            ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                               key_name=ligands_key_name).latest(
+                'entry_time')
+            ligand_names = ProjectToolEssentials_ligand_name_res.values
+            ligand_file_data = ast.literal_eval(ligand_names)
+            for key, value in ligand_file_data.items():
+                #value.split('_')[0]
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                + project_name + '/CatMec/MD_Simulation/' + str(value.split('_')[0]) + ".gro",
+                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + str(value.split('_')[0]) + ".gro")
+                # .ITP files
+                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                + project_name + '/CatMec/MD_Simulation/' + str(value.split('_')[0]) + ".itp",
+                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + str(
+                                    value.split('_')[0]) + ".itp")
 
             # queue command to database make_complex
             command_text_area = make_complex_params_replaced
