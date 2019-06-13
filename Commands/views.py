@@ -16,7 +16,6 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from django.db import close_old_connections
 from django import db
 import subprocess
 from subprocess import PIPE, Popen, call
@@ -1347,7 +1346,7 @@ class Hello_World(APIView):
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
         time.sleep(300)
-        close_old_connections()
+        django.db.close_old_connections()
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
