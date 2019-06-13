@@ -1625,9 +1625,9 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
     for mdp_file in MDP_filelist:
-        shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + 'Project/'
+        shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                         + project_name + '/CatMec/MD_Simulation/' + mdp_file + '.mdp',
-                        config.PATH_CONFIG['shared_folder_path'] + 'Project/'
+                        config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                         + project_name + '/' + command_tool + '/' +str(md_mutation_folder)+"/"+ mdp_file + '.mdp')
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"+str(md_mutation_folder)+"/"
