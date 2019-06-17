@@ -4043,27 +4043,30 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
               + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
               ) as fp_mutated_list:
         mutated_list_lines = fp_mutated_list.readlines()
-        variant_index_count = 0
+        variant_index_count = 0 # mutants entry
         for line in mutated_list_lines:
-            print "line loop in mutations file read ***********8"
-            #PDb folder variants
-            variant_index_dir = 0
+            # ********** line loop in mutations file read ***********
+            variant_index_dir = 0 # variant dirs counter
             for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
               + project_name + '/' + command_tool + '/' +line.strip()):
-                print "inside loop for variant dirs ---------------"
-                print mutations_dirs
-                print str(variant_index_dir)
+                # ---------- loop for variant dirs ---------------
                 if os.path.isdir(os.path.join(config.PATH_CONFIG[
                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
                                               mutations_dirs)) and mutations_dirs == "variant_"+str(variant_index_dir):
-                    print "in loop for mutations dir -----------------"
-                    print mutations_dirs
-                    pdb_file_index_str = 0
+                    # ------------ loop for mutations dir -----------------
+                    pdb_file_index_str = 0 # index for PDB (file) variant
                     for variants_dir in mutations_dirs:
-                        print "in loop for variants dir >>>>>>>>>>>>>>>>>"
-                        if variants_dir.endswith(".pdb") and variants_dir == "variant_"+str(pdb_file_index_str):
-                            print "PDB file found ********************"
-                            print variants_dir
+                        # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
+                        if variants_dir.endswith(".pdb") and variants_dir == "variant_"+str(pdb_file_index_str)+".pdb":
+                            # **************** PDB file  ********************"
+                            print "with pdb dir ---------------------"
+                            print config.PATH_CONFIG[
+                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip() + '/variant_' + str(
+                                pdb_file_index_str) + '.pdb'
+                            print "without pdb dir ++++++++++++++++++++++"
+                            print config.PATH_CONFIG[
+                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + '/variant_' + str(
+                                pdb_file_index_str) + '.pdb'
                         pdb_file_index_str += 1
                 variant_index_dir += 1
 
