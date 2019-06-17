@@ -4061,9 +4061,9 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                     pdb_file_index_str = 0 # index for PDB (file) variant
                     for variants_dir in mutations_dirs:
                         print "in variants dir ------"
-                        print  "variant_"+str(pdb_file_index_str)+".pdb"
+                        print  "variant_"+str(variant_index_dir)+".pdb"
                         print variants_dir.endswith(".pdb")
-                        print variants_dir.strip() == "variant_"+str(pdb_file_index_str)+".pdb"
+                        print variants_dir.strip() == "variant_"+str(variant_index_dir)+".pdb"
                         # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
                         if variants_dir.endswith(".pdb") and variants_dir.strip() == "variant_"+str(pdb_file_index_str)+".pdb":
                             # **************** PDB file  ********************"
