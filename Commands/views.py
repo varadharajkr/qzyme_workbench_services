@@ -106,7 +106,7 @@ class gromacs(APIView):
         print('before replacing primary_command_runnable')
         print(primary_command_runnable)
 
-        
+
         primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
         primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
@@ -2906,7 +2906,7 @@ class Homology_Modelling(APIView):
             status_id = config.CONSTS['status_error']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
-            
+
 
 class Loop_Modelling(APIView):
     # inside loop modelling class
@@ -4035,7 +4035,9 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
     hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
-
+    print "hotspot mutation file --------"
+    print "\n"
+    print hotspot_mutations_file
     # open mutated text file and loop thru to prepare files for make_complex.py
     with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
               + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
@@ -4043,6 +4045,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
         mutated_list_lines = fp_mutated_list.readlines()
         variant_index_count = 0
         for line in mutated_list_lines:
+            print "line loop in mutations file read ***********8"
             #PDb folder variants
             variant_index_dir = 0
             for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -4811,7 +4814,7 @@ def get_offset_crawler_data(url_part_api,url_part,search_keyword):
 # def post(self):
 #         pass
 
-class gromacsSample(APIView):                                                                                                                                                                                                                                           
+class gromacsSample(APIView):
 
     def get(self, request):
         commands = gromacsSample.objects.all()
