@@ -4052,6 +4052,11 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
               + project_name + '/' + command_tool + '/' +line.strip()):
                 print "inside loop for variant dirs ---------------"
                 print mutations_dirs
+                print str(variant_index_dir)
+                if os.path.isdir(mutations_dirs) and mutations_dirs == "variant_" + str(variant_index_dir):
+                    print "dir name match"
+                else:
+                    print "not matching dir name"
                 if os.path.isdir(mutations_dirs) and mutations_dirs == "variant_"+str(variant_index_dir):
                     print "in loop for mutations dir -----------------"
                     print mutations_dirs
