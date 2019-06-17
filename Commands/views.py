@@ -4050,6 +4050,10 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
             for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
               + project_name + '/' + command_tool + '/' +line.strip()):
                 # ---------- loop for variant dirs ---------------
+                print "in mutants dir "
+                print os.path.isdir(os.path.join(config.PATH_CONFIG[
+                                                  'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
+                                              mutations_dirs))
                 if os.path.isdir(os.path.join(config.PATH_CONFIG[
                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
                                               mutations_dirs)) and mutations_dirs == "variant_"+str(variant_index_dir):
