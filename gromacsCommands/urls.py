@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^autodock/',views.autodock.as_view()),
     url(r'^CatMec/',views.CatMec.as_view()),
     url(r'^Designer/',views.Designer.as_view()),
+    url(r'^Hotspot/',views.Hotspot.as_view()),
     url(r'^Designer_Mmpbsa_analyse/',views.Designer_Mmpbsa_analyse.as_view()),
     url(r'^grom/', views.grom),
     url(r'^get_activation_energy/', views.get_activation_energy.as_view()),
