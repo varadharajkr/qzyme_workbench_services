@@ -4061,7 +4061,8 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                     print "print mutations_dirs"
                     print mutations_dirs
                     pdb_file_index_str = 0 # index for PDB (file) variant
-                    for variants_dir in mutations_dirs:
+                    for variants_dir in os.listdir(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
                         print "in variants dir ------"
                         print  "variant_"+str(pdb_file_index_str)+".pdb"
                         print variants_dir.endswith(".pdb")
