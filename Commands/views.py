@@ -3805,7 +3805,7 @@ class Hotspot(APIView):
              8    Y     888   .8'     `888.   888  `88b.   888       o      `88b    ooo  `88b    d88'  8    Y     888   888          888       o  888       o   d8'  `888b   
             o8o        o888o o88o     o8888o o888o  o888o o888ooooood8       `Y8bood8P'   `Y8bood8P'  o8o        o888o o888o        o888ooooood8 o888ooooood8 o888o  o88888o 
             '''
-            #hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
+            hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
             try:
                 print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_success']
@@ -4033,193 +4033,31 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    designer_mutations_file = ProjectToolEssentials_mutations_file.values
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
 
     # open mutated text file and loop thru to prepare files for make_complex.py
     with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-              + project_name + '/' + command_tool + '/' + designer_mutations_file, 'r'
+              + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
               ) as fp_mutated_list:
         mutated_list_lines = fp_mutated_list.readlines()
         variant_index_count = 0
         for line in mutated_list_lines:
-            # process  PDB file to get amino acids as python dict
-            ''' PDB PARSER
-                           ATOM / HETAATM  STRING line[0:6]
-                           INDEX           STRING line[6:11]
-                           ATOM TYPE       STRING line[12:16]
-                           AMINO ACID      STRING line[17:20]
-                           CHAIN ID        STRING line[21:22]
-                           RESIDUE NO      STRING line[22:26]
-                           X CO-ORDINATE   STRING line[30:38]
-                           Y CO-ORDINATE   STRING line[38:46]
-                           Z CO-ORDINATE   STRING line[46:54]
-                           '''
-            aminoacids_list = []
-            # prepare a text file of all amino acids with residue number and serial number from PDB file
-            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool + '/' + line.strip() + '/variant_' + str(
-                variant_index_count) + '.pdb', 'r'
-                      ) as fp_variant_pdb:
-                variant_pdb_lines = fp_variant_pdb.readlines()
-                for line_pdb in variant_pdb_lines:
-                    if line_pdb[0:6].strip() == "ATOM" or line_pdb[0:6].strip() == "HETAATM":
-                        if line_pdb[22:26].strip() + "_" + line_pdb[17:20].strip() not in aminoacids_list:
-                            # append all amino acids to list
-                            aminoacids_list.append(line_pdb[22:26].strip() + "_" + line_pdb[17:20].strip())
+            #PDb folder variants
+            variant_index_dir = 0
+            for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+              + project_name + '/' + command_tool + '/' +line):
+                if os.path.isdir(mutations_dirs) and mutations_dirs == "variant_"+str(variant_index_dir):
+                    print "in loop for mutations dir -----------------"
+                    print mutations_dirs
+                    pdb_file_index_str = 0
+                    for variants_dir in mutations_dirs:
+                        print "in loop for variants dir >>>>>>>>>>>>>>>>>"
+                        if variants_dir.endswith(".pdb") and variants_dir == "variant_"+str(pdb_file_index_str):
+                            print "PDB file found ********************"
+                            print variants_dir
+                        pdb_file_index_str += 1
+                variant_index_dir += 1
 
-            designer_protonation_matrix = ""
-            protonation_ac_list = ["ASP", "GLU", "HIS", "LYS"]
-            # copy protonation files from CatMex module to Designer
-            for atoms_name in protonation_ac_list:
-                try:
-                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                    + project_name + '/CatMec/MD_Simulation/' + atoms_name + "_protonate.txt",
-                                    config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                    + project_name + '/' + command_tool + '/' + line.strip() + "/" + atoms_name + "_protonate.txt")
-                except IOError as e:
-                    pass
-
-            for atoms_name in protonation_ac_list:
-                try:
-                    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                              + project_name + '/' + command_tool + '/' + line.strip() + "/" + atoms_name + '_protonate.txt',
-                              'r'
-                              ) as file_pointer:
-                        lines_protonation_atoms = file_pointer.readlines()
-                        for line_in_protonate_atoms in lines_protonation_atoms:
-                            if line_in_protonate_atoms.split()[1] + "_" + line_in_protonate_atoms.split()[
-                                0] not in aminoacids_list:
-                                pass
-                            else:
-                                designer_protonation_matrix += line_in_protonate_atoms
-                except IOError as e:
-                    pass
-
-            # remove protonations input and matrix files if exsist
-            try:
-                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool + "/" + line.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt')
-                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool + "/" + line.strip() + '/protonate_input.txt')
-            except:
-                pass
-
-            # prepare final matrix file of protonation values
-            try:
-                outFile = open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                               + project_name + '/' + command_tool + "/" + line.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt',
-                               'w+')
-                outFile.write(designer_protonation_matrix)
-                outFile.close()
-            except IOError as (errno, strerror):
-                print "I/O error({0}): {1}".format(errno, strerror)
-
-            # prepare final protonation input text file
-            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                      + project_name + '/' + command_tool + "/" + line.strip() + '/protonate_input.txt', 'w+'
-                      ) as input_file_ptr:
-                with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                          + project_name + '/' + command_tool + "/" + line.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt',
-                          'r'
-                          ) as matrix_file_ptr:
-                    matrix_file_lines = matrix_file_ptr.readlines()
-                    for matrix_file_line in matrix_file_lines:
-                        input_file_ptr.write(matrix_file_line.split()[5] + '\n')
-
-            # get python script for make_compex execution
-            shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'CatMec/MD_Simulation/' + "make_complex.py",
-                            config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                            + project_name + '/' + command_tool + "/" + line.strip() + "/" + "make_complex.py")
-
-            # get make_complex parameters from DB
-            make_complex_params_keyname = "make_complex_parameters"
-            ProjectToolEssentials_make_complex_params = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=make_complex_params_keyname).latest('entry_time')
-            make_complex_params = ProjectToolEssentials_make_complex_params.values
-
-            variant_protien_file = 'variant_' + str(variant_index_count) + '.pdb'
-            # replace protien file in make_complex_params
-            make_complex_params_replaced = re.sub(r'(\w+)(\.pdb)', variant_protien_file, make_complex_params)
-
-            # copy ligand .GRO files and .ITP files from CatMec module
-            ligands_key_name = 'substrate_input'
-            ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                                               key_name=ligands_key_name).latest(
-                'entry_time')
-            ligand_names = ProjectToolEssentials_ligand_name_res.values
-            ligand_file_data = ast.literal_eval(ligand_names)
-            for key, value in ligand_file_data.items():
-                # value.split('_')[0]
-                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                + project_name + '/CatMec/Ligand_Parametrization/' + str(value.split('_')[0]) + ".gro",
-                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + str(
-                                    value.split('_')[0]) + ".gro")
-                # .ITP files
-                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                + project_name + '/CatMec/Ligand_Parametrization/' + str(value.split('_')[0]) + ".itp",
-                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + str(
-                                    value.split('_')[0]) + ".itp")
-
-            # copy "ATOMTYPES" file from CatMec module
-            shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                            + project_name + '/CatMec/Ligand_Parametrization/atomtypes.itp',
-                            config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                            + project_name + '/' + command_tool + '/' + line.strip() + '/atomtypes.itp')
-
-            # change DIR to Mutations list
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + line.strip() + '/')
-            # execute make_complex.py
-            os.system(make_complex_params_replaced)
-            # queue command to database make_complex
-            '''command_text_area = make_complex_params_replaced
-            status = config.CONSTS['status_queued']
-            comments = ""
-            command_title_as_variant = line.strip()
-            entry_time = datetime.now()
-            result_insert_QZwProjectCommands = commandDetails(project_id=project_id, user_id=user_id,
-                                                                  primary_command=command_text_area,
-                                                                  entry_time=entry_time,
-                                                                  status=status, command_tool=command_tool,
-                                                                  command_title=command_title_as_variant, comments=comments)
-            result = result_insert_QZwProjectCommands.save()'''
-            '''
-              ____                __  __ ____    ____  _                 _       _   _                 
-             |  _ \ _   _ _ __   |  \/  |  _ \  / ___|(_)_ __ ___  _   _| | __ _| |_(_) ___  _ __  ___ 
-             | |_) | | | | '_ \  | |\/| | | | | \___ \| | '_ ` _ \| | | | |/ _` | __| |/ _ \| '_ \/ __|
-             |  _ <| |_| | | | | | |  | | |_| |  ___) | | | | | | | |_| | | (_| | |_| | (_) | | | \__ \
-             |_| \_\\__,_|_| |_| |_|  |_|____/  |____/|_|_| |_| |_|\__,_|_|\__,_|\__|_|\___/|_| |_|___/
-
-            '''
-
-            md_mutation_folder = line.strip()
-            execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
-
-            # EXECUTE MMPBSA
-            '''
-              ____                __  __ __  __ ____  ____ ____    _    
-             |  _ \ _   _ _ __   |  \/  |  \/  |  _ \| __ ) ___|  / \   
-             | |_) | | | | '_ \  | |\/| | |\/| | |_) |  _ \___ \ / _ \  
-             |  _ <| |_| | | | | | |  | | |  | |  __/| |_) |__) / ___ \ 
-             |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
-
-            '''
-            designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
-
-            # EXECUTE CONTACT SCORE
-            '''
-               ____            _             _     ____                     
-              / ___|___  _ __ | |_ __ _  ___| |_  / ___|  ___ ___  _ __ ___ 
-             | |   / _ \| '_ \| __/ _` |/ __| __| \___ \ / __/ _ \| '__/ _ \
-             | |__| (_) | | | | || (_| | (__| |_   ___) | (_| (_) | | |  __/
-              \____\___/|_| |_|\__\__,_|\___|\__| |____/ \___\___/|_|  \___|
-            '''
-            # designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
-
-            # counter for next mutant folder
             variant_index_count += 1
 
 
