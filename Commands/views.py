@@ -4056,16 +4056,16 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                               mutations_dirs))
                 if os.path.isdir(os.path.join(config.PATH_CONFIG[
                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
-                                              mutations_dirs)) and mutations_dirs.strip() == "variant_"+str(variant_index_dir):
+                                              mutations_dirs)) :
                     # ------------ loop for mutations dir -----------------
                     pdb_file_index_str = 0 # index for PDB (file) variant
                     for variants_dir in mutations_dirs:
                         print "in variants dir ------"
-                        print  "variant_"+str(variant_index_dir)+".pdb"
+                        print  "variant_"+str(pdb_file_index_str)+".pdb"
                         print variants_dir.endswith(".pdb")
-                        print variants_dir.strip() == "variant_"+str(variant_index_dir)+".pdb"
+                        print variants_dir.strip() == "variant_"+str(pdb_file_index_str)+".pdb"
                         # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
-                        if variants_dir.endswith(".pdb") and variants_dir.strip() == "variant_"+str(pdb_file_index_str)+".pdb":
+                        if variants_dir.endswith(".pdb"):
                             # **************** PDB file  ********************"
                             print "with pdb dir ---------------------"
                             print config.PATH_CONFIG[
