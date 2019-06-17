@@ -4053,7 +4053,8 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                 print "inside loop for variant dirs ---------------"
                 print mutations_dirs
                 print str(variant_index_dir)
-                if os.path.isdir(mutations_dirs):
+                if os.path.isdir(os.path.join(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+              + project_name + '/' + command_tool + '/' +line.strip(),mutations_dirs)):
                     print "in loop for mutations dir -----------------"
                     print mutations_dirs
                     pdb_file_index_str = 0
