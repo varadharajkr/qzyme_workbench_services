@@ -3807,7 +3807,7 @@ class Hotspot(APIView):
             '''
             hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
 
@@ -3819,7 +3819,7 @@ class Hotspot(APIView):
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations error >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
 
@@ -4028,6 +4028,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
 #Hotspot module Make complex params
 def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name):
+    print "in  hotspot_queue_make_complex_params  definition =================="
     # get mutation filename from keyname (designer_input_mutations_file)
     key_mutations_filename = "hotspot_input_mutations_file"
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
