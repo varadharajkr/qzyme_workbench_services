@@ -4053,17 +4053,13 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                 print "inside loop for variant dirs ---------------"
                 print mutations_dirs
                 print str(variant_index_dir)
-                if os.path.isdir(mutations_dirs) and mutations_dirs.strip() == "variant_" + str(variant_index_dir):
-                    print "dir name match"
-                else:
-                    print "not matching dir name"
-                if os.path.isdir(mutations_dirs) and mutations_dirs.strip() == "variant_"+str(variant_index_dir):
+                if os.path.isdir(mutations_dirs):
                     print "in loop for mutations dir -----------------"
                     print mutations_dirs
                     pdb_file_index_str = 0
                     for variants_dir in mutations_dirs:
                         print "in loop for variants dir >>>>>>>>>>>>>>>>>"
-                        if variants_dir.endswith(".pdb") and variants_dir.strip() == "variant_"+str(pdb_file_index_str):
+                        if variants_dir.endswith(".pdb"):
                             print "PDB file found ********************"
                             print variants_dir
                         pdb_file_index_str += 1
