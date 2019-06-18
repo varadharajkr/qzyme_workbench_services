@@ -488,6 +488,7 @@ class analyse_mmpbsa(APIView):
 
 #new code for Designer MMPBSA
 def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    entry_time = datetime.now()
     # get command details from database
     #create ANALYSIS and MMPBSA folder in Mutations respective folder
     os.system("mkdir "+config.PATH_CONFIG[
@@ -794,6 +795,397 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+ \
                                 config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
                                 config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+ \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+             config.PATH_CONFIG['mmpbsa_project_path'])
+    os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
+    os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+    os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
+    return JsonResponse({"success": True})
+
+def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_id):
+    #MMPBSA for hotspot module
+    entry_time = datetime.now()
+    # get mutation filename from keyname (designer_input_mutations_file)
+    key_mutations_filename = "hotspot_input_mutations_file"
+    ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                      key_name=key_mutations_filename).latest(
+        'entry_time')
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
+
+    #get TRJCAT command string to be executed
+    get_hotspot_trjcat_command_str(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+    # open mutated text file and loop thru to prepare files for make_complex.py
+    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+              + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
+              ) as fp_mutated_list:
+        mutated_list_lines = fp_mutated_list.readlines()
+        variant_index_count = 0  # mutants entry
+        for line in mutated_list_lines:
+            # ********** line loop in mutations file read ***********
+            # create ANALYSIS and MMPBSA folder in Mutations respective folder
+            os.system("mkdir " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + line.strip() + "/Analysis")
+            os.system("mkdir " + config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + line.strip() + "/Analysis/MMPBSA/")
+            variant_index_dir = 0  # variant dirs counter
+            for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                             + project_name + '/' + command_tool + '/' + line.strip()):
+                # ---------- loop for variant dirs ---------------
+                print "in mutants dir "
+
+                if os.path.isdir(os.path.join(config.PATH_CONFIG[
+                                                  'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
+                                              mutations_dirs)):
+                    # ------------ loop for mutations dir -----------------
+                    print "print mutations_dirs"
+                    print mutations_dirs
+                    pdb_file_index_str = 0  # index for PDB (file) variant
+                    for variants_dir in os.listdir(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
+                        print "in variants dir ------"
+                        print  "variant_" + str(pdb_file_index_str) + ".pdb"
+                        print variants_dir.endswith(".pdb")
+                        print variants_dir.strip() == "variant_" + str(pdb_file_index_str) + ".pdb"
+                        # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
+                        if variants_dir.endswith(".pdb"):
+                            # **************** PDB file  ********************"
+                            print "with pdb dir ---------------------"
+                            print config.PATH_CONFIG[
+                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip()
+
+
+    # -----------------------------------======================--------------------------------------------------------------
+
+    inp_command_id = request.POST.get("command_id")
+    commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+    project_id = commandDetails_result.project_id
+    QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+    project_name = QzwProjectDetails_res.project_name
+
+    mdsimulations_source = config.PATH_CONFIG['shared_folder_path'
+                           ] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/"
+    xtc_files_list = {}
+    index_file_list = []
+    tpr_file_list = []
+    xtc_file_list_count = 1
+    # loop thru al files and directories in MDSimulations directory
+    for dirs in listdir(mdsimulations_source):
+        if os.path.isdir(os.path.join(mdsimulations_source, dirs)):  # check if directory
+            if re.match("md_run*", dirs):  # considerning only directories starting with md_run
+                for dir_files in listdir(os.path.join(mdsimulations_source, dirs)):
+                    if dir_files.endswith(".tpr"):  # applying .tpr file filter
+                        tpr_file_list.append(os.path.join(dirs, dir_files))
+                    if dir_files.endswith(".ndx"):  # applying .ndx file filter
+                        index_file_list.append(os.path.join(dirs, dir_files))
+                    if dir_files.endswith(".xtc"):  # applying .xtc file filter
+                        print "xtc file found"  # ^\[.*\]\n
+                        xtc_files_list.update({xtc_file_list_count: os.path.join(dirs, dir_files)})
+                        xtc_file_list_count += 1
+
+    ndx_count = 0
+    ndx_input_dict = {}
+    #
+    print tpr_file_list
+    with open(mdsimulations_source + index_file_list[0], 'r'
+              ) as fp:
+        lines = fp.readlines()
+        for line in lines:
+            if re.match("^\[.*\]\n", line):
+                ndx_input_dict.update({line.strip(): ndx_count})
+                ndx_count += 1
+
+    md_simulations_tpr_file = tpr_file_list[0].replace('\\', '/')
+
+    md_simulations_ndx_file = index_file_list[0].replace('\\', '/')
+
+    # save tpr file required to process MMPBSA in webservices
+    key_name_tpr_file = 'designer_mmpbsa_tpr_file'
+    ProjectToolEssentials_save_designer_mmpbsa_tpr_file = ProjectToolEssentials(tool_title=command_tool,
+                                                                                project_id=project_id,
+                                                                                key_name=key_name_tpr_file,
+                                                                                values=tpr_file_list[0],
+                                                                                entry_time=entry_time)
+    result_ProjectToolEssentials_save_mmpbsa_tpr_file = ProjectToolEssentials_save_designer_mmpbsa_tpr_file.save()
+
+    key_name_CatMec_input = 'substrate_input'
+    command_tootl_title = "CatMec"
+    # get list of ligand inputs
+    ProjectToolEssentials_res_CatMec_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                   key_name=key_name_CatMec_input).latest('entry_time')
+    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+    # if User has only one ligand as input
+    multiple_ligand_input = False
+    if len(CatMec_input_dict) > 1:
+        multiple_ligand_input = True
+
+    indexfile_input_dict = ndx_input_dict
+    xtcfile_input_dict = xtc_files_list
+
+    '''
+                                                              .                o8o                         .        
+                                                    .o8                `"'                       .o8        
+     .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .oooo.   .o888oo      
+    888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 `P  )88b    888        
+    888   888   888   888   888     Y888'           888    888         888 888        .oP"888    888        
+    `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 d8(  888    888 .      
+    `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y888""8o   "888"      
+    d"     YD                                                          888                                  
+    "Y88888P'                                                      .o. 88P                                  
+                                                                   `Y888P                                           
+    '''
+    # if len(xtcfile_input_dict) > 1:
+    md_xtc_files_str = ""
+    # mmpbsa_project_path
+    for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
+        xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
+        md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + \
+                            command_tool + "/" + md_mutation_folder + "/" + xtcfile_inputvalue_formatted + " "
+    gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                     config.PATH_CONFIG[
+                         'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
+    os.system(gmx_trjcat_cmd)
+
+    '''
+                                                                                      oooo                                                .o8              
+                                                                              `888                                               "888              
+     .oooooooo ooo. .oo.  .oo.   oooo    ooo      ooo. .oo.  .oo.    .oooo.    888  oooo   .ooooo.              ooo. .oo.    .oooo888  oooo    ooo 
+    888' `88b  `888P"Y88bP"Y88b   `88b..8P'       `888P"Y88bP"Y88b  `P  )88b   888 .8P'   d88' `88b             `888P"Y88b  d88' `888   `88b..8P'  
+    888   888   888   888   888     Y888'          888   888   888   .oP"888   888888.    888ooo888              888   888  888   888     Y888'    
+    `88bod8P'   888   888   888   .o8"'88b         888   888   888  d8(  888   888 `88b.  888    .o              888   888  888   888   .o8"'88b   
+    `8oooooo.  o888o o888o o888o o88'   888o      o888o o888o o888o `Y888""8o o888o o888o `Y8bod8P' ooooooooooo o888o o888o `Y8bod88P" o88'   888o 
+    d"     YD                                                                                                                                      
+    "Y88888P'                                                                                                                                      
+    '''
+    if multiple_ligand_input:
+        # for multiple ligand input
+        print "for multiple ligand input"
+        # get user input ligand name from DB
+        key_name_ligand_input = 'mmpbsa_input_ligand'
+
+        ProjectToolEssentials_res_ligand_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ligand_input).latest('entry_time')
+        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        # extract ligand number
+        if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
+            ligand_name_input = str(indexfile_input_dict["[ " + ligand_name + " ]"])
+        indexfile_complex_option_input = ""
+        indexfile_receptor_option_input = ""
+        # prepare receptor option input string
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            ligand_name_split = ligand_inputvalue.split("_")
+            dict_ligand_name = ligand_name_split[0]
+            if "[ " + dict_ligand_name + " ]" in indexfile_input_dict.keys() and dict_ligand_name != ligand_name:
+                indexfile_receptor_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
+        # prepare complex option input string
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            dict_ligand_name = ligand_inputkey[:-4]
+            if "[ " + dict_ligand_name + " ]" in indexfile_input_dict.keys():
+                indexfile_complex_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
+
+        if "[ Protein ]" in indexfile_input_dict.keys():
+            indexfile_complex_option_input += str(indexfile_input_dict["[ Protein ]"])
+            indexfile_receptor_option_input += str(indexfile_input_dict["[ Protein ]"])
+        # reverse the strings
+        indexfile_complex_option_input = indexfile_complex_option_input.split(" | ")
+        indexfile_complex_option_input = indexfile_complex_option_input[-1::-1]
+        reversed_indexfile_complex_option_input = ' | '.join(indexfile_complex_option_input)
+
+        indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
+        indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
+        reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
+        print reversed_indexfile_complex_option_input
+        print reversed_indexfile_receptor_option_input
+        maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
+        receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
+        protien_ligand_complex_index = receptor_index + 1
+        # write protien ligand complex index number to DB
+        entry_time = datetime.now()
+        key_name_protien_ligand_complex_index = 'mmpbsa_index_file_protien_ligand_complex_number'
+        ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(
+            tool_title=commandDetails_result.command_tool,
+            project_id=project_id,
+            key_name=key_name_protien_ligand_complex_index,
+            values=protien_ligand_complex_index,
+            entry_time=entry_time)
+        result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
+        ligand_name_index = protien_ligand_complex_index + 1
+        file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt",
+                                       "w")
+        file_gmx_make_ndx_input.write(
+            str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(
+                reversed_indexfile_complex_option_input) + "\nname " + str(
+                protien_ligand_complex_index) + " complex" + "\n" + str(ligand_name_input) + "\nname " + str(
+                ligand_name_index) + " ligand" + "\nq\n")
+        file_gmx_make_ndx_input.close()
+
+        gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
+                       config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                       config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
+                       config.PATH_CONFIG[
+                           'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
+
+        print " make index command"
+        print gmx_make_ndx
+        os.system(gmx_make_ndx)
+
+    else:
+        # for single ligand input
+        # get ligand name
+        ligand_name = ""
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            ligand_name = ligand_inputkey[:-4]
+        # prepare input file for gmx make_ndx command
+        protein_index = 0
+        ligandname_index = 0
+        for indexfile_inputkey, indexfile_inputvalue in indexfile_input_dict.iteritems():  # key is index option text and value is index number
+            if ligand_name in indexfile_inputkey:
+                ligandname_index = indexfile_inputvalue
+            if "[ Protein ]" == indexfile_inputkey:
+                protein_index = indexfile_inputvalue
+        maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
+        # print indexfile_input_dict[maximum_key_ndx_input]
+        receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
+        protien_ligand_complex_index = receptor_index + 1
+        file_gmx_make_ndx_input = open(config.PATH_CONFIG[
+                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt",
+                                       "w")
+        file_gmx_make_ndx_input.write(
+            str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex")
+        file_gmx_make_ndx_input.close()
+        gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
+                       config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                       config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
+                       config.PATH_CONFIG[
+                           'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
+
+        print " make index command"
+        print gmx_make_ndx
+        os.system(gmx_make_ndx)
+
+    perform_cmd_trajconv_designer_queue(project_name, project_id, md_simulations_tpr_file, md_simulations_ndx_file,
+                                        md_mutation_folder, command_tool)
+    # ===================   post processing after make index  ===============================
+    # copy MD .tpr file to MMPBSA working directory
+    source_tpr_md_file = config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file
+    tpr_file_split = md_simulations_tpr_file.split("/")
+    dest_tpr_md_file = config.PATH_CONFIG[
+                           'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                       config.PATH_CONFIG['mmpbsa_project_path'] + tpr_file_split[1]
+
+    shutil.copyfile(source_tpr_md_file, dest_tpr_md_file)
+
+    # copy topology file from MS to MMPBSA working directory
+    source_topology_file = config.PATH_CONFIG[
+                               'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + \
+                           tpr_file_split[0] + "/topol.top"
+    dest_topology_file = config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                         config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top"
+    shutil.copyfile(source_topology_file, dest_topology_file)
+
+    # copy ligand .itp files
+    for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+        ligand_name_split = ligand_inputvalue.split("_")
+        source_itp_file = config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + \
+                          tpr_file_split[0] + "/" + ligand_name_split[0] + ".itp"
+        dest_itp_file = config.PATH_CONFIG[
+                            'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                        config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
+        shutil.copyfile(source_itp_file, dest_itp_file)
+
+    key_name_ligand_input = 'mmpbsa_input_ligand'
+    # processing itp files
+    pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict,
+                                            key_name_ligand_input, md_mutation_folder, command_tool)
+
+    # ----------------------   make a "trail" directory for MMPBSA   -----------------------
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" +
+              config.PATH_CONFIG['mmpbsa_project_path'] + "trial")
+    # copying MMPBSA input files to trail directory
+    # copy .XTC file
+    shutil.copyfile(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                    config.PATH_CONFIG['mmpbsa_project_path'] + "merged-recentered.xtc",
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                    config.PATH_CONFIG['mmpbsa_project_path'] + "trial/npt.xtc")
+
+    # copy other input files for MMPBSA
+    for file_name in os.listdir(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path']):
+        # copy .TPR file
+        if file_name.endswith(".tpr"):
+            shutil.copyfile(config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                            config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/npt.tpr")
+        # copy .NDX file
+        if file_name.endswith(".ndx"):
+            shutil.copyfile(config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                            config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/index.ndx")
+
+        # copy .TOP file
+        if file_name.endswith(".top"):
+            shutil.copyfile(config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                            config.PATH_CONFIG[
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+        # copy .ITP files
+        if file_name.endswith(".itp"):
+            # renaming user input ligand as LIGAND
+            key_name_ligand_input = 'mmpbsa_input_ligand'
+
+            ProjectToolEssentials_res_ligand_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_ligand_input).latest('entry_time')
+            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            if file_name[:-4] == ligand_name:
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/ligand.itp")
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+            else:
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
                                 config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
 
     os.chdir(config.PATH_CONFIG[
@@ -2465,7 +2857,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
     return JsonResponse({'success': True})
 
-@csrf_exempt
+
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     key_name = 'md_simulation_no_of_runs'
 
@@ -2525,6 +2917,70 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         os.system(
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
     return JsonResponse({'success': True})
+
+
+#Run MD Simulations for Hotspot module
+def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id,
+                                                  user_id,variant_dir_md):
+    key_name = 'md_simulation_no_of_runs'
+
+    ProjectToolEssentials_res = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name).latest('entry_time')
+
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
+    print md_run_no_of_conformation
+    # copy MDP files to working directory
+    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
+    for mdp_file in MDP_filelist:
+        shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                        + project_name + '/CatMec/MD_Simulation/' + mdp_file + '.mdp',
+                        config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                        + project_name + '/' + command_tool + '/' +str(md_mutation_folder)+"/"+variant_dir_md+"/"+ mdp_file + '.mdp')
+
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"+str(md_mutation_folder)+"/"+variant_dir_md+"/"
+    for i in range(int(md_run_no_of_conformation)):
+        print (source_file_path + 'md_run' + str(i + 1))
+        os.mkdir(source_file_path + 'md_run' + str(i + 1))
+        dest_file_path = source_file_path + 'md_run' + str(i + 1)
+        for file_name in os.listdir(source_file_path):
+            try:
+                print "inside try"
+                shutil.copy(str(source_file_path) + file_name, dest_file_path)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
+                pass
+            except Exception:
+                print("Unexpected error:", sys.exc_info())
+                pass
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
+        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+        group_value = sol_group_option()
+        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
+        SOL_replace_str = SOL_replace_backup
+        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
+        print("printing group value in MD$$$$$$$$$$$$$$$$$$")
+        print(group_value)
+        print("printing after %SOL% replace")
+        print(SOL_replace_str)
+        os.system(SOL_replace_str)
+        os.system("echo q | gmx make_ndx -f solve_ions.gro")
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        # Hotspot MD RUN ends here ----
+        # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
+        # os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        # os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
+        # os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        # os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
+        # os.system(
+        #     "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+    return JsonResponse({'success': True})
+
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
@@ -3806,6 +4262,16 @@ class Hotspot(APIView):
             o8o        o888o o88o     o8888o o888o  o888o o888ooooood8       `Y8bood8P'   `Y8bood8P'  o8o        o888o o888o        o888ooooood8 o888ooooood8 o888o  o88888o 
             '''
             hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
+
+            '''
+              ____                __  __ __  __ ____  ____ ____    _    
+             |  _ \ _   _ _ __   |  \/  |  \/  |  _ \| __ ) ___|  / \   
+             | |_) | | | | '_ \  | |\/| | |\/| | |_) |  _ \___ \ / _ \  
+             |  _ <| |_| | | | | | |  | | |  | |  __/| |_) |__) / ___ \ 
+             |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
+
+            '''
+            hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_id)
             try:
                 print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_success']
@@ -4062,7 +4528,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                     print mutations_dirs
                     pdb_file_index_str = 0 # index for PDB (file) variant
                     for variants_dir in os.listdir(config.PATH_CONFIG[
-                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
+                                                        'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
                         print "in variants dir ------"
                         print  "variant_"+str(pdb_file_index_str)+".pdb"
                         print variants_dir.endswith(".pdb")
@@ -4072,12 +4538,13 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             # **************** PDB file  ********************"
                             print "with pdb dir ---------------------"
                             print config.PATH_CONFIG[
-                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip() + '/variant_' + str(
-                                pdb_file_index_str) + '.pdb'
-                            print "without pdb dir ++++++++++++++++++++++"
-                            print config.PATH_CONFIG[
-                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + '/variant_' + str(
-                                pdb_file_index_str) + '.pdb'
+                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip()
+
+
+
+
+
+
                         pdb_file_index_str += 1
                 variant_index_dir += 1
 
