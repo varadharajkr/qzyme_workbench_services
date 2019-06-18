@@ -4511,6 +4511,8 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
         mutated_list_lines = fp_mutated_list.readlines()
         variant_index_count = 0 # mutants entry
         for line in mutated_list_lines:
+            print "in mutations folder !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! and folder name is"
+            print line.strip()
             # ********** line loop in mutations file read ***********
             variant_index_dir = 0 # variant dirs counter
             for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
