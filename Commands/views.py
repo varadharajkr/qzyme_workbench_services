@@ -1560,8 +1560,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     new_input_lines = ""
     itp_ligand = "ligand.itp"
     itp_receptor = "complex.itp"
-    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat") as mmpbsa_input_file:
+    with open(config.PATH_CONFIG['shared_scripts'] + 'CatMec/Analysis/MMPBSA/'+"INPUT.dat") as mmpbsa_input_file:
         for line in mmpbsa_input_file:
             if ("\titp_ligand" in line):
                 line = "\titp_ligand  " + itp_ligand + "\n"
@@ -1865,7 +1864,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     new_input_lines = ""
     itp_ligand = "ligand.itp"
     itp_receptor = "complex.itp"
-    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat") as mmpbsa_input_file:
+    with open(config.PATH_CONFIG['shared_scripts'] + "CatMec/Analysis/MMPBSA/"+"INPUT.dat") as mmpbsa_input_file:
         for line in mmpbsa_input_file:
             if ("\titp_ligand" in line):
                 line = "\titp_ligand  " + itp_ligand + "\n"
@@ -3622,16 +3621,31 @@ class Homology_Modelling(APIView):
             print "success executing command"
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< success try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< success except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
             print "error executing command!!"
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< error try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< error except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -3719,16 +3733,30 @@ class Loop_Modelling(APIView):
             print "success executing command"
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< success try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< success except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
             print "error executing command!!"
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            try:
+                print "<<<<<<<<<<<<<<<<<<<<<<< error try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print "<<<<<<<<<<<<<<<<<<<<<<< error except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -4168,8 +4196,15 @@ class CatMec(APIView):
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(out)
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print "inside error"
@@ -4177,8 +4212,15 @@ class CatMec(APIView):
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(err)
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
             print command_tool_title
@@ -4218,8 +4260,15 @@ class CatMec(APIView):
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(out)
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print "inside error"
@@ -4227,8 +4276,15 @@ class CatMec(APIView):
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(err)
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         elif command_tool_title == "MD_Simulation":
@@ -4330,22 +4386,28 @@ class CatMec(APIView):
                 print out
                 fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
                 fileobj.write(out)
-                status_id = config.CONSTS['status_success']
-                moveFile_source = config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+commandDetails_result.command_title+'/outputFiles/'
-                moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-                #move_outputFiles(moveFile_source,moveFile_destination)
-                update_command_status(inp_command_id,status_id)
-                #move_files_(inp_command_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
             if process_return.returncode != 0:
                 fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-                #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
                 fileobj.write(err)
-                status_id = config.CONSTS['status_error']
-                moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/outputFiles/'
-                moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
-                #move_outputFiles(moveFile_source, moveFile_destination)
-                update_command_status(inp_command_id,status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Catmec docking condition >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Catmec docking condition  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
                 #move_files_(inp_command_id)
                 return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
