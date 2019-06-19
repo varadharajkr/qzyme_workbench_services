@@ -805,7 +805,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
     return JsonResponse({"success": True})
 
-def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_id):
+def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_tool,project_id, user_id):
     #MMPBSA for hotspot module
     entry_time = datetime.now()
     # get mutation filename from keyname (designer_input_mutations_file)
@@ -815,100 +815,43 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
         'entry_time')
     hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
 
-    #get TRJCAT command string to be executed
-    get_hotspot_trjcat_command_str(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
-    # open mutated text file and loop thru to prepare files for make_complex.py
-    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-              + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
-              ) as fp_mutated_list:
-        mutated_list_lines = fp_mutated_list.readlines()
-        variant_index_count = 0  # mutants entry
-        for line in mutated_list_lines:
-            # ********** line loop in mutations file read ***********
-            # create ANALYSIS and MMPBSA folder in Mutations respective folder
-            os.system("mkdir " + config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + line.strip() + "/Analysis")
-            os.system("mkdir " + config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + line.strip() + "/Analysis/MMPBSA/")
-            variant_index_dir = 0  # variant dirs counter
-            for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                             + project_name + '/' + command_tool + '/' + line.strip()):
-                # ---------- loop for variant dirs ---------------
-                print "in mutants dir "
+    #create MMPBSA dir only
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/")
 
-                if os.path.isdir(os.path.join(config.PATH_CONFIG[
-                                                  'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
-                                              mutations_dirs)):
-                    # ------------ loop for mutations dir -----------------
-                    print "print mutations_dirs"
-                    print mutations_dirs
-                    pdb_file_index_str = 0  # index for PDB (file) variant
-                    for variants_dir in os.listdir(config.PATH_CONFIG[
-                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
-                        print "in variants dir ------"
-                        print  "variant_" + str(pdb_file_index_str) + ".pdb"
-                        print variants_dir.endswith(".pdb")
-                        print variants_dir.strip() == "variant_" + str(pdb_file_index_str) + ".pdb"
-                        # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
-                        if variants_dir.endswith(".pdb"):
-                            # **************** PDB file  ********************"
-                            print "with pdb dir ---------------------"
-                            print config.PATH_CONFIG[
-                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip()
+    # -----------------------------------------------------------------------------------------------------
+    # --------------------    get TRJCAT command string to be executed    ---------------------------------
+    # -----------------------------------------------------------------------------------------------------
 
+    trajcat_return_list = get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, command_tool, project_id, user_id)
 
-    # -----------------------------------======================--------------------------------------------------------------
+    # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
+    # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
+    # -----------------------------------------------------------------------------------------------------
+    # --------------------    TRJCAT RUN   ----------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------
 
-    inp_command_id = request.POST.get("command_id")
-    commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
-    project_id = commandDetails_result.project_id
-    QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
-    project_name = QzwProjectDetails_res.project_name
+    gmx_trjcat_cmd = "gmx trjcat -f " + trajcat_return_list[0] + " -o " + config.PATH_CONFIG[
+       'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc -keeplast -cat"
 
-    mdsimulations_source = config.PATH_CONFIG['shared_folder_path'
-                           ] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/"
-    xtc_files_list = {}
-    index_file_list = []
-    tpr_file_list = []
-    xtc_file_list_count = 1
-    # loop thru al files and directories in MDSimulations directory
-    for dirs in listdir(mdsimulations_source):
-        if os.path.isdir(os.path.join(mdsimulations_source, dirs)):  # check if directory
-            if re.match("md_run*", dirs):  # considerning only directories starting with md_run
-                for dir_files in listdir(os.path.join(mdsimulations_source, dirs)):
-                    if dir_files.endswith(".tpr"):  # applying .tpr file filter
-                        tpr_file_list.append(os.path.join(dirs, dir_files))
-                    if dir_files.endswith(".ndx"):  # applying .ndx file filter
-                        index_file_list.append(os.path.join(dirs, dir_files))
-                    if dir_files.endswith(".xtc"):  # applying .xtc file filter
-                        print "xtc file found"  # ^\[.*\]\n
-                        xtc_files_list.update({xtc_file_list_count: os.path.join(dirs, dir_files)})
-                        xtc_file_list_count += 1
+    os.system(gmx_trjcat_cmd)
 
+    # -----------------------------------------------------------------------------------------------------
+    # --------------------   END TRJCAT RUN   ----------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------
     ndx_count = 0
     ndx_input_dict = {}
-    #
-    print tpr_file_list
-    with open(mdsimulations_source + index_file_list[0], 'r'
-              ) as fp:
+    #get index file '[]' data and count in dictionary
+    with open(trajcat_return_list[2], 'r') as fp:
         lines = fp.readlines()
         for line in lines:
             if re.match("^\[.*\]\n", line):
                 ndx_input_dict.update({line.strip(): ndx_count})
                 ndx_count += 1
 
-    md_simulations_tpr_file = tpr_file_list[0].replace('\\', '/')
+    md_simulations_tpr_file = trajcat_return_list[1]
 
-    md_simulations_ndx_file = index_file_list[0].replace('\\', '/')
-
-    # save tpr file required to process MMPBSA in webservices
-    key_name_tpr_file = 'designer_mmpbsa_tpr_file'
-    ProjectToolEssentials_save_designer_mmpbsa_tpr_file = ProjectToolEssentials(tool_title=command_tool,
-                                                                                project_id=project_id,
-                                                                                key_name=key_name_tpr_file,
-                                                                                values=tpr_file_list[0],
-                                                                                entry_time=entry_time)
-    result_ProjectToolEssentials_save_mmpbsa_tpr_file = ProjectToolEssentials_save_designer_mmpbsa_tpr_file.save()
+    md_simulations_ndx_file = trajcat_return_list[2]
 
     key_name_CatMec_input = 'substrate_input'
     command_tootl_title = "CatMec"
@@ -923,32 +866,6 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
         multiple_ligand_input = True
 
     indexfile_input_dict = ndx_input_dict
-    xtcfile_input_dict = xtc_files_list
-
-    '''
-                                                              .                o8o                         .        
-                                                    .o8                `"'                       .o8        
-     .oooooooo ooo. .oo.  .oo.   oooo    ooo      .o888oo oooo d8b    oooo  .ooooo.   .oooo.   .o888oo      
-    888' `88b  `888P"Y88bP"Y88b   `88b..8P'         888   `888""8P    `888 d88' `"Y8 `P  )88b    888        
-    888   888   888   888   888     Y888'           888    888         888 888        .oP"888    888        
-    `88bod8P'   888   888   888   .o8"'88b          888 .  888         888 888   .o8 d8(  888    888 .      
-    `8oooooo.  o888o o888o o888o o88'   888o        "888" d888b        888 `Y8bod8P' `Y888""8o   "888"      
-    d"     YD                                                          888                                  
-    "Y88888P'                                                      .o. 88P                                  
-                                                                   `Y888P                                           
-    '''
-    # if len(xtcfile_input_dict) > 1:
-    md_xtc_files_str = ""
-    # mmpbsa_project_path
-    for xtcfile_inputkey, xtcfile_inputvalue in xtcfile_input_dict.iteritems():
-        xtcfile_inputvalue_formatted = xtcfile_inputvalue.replace('\\', '/')
-        md_xtc_files_str += config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + \
-                            command_tool + "/" + md_mutation_folder + "/" + xtcfile_inputvalue_formatted + " "
-    gmx_trjcat_cmd = "gmx trjcat -f " + md_xtc_files_str + " -o " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                     config.PATH_CONFIG[
-                         'mmpbsa_project_path'] + "merged.xtc -keeplast -cat"
-    os.system(gmx_trjcat_cmd)
 
     '''
                                                                                       oooo                                                .o8              
@@ -1006,6 +923,7 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
         protien_ligand_complex_index = receptor_index + 1
         # write protien ligand complex index number to DB
         entry_time = datetime.now()
+        '''
         key_name_protien_ligand_complex_index = 'mmpbsa_index_file_protien_ligand_complex_number'
         ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(
             tool_title=commandDetails_result.command_tool,
@@ -1014,9 +932,10 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
             values=protien_ligand_complex_index,
             entry_time=entry_time)
         result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
+        '''
         ligand_name_index = protien_ligand_complex_index + 1
         file_gmx_make_ndx_input = open(config.PATH_CONFIG[
-                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt",
+                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt",
                                        "w")
         file_gmx_make_ndx_input.write(
             str(reversed_indexfile_receptor_option_input) + "\nname " + str(receptor_index) + " receptor\n" + str(
@@ -1025,17 +944,13 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
                 ligand_name_index) + " ligand" + "\nq\n")
         file_gmx_make_ndx_input.close()
 
-        gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
+        gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
-                       config.PATH_CONFIG[
-                           'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
+                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
-        print " make index command"
+        print " make index command in HOTSPOT MMPBSA"
         print gmx_make_ndx
         os.system(gmx_make_ndx)
 
@@ -1058,107 +973,92 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
         file_gmx_make_ndx_input = open(config.PATH_CONFIG[
-                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt",
+                                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt",
                                        "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
                 ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex")
         file_gmx_make_ndx_input.close()
-        gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
+        gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
-                       config.PATH_CONFIG[
-                           'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
+                           'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
-        print " make index command"
+        print " make index command in HOTSPOT MMPBSA"
         print gmx_make_ndx
         os.system(gmx_make_ndx)
 
-    perform_cmd_trajconv_designer_queue(project_name, project_id, md_simulations_tpr_file, md_simulations_ndx_file,
-                                        md_mutation_folder, command_tool)
-    # ===================   post processing after make index  ===============================
-    # copy MD .tpr file to MMPBSA working directory
-    source_tpr_md_file = config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file
+    # -------------------------   Call to execute trajconv command -----------------------------------------------------
+    perform_cmd_trajconv_hotspot_mmpbsa(project_name, project_id, md_simulations_tpr_file, md_simulations_ndx_file,
+                                        mutation_dir_mmpbsa, command_tool)
+
+    # ==================================================================================================================
+    # ===================   post processing after make index  ==========================================================
+    # ==================================================================================================================
+
+    # ------------------   copy MD .tpr file to MMPBSA working directory   ---------------------------------------------
+    source_tpr_md_file = md_simulations_tpr_file
     tpr_file_split = md_simulations_tpr_file.split("/")
     dest_tpr_md_file = config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                       config.PATH_CONFIG['mmpbsa_project_path'] + tpr_file_split[1]
+                           'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + tpr_file_split[-1]
 
     shutil.copyfile(source_tpr_md_file, dest_tpr_md_file)
 
-    # copy topology file from MS to MMPBSA working directory
-    source_topology_file = config.PATH_CONFIG[
-                               'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + \
-                           tpr_file_split[0] + "/topol.top"
+    # ------------------   copy topology file from MS to MMPBSA working directory   ------------------------------------
+    source_topology_file = trajcat_return_list[3] # topology file
     dest_topology_file = config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                         config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top"
+                             'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "topol.top"
     shutil.copyfile(source_topology_file, dest_topology_file)
 
-    # copy ligand .itp files
+    # ------------------   copy ligand .itp files   --------------------------------------------------------------------
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
         ligand_name_split = ligand_inputvalue.split("_")
-        source_itp_file = config.PATH_CONFIG[
-                              'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + \
-                          tpr_file_split[0] + "/" + ligand_name_split[0] + ".itp"
+        # rsplit is a shorthand for "reverse split", and unlike regular split works from the end of a string.
+        source_itp_file = md_simulations_tpr_file.rsplit("/",1)[0] + "/" + ligand_name_split[0] + ".itp"
         dest_itp_file = config.PATH_CONFIG[
-                            'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                        config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
+                            'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + ligand_name_split[0] + ".itp"
         shutil.copyfile(source_itp_file, dest_itp_file)
 
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
-    pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict,
-                                            key_name_ligand_input, md_mutation_folder, command_tool)
+    pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tpr_file, CatMec_input_dict,
+                                            key_name_ligand_input, mutation_dir_mmpbsa, command_tool)
 
     # ----------------------   make a "trail" directory for MMPBSA   -----------------------
     os.system("mkdir " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" +
-              config.PATH_CONFIG['mmpbsa_project_path'] + "trial")
-    # copying MMPBSA input files to trail directory
-    # copy .XTC file
-    shutil.copyfile(config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                    config.PATH_CONFIG['mmpbsa_project_path'] + "merged-recentered.xtc",
-                    config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                    config.PATH_CONFIG['mmpbsa_project_path'] + "trial/npt.xtc")
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial")
 
-    # copy other input files for MMPBSA
+    # -----------------   copying MMPBSA input files to trail directory   ----------------------------------------------
+    # -----------------   copy .XTC file   -----------------------------------------------------------------------------
+    shutil.copyfile(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged-recentered.xtc",
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/npt.xtc")
+
+    # -----------   copy other input files for MMPBSA   ----------------------------------------------------------------
     for file_name in os.listdir(config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path']):
-        # copy .TPR file
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" ):
+        # -------------   copy .TPR file   -----------------------------------------------------------------------------
         if file_name.endswith(".tpr"):
             shutil.copyfile(config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                             config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/npt.tpr")
-        # copy .NDX file
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/npt.tpr")
+        # -------------   copy .NDX file   -----------------------------------------------------------------------------
         if file_name.endswith(".ndx"):
             shutil.copyfile(config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                             config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/index.ndx")
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/index.ndx")
 
-        # copy .TOP file
+        # -------------   copy .TOP file   -----------------------------------------------------------------------------
         if file_name.endswith(".top"):
             shutil.copyfile(config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                             config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                            config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
-        # copy .ITP files
+                                'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/" + file_name)
+        # -------------   copy .ITP files   ----------------------------------------------------------------------------
         if file_name.endswith(".itp"):
             # renaming user input ligand as LIGAND
             key_name_ligand_input = 'mmpbsa_input_ligand'
@@ -1169,33 +1069,71 @@ def hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_
             ligand_name = ProjectToolEssentials_res_ligand_input.values
             if file_name[:-4] == ligand_name:
                 shutil.copyfile(config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                                 config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/ligand.itp")
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/ligand.itp")
                 shutil.copyfile(config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                                 config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/" + file_name)
             else:
                 shutil.copyfile(config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
                                 config.PATH_CONFIG[
-                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-                                config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/" + file_name)
 
     os.chdir(config.PATH_CONFIG[
-                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
-             config.PATH_CONFIG['mmpbsa_project_path'])
+                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" )
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
     return JsonResponse({"success": True})
 
+
+#trajcat for Hotspot MMPBSA module
+def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, command_tool, project_id, user_id):
+    em_gro_file_str = ""
+    em_tpr_file_str = ""
+    md_index_file_str = ""
+    md_topology_file_str = ""
+    variant_index_dir = 0  # variant dirs counter
+    for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                     + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa):
+        # ---------- loop for variant dirs ---------------
+        if os.path.isdir(os.path.join(config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' +mutation_dir_mmpbsa,
+                                      mutations_dirs)):
+            # ------------ loop for mutations dir -----------------
+            pdb_file_index_str = 0  # index for PDB (file) variant
+            for variants_dir in os.listdir(config.PATH_CONFIG[
+                                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/"):
+                # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
+                for md_run_dir in os.listdir(config.PATH_CONFIG[
+                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run0/"):
+                    #filter for em.gro file
+                    if md_run_dir.strip() == "em.gro":
+                        em_gro_file_str += config.PATH_CONFIG[
+                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run0/" + md_run_dir.strip() + " "
+
+                    # filter for em.tpr file
+                    if md_run_dir.strip() == "em.tpr":
+                        em_tpr_file_str = str(config.PATH_CONFIG[
+                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run0/" + md_run_dir.strip())
+
+                    # filter for index file
+                    if md_run_dir.strip() == "index.ndx":
+                        md_index_file_str = str(config.PATH_CONFIG[
+                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run0/" + md_run_dir.strip())
+
+                    # filter for topology file
+                    if md_run_dir.strip() == "topol.top":
+                        md_topology_file_str = str(config.PATH_CONFIG[
+                                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + variants_dir + "/md_run0/" + md_run_dir.strip())
+
+                pdb_file_index_str += 1
+    variant_index_dir += 1
+    # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
+    return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
     '''
@@ -1283,6 +1221,42 @@ def perform_cmd_trajconv_designer_queue(project_name,project_id,md_simulations_t
                   'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_ndx_file + " < " +
               config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_trjconv_input.txt")
+
+
+
+def perform_cmd_trajconv_hotspot_mmpbsa(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file,mutation_dir_mmpbsa,command_tool):
+    '''
+       ____ __  ____  __  _____           _
+      / ___|  \/  \ \/ / |_   _| __ __ _ (_) ___ ___  _ ____   __
+     | |  _| |\/| |\  /    | || '__/ _` || |/ __/ _ \| '_ \ \ / /
+     | |_| | |  | |/  \    | || | | (_| || | (_| (_) | | | \ V /
+      \____|_|  |_/_/\_\   |_||_|  \__,_|/ |\___\___/|_| |_|\_/
+                                       |__/
+    '''
+    # create input file for trjconv command
+    file_gmx_trjconv_input = open(config.PATH_CONFIG[
+                                      'local_shared_folder_path'] + project_name + '/' +command_tool+"/" +mutation_dir_mmpbsa+"/"+"gmx_trjconv_input.txt", "w")
+    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.close()
+    time.sleep(3)
+    '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
+                  config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                      'mmpbsa_project_path'] + "merged-recentered.xtc -center -n " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + md_simulations_ndx_file + " < " + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                      'md_simulations_path'] + "gmx_trjconv_input.txt"'''
+
+    os.system("gmx trjconv -f " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged.xtc -s " + md_simulations_tpr_file + " -pbc mol -ur compact -o " +
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged-recentered.xtc -center -n " + md_simulations_ndx_file + " < " +
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_trjconv_input.txt")
 
 
 def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input):
@@ -1905,6 +1879,304 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+"INPUT.dat", "w") as mmpbsa_input_file_update:
         mmpbsa_input_file_update.write(new_input_lines)
 
+
+#process hotspot mmpbsa inputs
+def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tpr_file, CatMec_input_dict,
+                                            key_name_ligand_input, mutation_dir_mmpbsa, command_tool):
+
+    #=======================  get user input ligand  ============================
+    ProjectToolEssentials_res_ligand_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_ligand_input).latest('entry_time')
+    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    #======================= End of get user input ligand  ======================
+
+
+    #==================  get [ ATOMS ] section final atom count  =================
+    count_line = 0
+    line_list = []
+    with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/topol.top") as topol_file:
+        for line in topol_file:
+            if line.strip() == '[ atoms ]':  # start from atoms section
+                break
+        for line in topol_file:  # End at bonds sections
+            if line.strip() == '[ bonds ]':
+                break
+            count_line += 1
+            if line not in ['\n', '\r\n']: # remove new lines and empty lines
+                line_list.append(line)  # line[:-1]
+    atoms_final_count = line_list[-1].split()[0]
+    #==================== End of get ATOMS final count  ===========================
+    for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+            initial_text_content = ""
+            topology_file_atoms_content = ""
+            topology_file_bonds_content = ""
+            topology_file_pairs_content = ""
+            topology_file_angles_content = ""
+            topology_file_dihedrals_content = ""
+            topology_content_atoms = ""
+            topology_content_bonds = ""
+            topology_content_pairs = ""
+            topology_content_angles = ""
+            topology_content_dihedrals = ""
+            topology_initial_content = ""
+
+            atoms_lastcount = atoms_final_count
+            # initial_text_content = initial_text_content+itp_file_inp[:-4]
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ atoms ]':
+                        initial_text_content += line2
+                        break
+                    initial_text_content += line2
+                for line2 in itp_file:
+                    if line2.strip() == '[ bonds ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            atoms_lastcount = int(line2.split()[0]) + int(atoms_final_count)
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_atoms_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_atoms_content += line2
+                    except IndexError:
+                        pass
+
+            # append edited data fo bonds section
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ bonds ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ pairs ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_bonds_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_bonds_content += line2
+                    except IndexError:
+                        pass
+
+            # append edited data for pairs section
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ pairs ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ angles ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_pairs_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_pairs_content += line2
+                    except IndexError:
+                        pass
+
+            # append edited data for angles section
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ angles ]':
+                        initial_text_content += "\n" + line2
+                        break
+                for line2 in itp_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_angles_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_angles_content += line2
+                    except IndexError:
+                        pass
+
+            # apend edited data for dihedrals section
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                for line2 in itp_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        initial_text_content += "\n" + line2
+                        break
+
+                for line2 in itp_file:
+                    if line2.strip() == '\n':
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            # pat = re.compile("^\S(.*\S)?$")
+                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                  1)
+                            line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                            line2 = line2.replace(" " + line2.split()[3] + " ",
+                                                  str(int(line2.split()[3]) + int(atoms_final_count)), 1)
+                            line2 = line2.lstrip()
+                            initial_text_content += "    " + line2
+                            topology_file_dihedrals_content += "    " + line2
+                        else:
+                            initial_text_content += line2
+                            topology_file_dihedrals_content += line2
+                    except IndexError:
+                        pass
+
+            # ================================================================================================
+            # ====================================== TOPOLOGY FILE ===========================================
+            # ================================================================================================
+            # write respective contents to topology file
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ atoms ]':
+                        topology_content_atoms += line2
+                        break
+                    topology_initial_content += line2
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_atoms += "    " + line2
+                        else:
+                            topology_content_atoms += line2
+                    except IndexError:
+                        pass
+
+            # ===================  bonds content  ===========================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ bonds ]':
+                        topology_content_bonds += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_bonds += "    " + line2
+                        else:
+                            topology_content_bonds += line2
+                    except IndexError:
+                        pass
+
+            # ==================   pairs content  ===============================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ pairs ]':
+                        topology_content_pairs += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_pairs += "    " + line2
+                        else:
+                            topology_content_pairs += line2
+                    except IndexError:
+                        pass
+
+            # =======================   angles content   ==============================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ pairs ]':
+                        topology_content_angles += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_angles += "    " + line2
+                        else:
+                            topology_content_angles += line2
+                    except IndexError:
+                        pass
+
+            # ======================   dihedrals content   ========================
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        topology_content_dihedrals += line2
+                        break
+
+                for line2 in topology_bak_file:
+                    if line2.strip() == "\n":
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_dihedrals += "    " + line2
+                        else:
+                            topology_content_dihedrals += line2
+                    except IndexError:
+                        pass
+            print "adding topology file contents are"
+            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "complex.itp", "w") as new_topology_file:
+                new_topology_file.write(topology_initial_content + "\n" +
+                                        topology_content_atoms + topology_file_atoms_content + "\n" +
+                                        topology_content_bonds + topology_file_bonds_content + "\n" +
+                                        topology_content_pairs + topology_file_pairs_content + "\n" +
+                                        topology_content_angles + topology_file_angles_content + "\n" +
+                                        topology_content_dihedrals + topology_file_dihedrals_content)
+
+            atoms_final_count = atoms_lastcount
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+                new_itp_file.write(initial_text_content)
+
+    #--------------------   update INPUT.dat file ---------------------------------
+    new_input_lines = ""
+    itp_ligand = "ligand.itp"
+    itp_receptor = "complex.itp"
+    with open(config.PATH_CONFIG['shared_scripts'] +"CatMec/Analysis/MMPBSA/"+"INPUT.dat") as mmpbsa_input_file:
+        for line in mmpbsa_input_file:
+            if ("\titp_ligand" in line):
+                line = "\titp_ligand  " + itp_ligand + "\n"
+                new_input_lines += line
+            elif ("\titp_receptor" in line):
+                line = "\titp_receptor  " + itp_receptor + "\n"
+                new_input_lines += line
+            else:
+                new_input_lines += line
+
+    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+"INPUT.dat", "w") as mmpbsa_input_file_update:
+        mmpbsa_input_file_update.write(new_input_lines)
 
 #Designer trajconv
 def perform__designer_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
@@ -2928,7 +3200,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
     # copy MDP files to working directory
@@ -2977,8 +3249,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         # os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
         # os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
         # os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
-        # os.system(
-        #     "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        # os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
     return JsonResponse({'success': True})
 
 
@@ -4263,15 +4534,7 @@ class Hotspot(APIView):
             '''
             hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
 
-            '''
-              ____                __  __ __  __ ____  ____ ____    _    
-             |  _ \ _   _ _ __   |  \/  |  \/  |  _ \| __ ) ___|  / \   
-             | |_) | | | | '_ \  | |\/| | |\/| | |_) |  _ \___ \ / _ \  
-             |  _ <| |_| | | | | | |  | | |  | |  __/| |_) |__) / ___ \ 
-             |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
 
-            '''
-            hotspot_analyse_mmpbsa(request, project_name, command_tool,project_id, user_id)
             try:
                 print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_success']
@@ -4542,13 +4805,178 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             print config.PATH_CONFIG[
                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip()
 
+                            # make_complex input preperation
+                            # process  PDB file to get amino acids as python dict
+                            ''' PDB PARSER
+                                           ATOM / HETAATM  STRING line[0:6]
+                                           INDEX           STRING line[6:11]
+                                           ATOM TYPE       STRING line[12:16]
+                                           AMINO ACID      STRING line[17:20]
+                                           CHAIN ID        STRING line[21:22]
+                                           RESIDUE NO      STRING line[22:26]
+                                           X CO-ORDINATE   STRING line[30:38]
+                                           Y CO-ORDINATE   STRING line[38:46]
+                                           Z CO-ORDINATE   STRING line[46:54]
+                                           '''
+                            aminoacids_list = []
+                            # prepare a text file of all amino acids with residue number and serial number from PDB file
+                            with open(config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip(),
+                                      'r'
+                                      ) as fp_variant_pdb:
+                                variant_pdb_lines = fp_variant_pdb.readlines()
+                                for line_pdb in variant_pdb_lines:
+                                    if line_pdb[0:6].strip() == "ATOM" or line_pdb[0:6].strip() == "HETAATM":
+                                        if line_pdb[22:26].strip() + "_" + line_pdb[
+                                                                           17:20].strip() not in aminoacids_list:
+                                            # append all amino acids to list
+                                            aminoacids_list.append(
+                                                line_pdb[22:26].strip() + "_" + line_pdb[17:20].strip())
 
+                            designer_protonation_matrix = ""
+                            protonation_ac_list = ["ASP", "GLU", "HIS", "LYS"]
+                            # copy protonation files from CatMac module to Hotspot
+                            for atoms_name in protonation_ac_list:
+                                try:
+                                    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                    + project_name + '/CatMec/MD_Simulation/' + atoms_name + "_protonate.txt",
+                                                    config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                    + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + atoms_name + "_protonate.txt")
+                                except IOError as e:
+                                    pass
 
+                            for atoms_name in protonation_ac_list:
+                                try:
+                                    with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                              + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + atoms_name + "_protonate.txt",
+                                              'r'
+                                              ) as file_pointer:
+                                        lines_protonation_atoms = file_pointer.readlines()
+                                        for line_in_protonate_atoms in lines_protonation_atoms:
+                                            if line_in_protonate_atoms.split()[1] + "_" + \
+                                                    line_in_protonate_atoms.split()[
+                                                        0] not in aminoacids_list:
+                                                pass
+                                            else:
+                                                designer_protonation_matrix += line_in_protonate_atoms
+                                except IOError as e:
+                                    pass
 
+                            # remove protonations input and matrix files if exsist
+                            try:
+                                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                          + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt')
+                                os.remove(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                          + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + '/protonate_input.txt')
+                            except:
+                                pass
 
+                            # prepare final matrix file of protonation values
+                            try:
+                                outFile = open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                               + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt',
+                                               'w+')
+                                outFile.write(designer_protonation_matrix)
+                                outFile.close()
+                            except IOError as (errno, strerror):
+                                print "I/O error({0}): {1}".format(errno, strerror)
+
+                            # prepare final protonation input text file
+                            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                      + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + '/protonate_input.txt',
+                                      'w+'
+                                      ) as input_file_ptr:
+                                with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                          + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + '/designer_final_matrix_pdb_pqr_protonate.txt',
+                                          'r'
+                                          ) as matrix_file_ptr:
+                                    matrix_file_lines = matrix_file_ptr.readlines()
+                                    for matrix_file_line in matrix_file_lines:
+                                        input_file_ptr.write(matrix_file_line.split()[5] + '\n')
+
+                            # get python script for make_compex execution
+                            shutil.copyfile(
+                                config.PATH_CONFIG['shared_scripts'] + 'CatMec/MD_Simulation/' + "make_complex.py",
+                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + "/" + "make_complex.py")
+
+                            # get make_complex parameters from DB
+                            make_complex_params_keyname = "make_complex_parameters"
+                            ProjectToolEssentials_make_complex_params = \
+                                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=make_complex_params_keyname).latest(
+                                    'entry_time')
+                            make_complex_params = ProjectToolEssentials_make_complex_params.values
+
+                            variant_protien_file = 'variant_' + str(variant_index_count) + '.pdb'
+                            # replace protien file in make_complex_params
+                            make_complex_params_replaced = re.sub(r'(\w+)(\.pdb)', variants_dir.strip(),
+                                                                  make_complex_params)
+
+                            # copy ligand .GRO files and .ITP files from CatMec module
+                            ligands_key_name = 'substrate_input'
+                            ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(
+                                project_id=project_id,
+                                key_name=ligands_key_name).latest(
+                                'entry_time')
+                            ligand_names = ProjectToolEssentials_ligand_name_res.values
+                            ligand_file_data = ast.literal_eval(ligand_names)
+                            for key, value in ligand_file_data.items():
+                                # value.split('_')[0]
+                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/CatMec/Ligand_Parametrization/' + str(
+                                    value.split('_')[0]) + ".gro",
+                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                                    value.split('_')[0]) + ".gro")
+                                # .ITP files
+                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/CatMec/Ligand_Parametrization/' + str(
+                                    value.split('_')[0]) + ".itp",
+                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                                    value.split('_')[0]) + ".itp")
+
+                            # copy "ATOMTYPES" file from CatMec module
+                            shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                            + project_name + '/CatMec/Ligand_Parametrization/atomtypes.itp',
+                                            config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                            + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + '/atomtypes.itp')
+
+                            # change DIR to Mutations list
+                            os.chdir(config.PATH_CONFIG[
+                                         'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + line.strip() + '/' + mutations_dirs.strip() + "/")
+                            # execute make_complex.py
+                            os.system(make_complex_params_replaced)
+
+                            '''
+                              ____                __  __ ____    ____  _                 _       _   _                 
+                             |  _ \ _   _ _ __   |  \/  |  _ \  / ___|(_)_ __ ___  _   _| | __ _| |_(_) ___  _ __  ___ 
+                             | |_) | | | | '_ \  | |\/| | | | | \___ \| | '_ ` _ \| | | | |/ _` | __| |/ _ \| '_ \/ __|
+                             |  _ <| |_| | | | | | |  | | |_| |  ___) | | | | | | | |_| | | (_| | |_| | (_) | | | \__ \
+                             |_| \_\\__,_|_| |_| |_|  |_|____/  |____/|_|_| |_| |_|\__,_|_|\__,_|\__|_|\___/|_| |_|___/
+
+                            '''
+
+                            md_mutation_folder = line.strip()
+                            variant_dir_md = mutations_dirs.strip()
+                            execute_hotspot_md_simulation(request, md_mutation_folder, project_name, command_tool,
+                                                          project_id,
+                                                          user_id, variant_dir_md)
 
                         pdb_file_index_str += 1
                 variant_index_dir += 1
+            #Execute MMPBSA (In mutations folder)
+            '''
+              ____                __  __ __  __ ____  ____ ____    _    
+             |  _ \ _   _ _ __   |  \/  |  \/  |  _ \| __ ) ___|  / \   
+             | |_) | | | | '_ \  | |\/| | |\/| | |_) |  _ \___ \ / _ \  
+             |  _ <| |_| | | | | | |  | | |  | |  __/| |_) |__) / ___ \ 
+             |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
+
+            '''
+            mutation_dir_mmpbsa = line.strip()
+            hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_tool, project_id, user_id)
 
             variant_index_count += 1
 
