@@ -2948,7 +2948,7 @@ class Contact_Score(APIView):
 
             #create trajconv input file
             file_gmx_trajconv_input = open("gmx_trajconv_input.txt", "w")
-            file_gmx_trajconv_input.write("1\n1\nq")
+            file_gmx_trajconv_input.write("0\n1\nq")
             file_gmx_trajconv_input.close()
 
             os.system(
