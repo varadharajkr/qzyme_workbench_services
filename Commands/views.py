@@ -3088,6 +3088,9 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     print md_run_no_of_conformation
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"
+    print('source file path in md simulation preparation --------------')
+    print(source_file_path)
+    print(source_file_path)
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -3254,6 +3257,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
+    print('inside class Complex_Simulations(APIView):')
     def get(self,request):
         pass
 
@@ -4060,6 +4064,7 @@ class autodock(APIView):
 
 
 class CatMec(APIView):
+    print('inside class CatMec')
     def get(self,request):
         pass
 
@@ -4223,6 +4228,7 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
+            print 'command_tool_title ----------------------'
             print command_tool_title
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
