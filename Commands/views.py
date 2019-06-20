@@ -4252,6 +4252,8 @@ class CatMec(APIView):
 
             if commandDetails_result.command_title == "md_run":
                 md_simulation_path = '/CatMec/MD_Simulation/'
+                print('md simulation path in md_run is')
+                print(md_simulation_path)
                 primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,md_simulation_path)
