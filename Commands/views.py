@@ -3131,7 +3131,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         print(group_value)
         print("printing after %SOL% replace")
         print(SOL_replace_str)
-        # os.system(SOL_replace_str)
+        os.system(SOL_replace_str)
         print("echo q | gmx make_ndx -f solve_ions.gro")
         os.system("echo q | gmx make_ndx -f solve_ions.gro")
         print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
