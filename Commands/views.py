@@ -262,7 +262,8 @@ class analyse_mmpbsa(APIView):
                     indexfile_receptor_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
              #prepare complex option input string
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-                dict_ligand_name = ligand_inputkey[:-4]
+                ligand_name_split = ligand_inputvalue.split("_")
+                dict_ligand_name = ligand_name_split[0]
                 if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys():
                     indexfile_complex_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
 
@@ -318,7 +319,7 @@ class analyse_mmpbsa(APIView):
             #get ligand name
             ligand_name = ""
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-                ligand_name = ligand_inputkey[:-4]
+                ligand_name = ligand_inputvalue.split("_")[0]
             #prepare input file for gmx make_ndx command
             protein_index = 0
             ligandname_index = 0
@@ -619,7 +620,8 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                 indexfile_receptor_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
         # prepare complex option input string
         for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-            dict_ligand_name = ligand_inputkey[:-4]
+            ligand_name_split = ligand_inputvalue.split("_")
+            dict_ligand_name = ligand_name_split[0]
             if "[ " + dict_ligand_name + " ]" in indexfile_input_dict.keys():
                 indexfile_complex_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
 
@@ -678,7 +680,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         # get ligand name
         ligand_name = ""
         for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-            ligand_name = ligand_inputkey[:-4]
+            ligand_name = ligand_inputvalue.split("_")[0]
         # prepare input file for gmx make_ndx command
         protein_index = 0
         ligandname_index = 0
@@ -901,7 +903,8 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                 indexfile_receptor_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
         # prepare complex option input string
         for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-            dict_ligand_name = ligand_inputkey[:-4]
+            ligand_name_split = ligand_inputvalue.split("_")
+            dict_ligand_name = ligand_name_split[0]
             if "[ " + dict_ligand_name + " ]" in indexfile_input_dict.keys():
                 indexfile_complex_option_input += str(indexfile_input_dict["[ " + dict_ligand_name + " ]"]) + " | "
 
@@ -959,7 +962,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         # get ligand name
         ligand_name = ""
         for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-            ligand_name = ligand_inputkey[:-4]
+            ligand_name = ligand_inputvalue.split("_")[0]
         # prepare input file for gmx make_ndx command
         protein_index = 0
         ligandname_index = 0
@@ -1287,7 +1290,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     atoms_final_count = line_list[-1].split()[0]
     #==================== End of get ATOMS final count  ===========================
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+        if ligand_inputvalue.split("_")[0] != ligand_name: # Filter with user input ligand
             initial_text_content = ""
             topology_file_atoms_content = ""
             topology_file_bonds_content = ""
@@ -1305,7 +1308,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             # initial_text_content = initial_text_content+itp_file_inp[:-4]
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ atoms ]':
                         initial_text_content += line2
@@ -1331,7 +1334,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             # append edited data fo bonds section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ bonds ]':
                         initial_text_content += "\n" + line2
@@ -1358,7 +1361,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             # append edited data for pairs section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ pairs ]':
                         initial_text_content += "\n" + line2
@@ -1385,7 +1388,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                         # append edited data for angles section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ angles ]':
                         initial_text_content += "\n" + line2
@@ -1414,7 +1417,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                         # apend edited data for dihedrals section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ dihedrals ]':
                         initial_text_content += "\n" + line2
@@ -1553,7 +1556,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
 
             atoms_final_count = atoms_lastcount
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+                            config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
     #--------------------   update INPUT.dat file ---------------------------------
@@ -1603,7 +1606,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     atoms_final_count = line_list[-1].split()[0]
     #==================== End of get ATOMS final count  ===========================
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+        if ligand_inputvalue.split("_")[0] != ligand_name: # Filter with user input ligand
             initial_text_content = ""
             topology_file_atoms_content = ""
             topology_file_bonds_content = ""
@@ -1620,7 +1623,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
             atoms_lastcount = atoms_final_count
             # initial_text_content = initial_text_content+itp_file_inp[:-4]
             with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' +command_tool+"/"+md_mutation_folder+"/"+ tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'local_shared_folder_path'] + project_name + '/' +command_tool+"/"+md_mutation_folder+"/"+ tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ atoms ]':
                         initial_text_content += line2
@@ -1645,7 +1648,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
 
             # append edited data fo bonds section
             with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ bonds ]':
                         initial_text_content += "\n" + line2
@@ -1671,7 +1674,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
 
             # append edited data for pairs section
             with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ pairs ]':
                         initial_text_content += "\n" + line2
@@ -1697,7 +1700,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
 
             # append edited data for angles section
             with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ angles ]':
                         initial_text_content += "\n" + line2
@@ -1725,7 +1728,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
 
             # apend edited data for dihedrals section
             with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/" +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ dihedrals ]':
                         initial_text_content += "\n" + line2
@@ -1857,7 +1860,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                                         topology_content_dihedrals + topology_file_dihedrals_content)
 
             atoms_final_count = atoms_lastcount
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
     #--------------------   update INPUT.dat file ---------------------------------
@@ -1907,7 +1910,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     atoms_final_count = line_list[-1].split()[0]
     #==================== End of get ATOMS final count  ===========================
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+        if ligand_inputvalue.split("_")[0] != ligand_name: # Filter with user input ligand
             initial_text_content = ""
             topology_file_atoms_content = ""
             topology_file_bonds_content = ""
@@ -1923,7 +1926,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
 
             atoms_lastcount = atoms_final_count
             # initial_text_content = initial_text_content+itp_file_inp[:-4]
-            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ atoms ]':
                         initial_text_content += line2
@@ -1947,7 +1950,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                         pass
 
             # append edited data fo bonds section
-            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ bonds ]':
                         initial_text_content += "\n" + line2
@@ -1972,7 +1975,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                         pass
 
             # append edited data for pairs section
-            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ pairs ]':
                         initial_text_content += "\n" + line2
@@ -1997,7 +2000,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                         pass
 
             # append edited data for angles section
-            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ angles ]':
                         initial_text_content += "\n" + line2
@@ -2024,7 +2027,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                         pass
 
             # apend edited data for dihedrals section
-            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+            with open(md_simulations_tpr_file.rsplit("/",1)[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ dihedrals ]':
                         initial_text_content += "\n" + line2
@@ -2156,7 +2159,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                                         topology_content_dihedrals + topology_file_dihedrals_content)
 
             atoms_final_count = atoms_lastcount
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
     #--------------------   update INPUT.dat file ---------------------------------
@@ -2251,7 +2254,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
     atoms_final_count = line_list[-1].split()[0]
     #==================== End of get ATOMS final count  ===========================
     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-        if ligand_inputkey[:-4] != ligand_name: # Filter with user input ligand
+        if ligand_inputvalue.split("_")[0] != ligand_name: # Filter with user input ligand
             initial_text_content = ""
             topology_file_atoms_content = ""
             topology_file_bonds_content = ""
@@ -2269,7 +2272,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
             # initial_text_content = initial_text_content+itp_file_inp[:-4]
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ atoms ]':
                         initial_text_content += line2
@@ -2295,7 +2298,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
             # append edited data fo bonds section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ bonds ]':
                         initial_text_content += "\n" + line2
@@ -2322,7 +2325,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
             # append edited data for pairs section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ pairs ]':
                         initial_text_content += "\n" + line2
@@ -2349,7 +2352,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
                         # append edited data for angles section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ angles ]':
                         initial_text_content += "\n" + line2
@@ -2378,7 +2381,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
                         # apend edited data for dihedrals section
             with open(config.PATH_CONFIG[
                           'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputkey[:-4]+".itp", "r+") as itp_file:
+                          'designer_md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
                 for line2 in itp_file:
                     if line2.strip() == '[ dihedrals ]':
                         initial_text_content += "\n" + line2
@@ -2517,7 +2520,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
 
             atoms_final_count = atoms_lastcount
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
-                            config.PATH_CONFIG['designer_mmpbsa_path']+"new_" +ligand_inputkey[:-4]+".itp", "w") as new_itp_file:
+                            config.PATH_CONFIG['designer_mmpbsa_path']+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
     #--------------------   update INPUT.dat file ---------------------------------
@@ -5171,7 +5174,8 @@ class Designer_Mmpbsa_analyse(APIView):
                     indexfile_receptor_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
              #prepare complex option input string
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-                dict_ligand_name = ligand_inputkey[:-4]
+                ligand_name_split = ligand_inputvalue.split("_")
+                dict_ligand_name = ligand_name_split[0]
                 if "[ "+dict_ligand_name+" ]" in indexfile_input_dict.keys():
                     indexfile_complex_option_input += str(indexfile_input_dict["[ "+dict_ligand_name+" ]"]) +" | "
 
@@ -5227,7 +5231,7 @@ class Designer_Mmpbsa_analyse(APIView):
             #get ligand name
             ligand_name = ""
             for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-                ligand_name = ligand_inputkey[:-4]
+                ligand_name = ligand_inputvalue.split("_")[0]
             #prepare input file for gmx make_ndx command
             protein_index = 0
             ligandname_index = 0
