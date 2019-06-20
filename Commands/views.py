@@ -3091,7 +3091,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
     print(source_file_path)
