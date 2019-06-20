@@ -2951,24 +2951,24 @@ class Contact_Score(APIView):
                     'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n "+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] +md_simulations_tpr_file_split[0]+"/"+"index.ndx")
+                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                    'mmpbsa_project_path'] +"complex_index.ndx")
 
             os.system(
                 "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
                 config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n"+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file_split[0]+ "/" + "index.ndx")
+                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                    'mmpbsa_project_path'] +"complex_index.ndx")
 
             os.system(
                 "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_fit.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n"+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file_split[0] + "/" + "index.ndx")
+                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                    'mmpbsa_project_path'] +"complex_index.ndx")
 
             #execute contact score command
             process_return = execute_command(primary_command_runnable, inp_command_id)
