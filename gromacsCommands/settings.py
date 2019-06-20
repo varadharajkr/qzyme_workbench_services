@@ -132,7 +132,7 @@ USE_TZ = True
 #Logging
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'standard': {
             'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
@@ -140,38 +140,24 @@ LOGGING = {
         },
     },
     'handlers': {
-        'null': {
-            'level':'DEBUG',
-            'class':'logging.NullHandler',
-        },
         'logfile': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'filename':  config.PATH_CONFIG['local_shared_folder_path']+ "/qz_test_logfile",
-            'maxBytes': 25000000,
-            'backupCount': 2,
-            'formatter': 'standard',
+            'maxBytes': 1024*1024*80, # 80MB
+            'backupCount': 10,
+            'formatter': 'simple',
         },
         'console':{
-            'level':'INFO',
+            'level':'DEBUG',
             'class':'logging.StreamHandler',
-            'formatter': 'standard'
+            'formatter': 'simple'
         },
     },
     'loggers': {
-        'django': {
-            'handlers':['console'],
-            'propagate': True,
-            'level':'WARN',
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
+        '': {
             'level': 'DEBUG',
-            'propagate': False,
-        },
-        'MYAPP': {
-            'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
+            'handlers': ['console','logfile']
         },
     }
 }
