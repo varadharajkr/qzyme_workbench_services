@@ -2945,30 +2945,36 @@ class Contact_Score(APIView):
                                                            key_name=key_name_tpr_file).latest('entry_time')
             md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
             md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
+
+            #create trajconv input file
+            file_gmx_trajconv_input = open("gmx_trajconv_input.txt", "w")
+            file_gmx_trajconv_input.write(str(index_file_complex_input_number)+"\n1\nq")
+            file_gmx_trajconv_input.close()
+
             os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
+                "gmx trjconv -f " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                     'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n "+config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx")
+                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")
 
             os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
+                "gmx trjconv -f merged_center.xtc -s " +
                 config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n"+config.PATH_CONFIG[
+                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n "+config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx")
+                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")
 
             os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_fit.xtc -s " + config.PATH_CONFIG[
+                "gmx trjconv -f merged_fit.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n"+config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n "+config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx")
+                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")
 
             #execute contact score command
             process_return = execute_command(primary_command_runnable, inp_command_id)
