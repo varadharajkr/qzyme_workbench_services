@@ -337,7 +337,7 @@ class analyse_mmpbsa(APIView):
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
-            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex")
+            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex"+"\nq\n")
             file_gmx_make_ndx_input.close()
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
@@ -1157,7 +1157,7 @@ def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simu
     file_gmx_trjconv_input = open(config.PATH_CONFIG[
                                       'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                       'md_simulations_path'] + "gmx_trjconv_input.txt", "w")
-    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.write("1\n0\nq\n")
     file_gmx_trjconv_input.close()
     time.sleep(3)
     '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
@@ -3195,7 +3195,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
+        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
         print("printing group value in MD$$$$$$$$$$$$$$$$$$")
         print(group_value)
         print("printing after %SOL% replace")
@@ -3258,7 +3258,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
+        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
         print("printing group value in MD$$$$$$$$$$$$$$$$$$")
         print(group_value)
         print("printing after %SOL% replace")
