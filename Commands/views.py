@@ -2738,6 +2738,7 @@ class Hello_World(APIView):
         time.sleep(3)
         try:
             django_logger.info("Hey there it works!! and in post is"+str(request.POST)+"\nend of post data")
+            django_logger.debug("Hey there it works!! and in post is" + str(request.POST) + "\nend of post data") 
             print "<<<<<<<<<<<<<<<<<<<<<<< in try >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
