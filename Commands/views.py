@@ -456,44 +456,20 @@ class analyse_mmpbsa(APIView):
         os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
+
+        #update command status to database
+        try:
+            print "<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
+        except db.OperationalError as e:
+            print "<<<<<<<<<<<<<<<<<<<<<<< error except block CatMec MMPBSA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            db.close_old_connections()
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
         return JsonResponse({"success": True})
 
-        '''primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
-        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
-        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
-        primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-        #MD simulations shared path
-        md_simulations_sharedpath = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' +"Analysis/mmpbsa" + '/')
-        print os.system("pwd")
-        print os.getcwd()
-        print "=========== title is =============="
-        print commandDetails_result.command_title
 
-
-        process_return = execute_command(primary_command_runnable,inp_command_id)
-
-        command_title_folder = commandDetails_result.command_title
-
-        out, err = process_return.communicate()
-        process_return.wait()
-        print "process return code is "
-        print process_return.returncode
-        if process_return.returncode == 0:
-            print "inside success"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
-        if process_return.returncode != 0:
-            print "inside error"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
-            fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})'''
 
 
 #new code for Designer MMPBSA
