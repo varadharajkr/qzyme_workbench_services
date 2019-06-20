@@ -3124,7 +3124,6 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
-        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
         SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
         print("printing group value in MD$$$$$$$$$$$$$$$$$$")
