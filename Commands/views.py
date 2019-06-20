@@ -2969,7 +2969,7 @@ class Contact_Score(APIView):
                     'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")'''
 
             os.system(
-                "echo "+str(index_file_complex_input_number)+" | gmx trjconv -f merged_center.xtc -s " + config.PATH_CONFIG[
+                "echo "+index_file_complex_input_number+" | gmx trjconv -f merged_center.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n "+config.PATH_CONFIG[
