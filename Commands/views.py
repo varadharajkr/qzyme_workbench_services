@@ -2974,7 +2974,7 @@ class Contact_Score(APIView):
                     'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n "+config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")
+                    'mmpbsa_project_path'] +"complex_index.ndx ")
 
             #execute contact score command
             process_return = execute_command(primary_command_runnable, inp_command_id)
