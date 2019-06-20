@@ -133,35 +133,21 @@ USE_TZ = True
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
-        },
-    },
     'handlers': {
-        'logfile': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename':  config.PATH_CONFIG['local_shared_folder_path']+ "/qz_test_logfile",
-            'maxBytes': 1024*1024*80, # 80MB
-            'backupCount': 10,
-            'formatter': 'standard',
-        },
-        'console':{
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
-            'formatter': 'standard'
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': config.PATH_CONFIG['local_shared_folder_path']+ "/qz_test_logfile",
         },
     },
     'loggers': {
-        '': {
+        'django.request': {
+            'handlers': ['file'],
             'level': 'DEBUG',
-            'handlers': ['console','logfile']
+            'propagate': True,
         },
-    }
+    },
 }
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
