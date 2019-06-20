@@ -2907,74 +2907,96 @@ class Contact_Score(APIView):
         #Check for Command Title
         if commandDetails_result.command_title == "CatMec":
             #Execute for CatMec module
-            primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
-            #change working directory
-            try:
-                os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-            except: #excep path error
-                #error_num, error_msg = e
-                #if error_msg.strip() == "The system cannot find the file specified":
-                #create directory
-                os.system("mkdir "+config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-                #change directory
-                os.chdir(config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
-            #------   create PDBS folder -----------
-            os.system("mkdir " + config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/pdbs")
+            primary_command_runnable = commandDetails_result.primary_command
 
+            # check command IF Contact calculation(C) or combine contact score(S)
+            if primary_command_runnable.split()[3].strip() == "C":
+                # change working directory
+                try:
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                except:  # excep path error
+                    # error_num, error_msg = e
+                    # if error_msg.strip() == "The system cannot find the file specified":
+                    # create directory
+                    os.system("mkdir " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                    # change directory
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
-            #---------  generate PDB frames from .XTC file   ----------------
-            key_name_protien_ligand_complex_index_number = 'mmpbsa_index_file_protien_ligand_complex_number'
-            ProjectToolEssentials_protien_ligand_complex_index_number = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_protien_ligand_complex_index_number).latest('entry_time')
-            index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                # copy Contact Score python scripts
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/Contact_Score/whole_protein_contact.py',
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/" + "whole_protein_contact.py")
 
-            #------   get TPR file   ------
-            # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
-            key_name_tpr_file = 'mmpbsa_tpr_file'
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/Contact_Score/readpdb2.py',
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/" + "readpdb2.py")
 
-            ProjectToolEssentials_res_tpr_file_input = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_tpr_file).latest('entry_time')
-            md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
-            md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
+                # ------   create PDBS folder -----------
+                os.system("mkdir " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/pdbs")
 
-            #create trajconv input file
-            file_gmx_trajconv_input = open("gmx_trajconv_input.txt", "w")
-            file_gmx_trajconv_input.write("1\n0\nq")
-            file_gmx_trajconv_input.close()
+                # ---------  generate PDB frames from .XTC file   ----------------
+                key_name_protien_ligand_complex_index_number = 'mmpbsa_index_file_protien_ligand_complex_number'
+                ProjectToolEssentials_protien_ligand_complex_index_number = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_protien_ligand_complex_index_number).latest(
+                        'entry_time')
+                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
 
-            os.system(
-                "gmx trjconv -f " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n "+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")
+                # ------   get TPR file   ------
+                # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+                key_name_tpr_file = 'mmpbsa_tpr_file'
 
-            '''os.system(
-                "gmx trjconv -f merged_center.xtc -s " +
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n "+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")'''
+                ProjectToolEssentials_res_tpr_file_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_tpr_file).latest('entry_time')
+                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
 
-            os.system(
-                "echo "+index_file_complex_input_number+" | gmx trjconv -f merged_center.xtc -s " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n "+config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] +"complex_index.ndx ")
+                # create trajconv input file
+                file_gmx_trajconv_input = open("gmx_trajconv_input.txt", "w")
+                file_gmx_trajconv_input.write("1\n0\nq")
+                file_gmx_trajconv_input.close()
+
+                os.system(
+                    "gmx trjconv -f " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "complex_index.ndx < gmx_trajconv_input.txt")
+
+                '''os.system(
+                    "gmx trjconv -f merged_center.xtc -s " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n "+config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")'''
+
+                os.system(
+                    "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "complex_index.ndx ")
+            else: # primary_command_runnable.split()[3].strip() == "S":
+                print "------   in contact score combine ----------"
+                pass
+
 
             #execute contact score command
             process_return = execute_command(primary_command_runnable, inp_command_id)
