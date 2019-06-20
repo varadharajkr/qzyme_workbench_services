@@ -2972,7 +2972,7 @@ class Contact_Score(APIView):
                 "echo "+index_file_complex_input_number+" | gmx trjconv -f merged_center.xtc -s " + config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                     'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n "+config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n "+config.PATH_CONFIG[
                     'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                     'mmpbsa_project_path'] +"complex_index.ndx ")
 
