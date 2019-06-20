@@ -384,6 +384,13 @@ class analyse_mmpbsa(APIView):
                             config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
             shutil.copyfile(source_itp_file, dest_itp_file)
 
+        #copy atom_types.itp file from MD dir
+        source_atomtype_itp_file = config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
+        dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                        config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
+        shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
 
         key_name_ligand_input = 'mmpbsa_input_ligand'
         # processing itp files
