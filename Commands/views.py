@@ -335,6 +335,15 @@ class analyse_mmpbsa(APIView):
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] +1
             protien_ligand_complex_index = receptor_index + 1
             ligand_name_index = protien_ligand_complex_index + 1
+            entry_time = datetime.now()
+            key_name_protien_ligand_complex_index = 'mmpbsa_index_file_protien_ligand_complex_number'
+            ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(
+                tool_title=commandDetails_result.command_tool,
+                project_id=project_id,
+                key_name=key_name_protien_ligand_complex_index,
+                values=protien_ligand_complex_index,
+                entry_time=entry_time)
+            result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
@@ -2905,15 +2914,15 @@ class Contact_Score(APIView):
             try:
                 os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-            except OSError as e: #excep path error
-                error_num, error_msg = e
-                if error_msg.strip() == "The system cannot find the file specified":
-                    #create directory
-                    os.system("mkdir "+config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-                    #change directory
-                    os.chdir(config.PATH_CONFIG[
-                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except: #excep path error
+                #error_num, error_msg = e
+                #if error_msg.strip() == "The system cannot find the file specified":
+                #create directory
+                os.system("mkdir "+config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
+                #change directory
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
             #------   create PDBS folder -----------
             os.system("mkdir " + config.PATH_CONFIG[
