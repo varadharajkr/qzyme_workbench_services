@@ -39,8 +39,10 @@ from multiprocessing import Process
 from urlparse import urljoin
 from bs4 import BeautifulSoup
 from django import db
+import logging # for default django logging
 # Create your views ere.
 
+django_logger = logging.getLogger(__name__)
 # to run command in shell
 def execute_command(command,inp_command_id):
     status_id = config.CONSTS['status_initiated']
@@ -2733,8 +2735,9 @@ class Hello_World(APIView):
         inp_command_id = 2599
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
-        time.sleep(360)
+        time.sleep(3)
         try:
+            django_logger.debug("Hey there it works!! and in post is"+request.POST+"\nend of post data")
             print "<<<<<<<<<<<<<<<<<<<<<<< in try >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
