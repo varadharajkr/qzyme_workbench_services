@@ -3081,7 +3081,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     update_command_status(inp_command_id, status_id)
     print "inside md_simulation_preparation function"
     key_name = 'md_simulation_no_of_runs'
-
+    print('command_tool is')
+    print(command_tool)
     ProjectToolEssentials_res = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
