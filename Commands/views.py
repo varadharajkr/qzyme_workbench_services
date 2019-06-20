@@ -3079,12 +3079,13 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool='CatMec/MD_Simulation',command_title=""):
+def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
     print "inside md_simulation_preparation function"
     key_name = 'md_simulation_no_of_runs'
-
+    print('md_simulation_path is')
+    print(md_simulation_path)
     ProjectToolEssentials_res = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
@@ -3094,6 +3095,9 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     print md_run_no_of_conformation
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"
+    print('source file path in md simulation preparation --------------')
+    print(source_file_path)
+    print(source_file_path)
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -3132,7 +3136,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         os.system(
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': True})\
+
 
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
@@ -3260,6 +3265,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
 
 #Substrate Parameterization
 class Complex_Simulations(APIView):
+    print('inside class Complex_Simulations(APIView):')
     def get(self,request):
         pass
 
@@ -4066,6 +4072,7 @@ class autodock(APIView):
 
 
 class CatMec(APIView):
+    print('inside class CatMec')
     def get(self,request):
         pass
 
@@ -4229,6 +4236,7 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
+            print 'command_tool_title ----------------------'
             print command_tool_title
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
@@ -4244,10 +4252,12 @@ class CatMec(APIView):
             # print ligand_name
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
             print (os.getcwd())
+
             if commandDetails_result.command_title == "md_run":
+                md_simulation_path = '/CatMec/MD_Simulation/'
                 primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
-                                          commandDetails_result.command_title)
+                                          commandDetails_result.command_title,md_simulation_path)
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
