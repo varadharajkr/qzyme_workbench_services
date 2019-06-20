@@ -146,12 +146,12 @@ LOGGING = {
             'filename':  config.PATH_CONFIG['local_shared_folder_path']+ "/qz_test_logfile",
             'maxBytes': 1024*1024*80, # 80MB
             'backupCount': 10,
-            'formatter': 'simple',
+            'formatter': 'standard',
         },
         'console':{
             'level':'DEBUG',
             'class':'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'standard'
         },
     },
     'loggers': {
