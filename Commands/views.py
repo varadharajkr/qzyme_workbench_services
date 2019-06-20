@@ -3076,7 +3076,7 @@ def sol_group_option():
 
 
 @csrf_exempt
-def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool='CatMec/MD_Simulation',command_title=""):
+def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool='CatMec\/MD_Simulation',command_title=""):
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
     print "inside md_simulation_preparation function"
