@@ -3113,11 +3113,17 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 print("Unexpected error:", sys.exc_info())
                 pass
         os.chdir(source_file_path + '/md_run' + str(i + 1))
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        print("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
         os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
+        print("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
         os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        print("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
         os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+        print("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
         os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
         group_value = sol_group_option()
+        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
         SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value))
@@ -3125,17 +3131,25 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         print(group_value)
         print("printing after %SOL% replace")
         print(SOL_replace_str)
-        os.system(SOL_replace_str)
+        # os.system(SOL_replace_str)
+        print("echo q | gmx make_ndx -f solve_ions.gro")
         os.system("echo q | gmx make_ndx -f solve_ions.gro")
+        print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+        print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
+        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
         os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
         os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
+        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
         os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
-        os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
     return JsonResponse({'success': True})\
 
 
