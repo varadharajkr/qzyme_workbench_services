@@ -3937,6 +3937,8 @@ class autodock(APIView):
                 project_id=project_id, key_name=enzyme_file_key)
             nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
             nma_path = nma_enzyme_file[:-4]
+            print('nma_path ****************************************')
+            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
@@ -4271,7 +4273,6 @@ class CatMec(APIView):
                 md_simulation_path = '/CatMec/MD_Simulation/'
                 print('md simulation path in md_run is')
                 print(md_simulation_path)
-                primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,md_simulation_path)
             print("primary_command_runnable.........................................")
