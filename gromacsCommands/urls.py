@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^serverdetails/', views.getserverDetails.as_view()),
     url(r'^gromacs/', views.gromacs.as_view()),
     url(r'^Path_Analysis/', views.pathanalysis.as_view()),
+    url(r'^pathanalysis/', views.pathanalysis.as_view()),
     url(r'^mmpbsa/', views.pathanalysis.as_view()),
     url(r'^analyse_mmpbsa/', views.analyse_mmpbsa.as_view()),
     url(r'^Hello_World/', views.Hello_World.as_view()),

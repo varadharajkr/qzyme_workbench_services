@@ -334,10 +334,20 @@ class analyse_mmpbsa(APIView):
             #print indexfile_input_dict[maximum_key_ndx_input]
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] +1
             protien_ligand_complex_index = receptor_index + 1
+            ligand_name_index = protien_ligand_complex_index + 1
+            entry_time = datetime.now()
+            key_name_protien_ligand_complex_index = 'mmpbsa_index_file_protien_ligand_complex_number'
+            ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(
+                tool_title=commandDetails_result.command_tool,
+                project_id=project_id,
+                key_name=key_name_protien_ligand_complex_index,
+                values=protien_ligand_complex_index,
+                entry_time=entry_time)
+            result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'md_simulations_path'] + "gmx_make_ndx_input.txt", "w")
-            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex"+"\nq\n")
+            file_gmx_make_ndx_input.write(str(protein_index)+"\nname "+str(receptor_index)+" receptor\n"+str(protein_index)+" | "+str(ligandname_index)+"\nname "+str(protien_ligand_complex_index)+" complex"+"\n" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
             file_gmx_make_ndx_input.close()
             gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
@@ -383,6 +393,13 @@ class analyse_mmpbsa(APIView):
                             config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
             shutil.copyfile(source_itp_file, dest_itp_file)
 
+        #copy atom_types.itp file from MD dir
+        source_atomtype_itp_file = config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
+        dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                        config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
+        shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
 
         key_name_ligand_input = 'mmpbsa_input_ligand'
         # processing itp files
@@ -422,13 +439,20 @@ class analyse_mmpbsa(APIView):
                                 config.PATH_CONFIG['mmpbsa_project_path'] + "trial/"+file_name)
             # copy .ITP files
             if file_name.endswith(".itp"):
-                # renaming user input ligand as LIGAND
-                key_name_ligand_input = 'mmpbsa_input_ligand'
+                #check for multiple ligand
+                if multiple_ligand_input:
+                    #for multiple ligand
+                    # renaming user input ligand as LIGAND
+                    key_name_ligand_input = 'mmpbsa_input_ligand'
 
-                ProjectToolEssentials_res_ligand_input = \
-                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                               key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                    ProjectToolEssentials_res_ligand_input = \
+                        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                   key_name=key_name_ligand_input).latest('entry_time')
+                    ligand_name = ProjectToolEssentials_res_ligand_input.values
+                else:
+                    #for single ligand
+                    for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                        ligand_name = ligand_inputvalue.split("_")[0]
                 if file_name[:-4] == ligand_name:
                     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
@@ -449,44 +473,20 @@ class analyse_mmpbsa(APIView):
         os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
+
+        #update command status to database
+        try:
+            print "<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
+        except db.OperationalError as e:
+            print "<<<<<<<<<<<<<<<<<<<<<<< error except block CatMec MMPBSA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            db.close_old_connections()
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id, status_id)
         return JsonResponse({"success": True})
 
-        '''primary_command_runnable =re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/',primary_command_runnable)
-        primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
-        primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
-        primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
-        #MD simulations shared path
-        md_simulations_sharedpath = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' +"Analysis/mmpbsa" + '/')
-        print os.system("pwd")
-        print os.getcwd()
-        print "=========== title is =============="
-        print commandDetails_result.command_title
 
-
-        process_return = execute_command(primary_command_runnable,inp_command_id)
-
-        command_title_folder = commandDetails_result.command_title
-
-        out, err = process_return.communicate()
-        process_return.wait()
-        print "process return code is "
-        print process_return.returncode
-        if process_return.returncode == 0:
-            print "inside success"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-            fileobj.write(out)
-            status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
-        if process_return.returncode != 0:
-            print "inside error"
-            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
-            fileobj.write(err)
-            status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
-            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})'''
 
 
 #new code for Designer MMPBSA
@@ -2570,15 +2570,14 @@ class pathanalysis(APIView):
             try:
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
-            except OSError as e:  # except path error
-                error_num, error_msg = e
-                if error_msg.strip() == "The system cannot find the file specified":
-                    # create directory
-                    os.system("mkdir " + config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
-                    # change directory
-                    os.chdir(config.PATH_CONFIG[
-                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except:  # except path error
+                # create directory
+                os.system("mkdir " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                # change directory
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+
             #copy PDB frames from CatMec Analysis Contact Score module
             #catmec contact score path
             catmec_contact_score_path = config.PATH_CONFIG[
@@ -2600,11 +2599,11 @@ class pathanalysis(APIView):
             if process_return.returncode == 0:
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+                print JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+                print JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         else:
             # Execute for Designer module Path Analysis
@@ -2907,75 +2906,101 @@ class Contact_Score(APIView):
         #Check for Command Title
         if commandDetails_result.command_title == "CatMec":
             #Execute for CatMec module
-            primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
-            #change working directory
-            try:
-                os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-            except OSError as e: #excep path error
-                error_num, error_msg = e
-                if error_msg.strip() == "The system cannot find the file specified":
-                    #create directory
-                    os.system("mkdir "+config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/'+commandDetails_result.command_tool)
-                    #change directory
+
+            primary_command_runnable = commandDetails_result.primary_command
+
+            # check command IF Contact calculation(C) or combine contact score(S)
+            if primary_command_runnable.split()[3].strip() == "C":
+                # change working directory
+                try:
+                    os.chdir(config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                except:  # excep path error
+                    # error_num, error_msg = e
+                    # if error_msg.strip() == "The system cannot find the file specified":
+                    # create directory
+                    os.system("mkdir " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                    # change directory
                     os.chdir(config.PATH_CONFIG[
                                  'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
 
-            #------   create PDBS folder -----------
-            os.system("mkdir " + config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/pdbs")
+                # copy Contact Score python scripts
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/Contact_Score/whole_protein_contact.py',
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/" + "whole_protein_contact.py")
 
+                shutil.copyfile(config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/Contact_Score/readpdb2.py',
+                                config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/" + "readpdb2.py")
 
-            #---------  generate PDB frames from .XTC file   ----------------
-            key_name_protien_ligand_complex_index_number = 'mmpbsa_index_file_protien_ligand_complex_number'
-            ProjectToolEssentials_protien_ligand_complex_index_number = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_protien_ligand_complex_index_number).latest('entry_time')
-            index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                # ------   create PDBS folder -----------
+                os.system("mkdir " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/pdbs")
 
-            #------   get TPR file   ------
-            # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
-            key_name_tpr_file = 'mmpbsa_tpr_file'
+                # ---------  generate PDB frames from .XTC file   ----------------
+                key_name_protien_ligand_complex_index_number = 'mmpbsa_index_file_protien_ligand_complex_number'
+                ProjectToolEssentials_protien_ligand_complex_index_number = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_protien_ligand_complex_index_number).latest(
+                        'entry_time')
+                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
 
-            ProjectToolEssentials_res_tpr_file_input = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_tpr_file).latest('entry_time')
-            md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
-            os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                    'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n")
+                # ------   get TPR file   ------
+                # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
+                key_name_tpr_file = 'mmpbsa_tpr_file'
 
-            os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n")
+                ProjectToolEssentials_res_tpr_file_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_tpr_file).latest('entry_time')
+                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
 
-            os.system(
-                "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_fit.xtc -s " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                    'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 1 -n")
+                # create trajconv input file
+                file_gmx_trajconv_input = open("gmx_trajconv_input.txt", "w")
+                file_gmx_trajconv_input.write("1\n0\nq")
+                file_gmx_trajconv_input.close()
 
+                os.system(
+                    "gmx trjconv -f " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "complex_index.ndx < gmx_trajconv_input.txt")
+
+                '''os.system(
+                    "gmx trjconv -f merged_center.xtc -s " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o merged_fit.xtc -fit rot+trans -n "+config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] +"complex_index.ndx < gmx_trajconv_input.txt")'''
+
+                os.system(
+                    "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                        'md_simulations_path'] + md_simulations_tpr_file + " -o " + config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n " +
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
+                        'mmpbsa_project_path'] + "complex_index.ndx ")
+            else: # primary_command_runnable.split()[3].strip() == "S":
+                print "------   in contact score combine ----------"
+                pass
+
+            print "primary_command_runnable is -------------"
+            print primary_command_runnable
             #execute contact score command
-            process_return = execute_command(primary_command_runnable, inp_command_id)
-            out, err = process_return.communicate()
-            process_return.wait()
-            if process_return.returncode == 0:
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
-            if process_return.returncode != 0:
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
-
+            print os.system(primary_command_runnable)
+            return JsonResponse({"success": True})
             '''
             .-,--.                                          .     .      
             ' |   \ ,-. ,-. . ,-. ,-. ,-. ,-.   ,-,-. ,-. ,-| . . |  ,-. 
@@ -4473,15 +4498,6 @@ class Designer(APIView):
 
         elif command_tool_title == "Designer_Mutations":
             # execute Designer Mutations
-            #get python scripts
-            shutil.copyfile(
-                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/create_mutation.py',
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/create_mutation.py')
-            shutil.copyfile(
-                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/pymol_mutate.py',
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/pymol_mutate.py')
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
