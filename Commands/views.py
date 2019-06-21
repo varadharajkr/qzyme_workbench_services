@@ -4497,15 +4497,6 @@ class Designer(APIView):
 
         elif command_tool_title == "Designer_Mutations":
             # execute Designer Mutations
-            #get python scripts
-            shutil.copyfile(
-                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/create_mutation.py',
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/create_mutation.py')
-            shutil.copyfile(
-                config.PATH_CONFIG['shared_scripts'] + commandDetails_result.command_tool + '/pymol_mutate.py',
-                config.PATH_CONFIG[
-                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/pymol_mutate.py')
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
