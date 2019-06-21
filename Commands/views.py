@@ -3956,7 +3956,7 @@ class autodock(APIView):
         if(command_tool_title_split[0] == "nma"):
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
-        elif(command_tool_title_split[0] == "tconcord_dlg"):
+        elif(str(command_tool_title) == "tconcord_dlg"):
             enzyme_file_key = 'autodock_nma_final_protein_conformation'
             ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
                 project_id=project_id, key_name=enzyme_file_key)
