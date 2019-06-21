@@ -3961,7 +3961,7 @@ class autodock(APIView):
             ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
                 project_id=project_id, key_name=enzyme_file_key)
             nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
-            nma_path = str(nma_enzyme_file)[:-4]
+            nma_path = os.path.basename(nma_enzyme_file)
             print('nma_path ****************************************')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
