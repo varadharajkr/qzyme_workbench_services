@@ -2997,7 +2997,8 @@ class Contact_Score(APIView):
                 print "------   in contact score combine ----------"
                 pass
 
-
+            print "primary_command_runnable is -------------"
+            print primary_command_runnable
             #execute contact score command
             process_return = execute_command(primary_command_runnable, inp_command_id)
             out, err = process_return.communicate()
