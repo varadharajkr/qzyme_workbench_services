@@ -3000,17 +3000,7 @@ class Contact_Score(APIView):
             print "primary_command_runnable is -------------"
             print primary_command_runnable
             #execute contact score command
-            process_return = execute_command(primary_command_runnable, inp_command_id)
-            out, err = process_return.communicate()
-            process_return.wait()
-            if process_return.returncode == 0:
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
-            if process_return.returncode != 0:
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+            os.system(primary_command_runnable)
 
             '''
             .-,--.                                          .     .      
