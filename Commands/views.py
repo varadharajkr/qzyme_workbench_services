@@ -4498,6 +4498,8 @@ class Designer(APIView):
                                       command_title = commandDetails_result.command_title)
 
         elif command_tool_title == "Designer_Mutations":
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
             # execute Designer Mutations
             process_return = Popen(
                 args=primary_command_runnable,
@@ -4548,8 +4550,7 @@ class Designer(APIView):
             #Make Complex Execution
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'+command_tool_title)
-            status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id)
+
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
