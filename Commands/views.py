@@ -3000,8 +3000,8 @@ class Contact_Score(APIView):
             print "primary_command_runnable is -------------"
             print primary_command_runnable
             #execute contact score command
-            os.system(primary_command_runnable)
-
+            print os.system(primary_command_runnable)
+            return JsonResponse({"success": True})
             '''
             .-,--.                                          .     .      
             ' |   \ ,-. ,-. . ,-. ,-. ,-. ,-.   ,-,-. ,-. ,-| . . |  ,-. 
