@@ -4815,7 +4815,8 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + command_tool+ '/' +line.strip() +'/' )
             #execute make_complex.py
-            os.system(make_complex_params_replaced)
+            print "execute make_complex.py-----------------"
+            print os.system(make_complex_params_replaced)
             # queue command to database make_complex
             '''command_text_area = make_complex_params_replaced
             status = config.CONSTS['status_queued']
