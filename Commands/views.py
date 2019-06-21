@@ -3950,18 +3950,21 @@ class autodock(APIView):
         str_command_tool_title = str(command_tool_title)
         print type(str_command_tool_title)
         command_tool_title_split = str_command_tool_title.split('_')
-        print "split is----------------------------"
+        print "split is---------------------------------------------------------------------------------"
         print type(command_tool_title_split)
         print command_tool_title_split
         if(command_tool_title_split[0] == "nma"):
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
-        elif(command_tool_title_split[0] == "tconcord_dlg"):
+        elif(str(command_tool_title) == "tconcord_dlg"):
             enzyme_file_key = 'autodock_nma_final_protein_conformation'
             ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
-                project_id=project_id, key_name=enzyme_file_key)
+                project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
             nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
             nma_path = nma_enzyme_file[:-4]
+            print(str(nma_path[:-4]))
+            print('nma_path ****************************************')
+            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
@@ -4296,7 +4299,6 @@ class CatMec(APIView):
                 md_simulation_path = '/CatMec/MD_Simulation/'
                 print('md simulation path in md_run is')
                 print(md_simulation_path)
-                primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,md_simulation_path)
             print("primary_command_runnable.........................................")
