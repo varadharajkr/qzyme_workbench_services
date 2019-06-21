@@ -2570,15 +2570,14 @@ class pathanalysis(APIView):
             try:
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
-            except OSError as e:  # except path error
-                error_num, error_msg = e
-                if error_msg.strip() == "The system cannot find the file specified":
-                    # create directory
-                    os.system("mkdir " + config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
-                    # change directory
-                    os.chdir(config.PATH_CONFIG[
-                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+            except:  # except path error
+                # create directory
+                os.system("mkdir " + config.PATH_CONFIG[
+                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+                # change directory
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
+
             #copy PDB frames from CatMec Analysis Contact Score module
             #catmec contact score path
             catmec_contact_score_path = config.PATH_CONFIG[
@@ -2600,11 +2599,11 @@ class pathanalysis(APIView):
             if process_return.returncode == 0:
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+                print JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+                print JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         else:
             # Execute for Designer module Path Analysis
