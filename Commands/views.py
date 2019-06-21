@@ -3950,7 +3950,7 @@ class autodock(APIView):
         str_command_tool_title = str(command_tool_title)
         print type(str_command_tool_title)
         command_tool_title_split = str_command_tool_title.split('_')
-        print "split is----------------------------"
+        print "split is---------------------------------------------------------------------------------"
         print type(command_tool_title_split)
         print command_tool_title_split
         if(command_tool_title_split[0] == "nma"):
