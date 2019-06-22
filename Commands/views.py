@@ -4857,7 +4857,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
             
             '''
-            designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            #designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE CONTACT SCORE
             '''
