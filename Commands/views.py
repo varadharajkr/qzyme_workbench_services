@@ -58,9 +58,10 @@ def execute_command(command,inp_command_id):
     return process
 
 
-def execute_command_md_run(command, change_dir):
+def execute_command_md_run(command, change_dir,source_file_path):
     print "in md popen-----"
     print change_dir
+    os.chdir(source_file_path)
     os.chdir(change_dir)
     process =Popen(
         args=command,
@@ -3287,26 +3288,26 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         print("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
         md_editconf = "gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2"
-        execute_command_md_run(md_editconf,popen_change_dir)
+        execute_command_md_run(md_editconf,popen_change_dir,source_file_path)
 
         print("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
         print("start solvate==========================================")
         print(os.getcwd())
         md_solvate = "gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro"
-        execute_command_md_run(md_solvate, popen_change_dir)
+        execute_command_md_run(md_solvate, popen_change_dir,source_file_path)
 
 
         print("start make_ndx==========================================")
         print(os.getcwd())
         print("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
         md_make_ndx = "echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt"
-        execute_command_md_run(md_make_ndx, popen_change_dir)
+        execute_command_md_run(md_make_ndx, popen_change_dir,source_file_path)
 
         print("start grompp 11111111111111111111==========================================")
         print(os.getcwd())
         print("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
         md_grompp1 = "gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr"
-        execute_command_md_run(md_grompp1, popen_change_dir)
+        execute_command_md_run(md_grompp1, popen_change_dir,source_file_path)
 
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
@@ -3319,34 +3320,34 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print("start genion ==========================================")
         print(os.getcwd())
         md_genion = SOL_replace_str
-        execute_command_md_run(md_genion, popen_change_dir)
+        execute_command_md_run(md_genion, popen_change_dir,source_file_path)
 
         print("echo q | gmx make_ndx -f solve_ions.gro")
         print("start make_ndx 222222222222 ==========================================")
         print(os.getcwd())
         md_make_ndx2 = "echo q | gmx make_ndx -f solve_ions.gro"
-        execute_command_md_run(md_make_ndx2, popen_change_dir)
+        execute_command_md_run(md_make_ndx2, popen_change_dir,source_file_path)
 
 
         print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
         print("start grompp 222222222222 ==========================================")
         print(os.getcwd())
         md_grompp2 = "gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr"
-        execute_command_md_run(md_grompp2, popen_change_dir)
+        execute_command_md_run(md_grompp2, popen_change_dir,source_file_path)
 
 
         print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
         print("start mdrun  ==========================================")
         print(os.getcwd())
         md_mdrun1 = "gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em"
-        execute_command_md_run(md_mdrun1, popen_change_dir)
+        execute_command_md_run(md_mdrun1, popen_change_dir,source_file_path)
 
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         print("start grompp 33333333333333  ==========================================")
         print(os.getcwd())
         md_grompp3 = "gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx"
-        execute_command_md_run(md_grompp3, popen_change_dir)
+        execute_command_md_run(md_grompp3, popen_change_dir,source_file_path)
 
 
 
@@ -3354,7 +3355,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print("start mdrun 2222222222222  ==========================================")
         print(os.getcwd())
         md_mdrun2 = "gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt"
-        execute_command_md_run(md_mdrun2, popen_change_dir)
+        execute_command_md_run(md_mdrun2, popen_change_dir,source_file_path)
 
 
 
@@ -3362,7 +3363,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print("start grompp 44444444444  ==========================================")
         print(os.getcwd())
         md_grompp4  = "gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx"
-        execute_command_md_run(md_grompp4, popen_change_dir)
+        execute_command_md_run(md_grompp4, popen_change_dir,source_file_path)
 
 
 
@@ -3370,7 +3371,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print("start mdrun 333333333333  ==========================================")
         print(os.getcwd())
         md_mdrun3 = "gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt"
-        execute_command_md_run(md_mdrun3, popen_change_dir)
+        execute_command_md_run(md_mdrun3, popen_change_dir,source_file_path)
 
 
 
@@ -3378,14 +3379,14 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print("start grompp 5555555555  ==========================================")
         print(os.getcwd())
         md_grompp5 = "gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx"
-        execute_command_md_run(md_grompp5, popen_change_dir)
+        execute_command_md_run(md_grompp5, popen_change_dir,source_file_path)
 
         print(
             "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
         print("start mdrun 4444444444444  ==========================================")
         print(os.getcwd())
         md_mdrun4 = "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1"
-        execute_command_md_run(md_mdrun4, popen_change_dir)
+        execute_command_md_run(md_mdrun4, popen_change_dir,source_file_path)
 
     return JsonResponse({'success': True})
 
