@@ -71,7 +71,7 @@ def execute_command_md_run(command, change_dir,source_file_path):
         args=command,
         stdout=PIPE,
         stderr=PIPE,
-        shell=False
+        shell=True
     )
     print "execute command md run"
     process.wait()
