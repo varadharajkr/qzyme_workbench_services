@@ -4003,19 +4003,19 @@ class autodock(APIView):
 
         if process_return.returncode == 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in except of autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4024,7 +4024,7 @@ class autodock(APIView):
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print "<<<<<<<<<<<<<<<<<<<<<<< in except autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
