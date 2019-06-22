@@ -699,7 +699,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                            'local_shared_folder_path'] + project_name + '/' + command_tool+"/"+md_mutation_folder +"/"+ "gmx_make_ndx_input.txt", "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+ "\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
@@ -3180,6 +3180,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    print "in execute_md_simulation definition"
     key_name = 'md_simulation_no_of_runs'
 
     ProjectToolEssentials_res = \
@@ -3212,6 +3213,8 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
+        print "in md_run loooppppp"
+        print source_file_path + '/md_run' + str(i + 1)
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
         os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
