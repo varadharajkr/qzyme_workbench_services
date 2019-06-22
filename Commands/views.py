@@ -57,6 +57,18 @@ def execute_command(command,inp_command_id):
     process.wait()
     return process
 
+
+def execute_command_md_run(command):
+    process =Popen(
+        args=command,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True
+    )
+    print "execute command md run"
+    process.wait()
+    return process
+
 # commands/
 class gromacsCommands(APIView):
 
@@ -699,7 +711,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                            'local_shared_folder_path'] + project_name + '/' + command_tool+"/"+md_mutation_folder +"/"+ "gmx_make_ndx_input.txt", "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+ "\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
@@ -3180,6 +3192,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    print "in execute_md_simulation definition"
     key_name = 'md_simulation_no_of_runs'
 
     ProjectToolEssentials_res = \
@@ -3212,11 +3225,25 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
+        print "in md_run loooppppp"
+        print source_file_path + '/md_run' + str(i + 1)
         os.chdir(source_file_path + '/md_run' + str(i + 1))
-        os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
-        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
-        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+        #os.system()
+        editconf = "gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2"
+        execute_command_md_run(editconf)
+
+        #os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        solvate = "gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro"
+        execute_command_md_run(solvate)
+
+        #os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+        make_ndx = "echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt"
+        execute_command_md_run(make_ndx)
+
+        #os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+        grompp = "gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr"
+        execute_command_md_run(grompp)
+
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
         SOL_replace_str = SOL_replace_backup
@@ -3225,18 +3252,52 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(group_value)
         print("printing after %SOL% replace")
         print(SOL_replace_str)
-        os.system(SOL_replace_str)
-        os.system("echo q | gmx make_ndx -f solve_ions.gro")
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        #os.system(SOL_replace_str)
+        genion = SOL_replace_str
+        execute_command_md_run(genion)
+
+        #os.system("echo q | gmx make_ndx -f solve_ions.gro")
+        make_ndx2 = "echo q | gmx make_ndx -f solve_ions.gro"
+        execute_command_md_run(make_ndx2)
+
+        #os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+        grompp2 = "gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr"
+        execute_command_md_run(grompp2)
+
+        #os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        mdrun1 = "gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em"
+        execute_command_md_run(mdrun1)
+
         # Hotspot MD RUN ends here ----
-        os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
-        os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
-        os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
-        os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        #os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
+        grompp3 = "gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx"
+        execute_command_md_run(grompp3)
+
+
+        #os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        mdrun2 = "gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt"
+        execute_command_md_run(mdrun2)
+
+
+        #os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
+        grompp4 = "gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx"
+        execute_command_md_run(grompp4)
+
+
+        #os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        mdrun3 = "gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt"
+        execute_command_md_run(mdrun3)
+
+
+        #os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
+        grompp5 = "gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx"
+        execute_command_md_run(grompp5)
+
+
+        #os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        mdrun4 = "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1"
+        execute_command_md_run(mdrun4)
+
     return JsonResponse({'success': True})
 
 
@@ -4498,6 +4559,8 @@ class Designer(APIView):
                                       command_title = commandDetails_result.command_title)
 
         elif command_tool_title == "Designer_Mutations":
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
             # execute Designer Mutations
             process_return = Popen(
                 args=primary_command_runnable,
@@ -4548,8 +4611,7 @@ class Designer(APIView):
             #Make Complex Execution
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'+command_tool_title)
-            status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id)
+
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
@@ -4817,7 +4879,9 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + command_tool+ '/' +line.strip() +'/' )
             #execute make_complex.py
-            os.system(make_complex_params_replaced)
+            print "execute make_complex.py-----------------"
+            print make_complex_params_replaced
+            print os.system("python3 make_complex.py "+make_complex_params_replaced)
             # queue command to database make_complex
             '''command_text_area = make_complex_params_replaced
             status = config.CONSTS['status_queued']
@@ -4851,7 +4915,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
             
             '''
-            designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            #designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE CONTACT SCORE
             '''
