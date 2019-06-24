@@ -1264,7 +1264,7 @@ def perform_cmd_trajconv_designer_queue(project_name,project_id,md_simulations_t
                       'md_simulations_path'] + "gmx_trjconv_input.txt"'''
 
     os.system("gmx trjconv -f " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + "/" + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + md_mutation_folder + "/" + config.PATH_CONFIG[
                   'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
               config.PATH_CONFIG[
