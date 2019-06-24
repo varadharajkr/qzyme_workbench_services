@@ -4554,7 +4554,7 @@ class CatMec(APIView):
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+                return JsonResponse({"success": True})
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
