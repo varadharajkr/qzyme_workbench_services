@@ -511,6 +511,8 @@ class analyse_mmpbsa(APIView):
 
 #new code for Designer MMPBSA
 def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    #if Mysql has timed out
+    db.close_old_connections()
     entry_time = datetime.now()
     # get command details from database
     #create ANALYSIS and MMPBSA folder in Mutations respective folder
@@ -3265,6 +3267,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    db.close_old_connections()
     print "in execute_md_simulation definition"
     key_name = 'md_simulation_no_of_runs'
 
