@@ -513,6 +513,10 @@ class analyse_mmpbsa(APIView):
 def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     #if Mysql has timed out
     db.close_old_connections()
+    print "requst is ----"
+    print request
+    print "md_mutation_folder"
+    print md_mutation_folder
     entry_time = datetime.now()
     # get command details from database
     #create ANALYSIS and MMPBSA folder in Mutations respective folder
@@ -521,7 +525,14 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     os.system("mkdir " + config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA/")
     inp_command_id = request.POST.get("command_id")
-    commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+    try:
+        print "in designer_queue_analyse_mmpbsa try first DB operation"
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+    except db.OperationalError as e:
+        print "in designer_queue_analyse_mmpbsa except first DB operation"
+        db.close_old_connections()
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+
     project_id = commandDetails_result.project_id
     QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
     project_name = QzwProjectDetails_res.project_name
@@ -3419,6 +3430,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
 #Run MD Simulations for Hotspot module
 def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id,
                                                   user_id,variant_dir_md):
+    db.close_old_connections()
     key_name = 'md_simulation_no_of_runs'
 
     ProjectToolEssentials_res = \
