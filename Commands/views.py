@@ -738,9 +738,9 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
+                           'local_shared_folder_path'] + project_name +"/" +command_tool + "/" + md_mutation_folder + '/' + \
                        config.PATH_CONFIG[
                            'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
