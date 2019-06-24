@@ -3441,6 +3441,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         process_return.wait()
         file_outpu_md.write("outpu md_mdrun4\n" + out + "\n-----------error------\n" + err)
 
+        file_outpu_md.close()
     return JsonResponse({'success': True})
 
 
