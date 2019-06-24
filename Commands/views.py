@@ -3515,10 +3515,26 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
+        print(os.getcwd())
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        print('after change directory')
+        print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
+        print(os.getcwd())
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        print('after change directory')
+        print(os.getcwd())
         os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        print(os.getcwd())
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        print('after change directory')
+        print(os.getcwd())
         os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+        print(os.getcwd())
+        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        print('after change directory')
+        print(os.getcwd())
         os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
         group_value = sol_group_option()
         SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
@@ -4541,6 +4557,16 @@ class CatMec(APIView):
                 print(md_simulation_path)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,md_simulation_path)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True})
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
