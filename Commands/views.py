@@ -164,6 +164,7 @@ class gromacs(APIView):
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+
 #analyse_mmpsa
 class analyse_mmpbsa(APIView):
     def get(self,request):
@@ -331,7 +332,6 @@ class analyse_mmpbsa(APIView):
                                'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + "gmx_make_ndx_input.txt"
-
             print " make index command"
             print gmx_make_ndx
             os.system(gmx_make_ndx)
@@ -715,11 +715,12 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         # print indexfile_input_dict[maximum_key_ndx_input]
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
+        ligand_name_index = protien_ligand_complex_index + 1
         file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                            'local_shared_folder_path'] + project_name + '/' + command_tool+"/"+md_mutation_folder +"/"+ "gmx_make_ndx_input.txt", "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+ "\nq\n")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
@@ -824,8 +825,22 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     os.chdir(config.PATH_CONFIG[
                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
              config.PATH_CONFIG['mmpbsa_project_path'])
+    # =========================    execute GMXMMPBSA shell script 0    =================================================
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
+    # change dir if required
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+             config.PATH_CONFIG['mmpbsa_project_path'])
+
+    # =========================    execute GMXMMPBSA shell script 1    =================================================
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+
+    # change dir if required
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
+             config.PATH_CONFIG['mmpbsa_project_path'])
+
+    # =========================    execute GMXMMPBSA shell script 2    =================================================
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
     return JsonResponse({"success": True})
 
@@ -1220,7 +1235,7 @@ def perform_cmd_trajconv_designer_queue(project_name,project_id,md_simulations_t
     # create input file for trjconv command
     file_gmx_trjconv_input = open(config.PATH_CONFIG[
                                       'local_shared_folder_path'] + project_name + '/' +command_tool+"/" +md_mutation_folder+"/"+"gmx_trjconv_input.txt", "w")
-    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.write("1\n0\nq\n")
     file_gmx_trjconv_input.close()
     time.sleep(3)
     '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
@@ -4680,24 +4695,24 @@ class Designer(APIView):
                 '''
                 queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in success try mutations after make complex, md run and MMPBSA   >>>"
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in success except mutations after make complex, md run and MMPBSA >>"
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in error try mutations after make complex, md run and MMPBSA >>>>>>>"
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in error except mutations after make complex, md run and MMPBSA  >>>"
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
@@ -4745,12 +4760,28 @@ class Designer(APIView):
             if process_return.returncode == 0:
                 print "output of out is"
                 print out
-                status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in else success try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in else success except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in else error try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< in else error except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
 
@@ -5012,7 +5043,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
             
             '''
-            #designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE CONTACT SCORE
             '''
@@ -5026,6 +5057,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
             #counter for next mutant folder
             variant_index_count +=1
+    return JsonResponse({'success': True})
 
 
 #Hotspot module Make complex params
