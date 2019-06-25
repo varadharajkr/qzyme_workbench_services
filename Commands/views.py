@@ -778,11 +778,12 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
 
     # copy atom_types.itp file from MD dir
     source_atomtype_itp_file = config.PATH_CONFIG[
-                                   'local_shared_folder_path'] + project_name + '/' +command_tool +"/"+ md_mutation_folder + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
+                                   'local_shared_folder_path'] + project_name + '/' +command_tool +"/"+ md_mutation_folder +"/"+ tpr_file_split[0] + "/" + "atomtypes" + ".itp"
     dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+ "/" +md_mutation_folder +"/" +config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
     shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
 
     key_name_ligand_input = 'mmpbsa_input_ligand'
+
     # processing itp files
     pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input,md_mutation_folder,command_tool)
 
