@@ -781,7 +781,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                    'local_shared_folder_path'] + project_name + '/' +command_tool +"/"+ md_mutation_folder + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
     dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+ "/" +md_mutation_folder +"/" +config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
     shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
-    
+
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
     pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input,md_mutation_folder,command_tool)
@@ -3456,7 +3456,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         print("start grompp 33333333333333  ==========================================")
@@ -3470,7 +3470,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt 18")
 
         print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
         print("start grompp 44444444444  ==========================================")
@@ -3484,7 +3484,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt 18")
 
         print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         print("start grompp 5555555555  ==========================================")
@@ -3500,7 +3500,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
         os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt 18")
 
     return JsonResponse({'success': True})
 
