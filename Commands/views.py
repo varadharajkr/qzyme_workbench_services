@@ -1632,10 +1632,21 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
 def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input,md_mutation_folder,command_tool):
 
     #=======================  get user input ligand  ============================
-    ProjectToolEssentials_res_ligand_input = \
-        ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                   key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+
+    try:
+        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        ProjectToolEssentials_res_ligand_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ligand_input).latest('entry_time')
+        ligand_name = ProjectToolEssentials_res_ligand_input.values
+    except db.OperationalError as e:
+        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        db.close_old_connections()
+        ProjectToolEssentials_res_ligand_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ligand_input).latest('entry_time')
+        ligand_name = ProjectToolEssentials_res_ligand_input.values
+
     #======================= End of get user input ligand  ======================
 
 
