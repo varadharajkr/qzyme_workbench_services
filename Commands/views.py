@@ -3284,14 +3284,14 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         print(os.getcwd())
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
 
-        print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt 18")
         print("start mdrun  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         print("start grompp 33333333333333  ==========================================")
@@ -3303,17 +3303,17 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt 18")
         print("start mdrun 2222222222222  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt 18")
 
 
-        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
+        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -nt 18")
         print("start grompp 44444444444  ==========================================")
         print('before change directory')
         print(os.getcwd())
@@ -3323,7 +3323,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt 18")
         print("start mdrun 333333333333  ==========================================")
         print('before change directory')
         print(os.getcwd())
@@ -3333,7 +3333,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
 
 
-        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
+        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -nt 18")
         print("start grompp 5555555555  ==========================================")
         print('before change directory')
         print(os.getcwd())
@@ -3343,14 +3343,14 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt 18")
         print("start mdrun 4444444444444  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt 18")
 
     return JsonResponse({'success': True})\
 
