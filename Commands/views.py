@@ -733,14 +733,14 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                            'local_shared_folder_path'] + project_name + '/' + command_tool+"/"+md_mutation_folder +"/"+ "gmx_make_ndx_input.txt", "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\n" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -n " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + '/' + md_mutation_folder + "/" + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + '/' + \
+                           'local_shared_folder_path'] + project_name +"/" +command_tool + "/" + md_mutation_folder + '/' + \
                        config.PATH_CONFIG[
                            'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
@@ -775,6 +775,12 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                               'local_shared_folder_path'] + project_name + '/' +command_tool+"/"+md_mutation_folder+"/"+ tpr_file_split[0] + "/" + ligand_name_split[0] + ".itp"
         dest_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
         shutil.copyfile(source_itp_file, dest_itp_file)
+
+    # copy atom_types.itp file from MD dir
+    source_atomtype_itp_file = config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' +command_tool +"/"+ md_mutation_folder + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
+    dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+ "/" +md_mutation_folder +"/" +config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
+    shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
 
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
@@ -813,13 +819,21 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                             config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
         # copy .ITP files
         if file_name.endswith(".itp"):
-            # renaming user input ligand as LIGAND
-            key_name_ligand_input = 'mmpbsa_input_ligand'
+            # check for multiple ligand
+            if multiple_ligand_input:
+                # for multiple ligand
+                # renaming user input ligand as LIGAND
+                key_name_ligand_input = 'mmpbsa_input_ligand'
 
-            ProjectToolEssentials_res_ligand_input = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ProjectToolEssentials_res_ligand_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_ligand_input).latest('entry_time')
+                ligand_name = ProjectToolEssentials_res_ligand_input.values
+            else:
+                # for single ligand
+                for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                    ligand_name = ligand_inputvalue.split("_")[0]
+
             if file_name[:-4] == ligand_name:
                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+\
                                 config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
@@ -834,6 +848,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                 config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
                                 config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+ \
                                 config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+
 
     os.chdir(config.PATH_CONFIG[
                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
@@ -1264,7 +1279,7 @@ def perform_cmd_trajconv_designer_queue(project_name,project_id,md_simulations_t
                       'md_simulations_path'] + "gmx_trjconv_input.txt"'''
 
     os.system("gmx trjconv -f " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + command_tool + "/" + md_mutation_folder + "/" + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + md_mutation_folder + "/" + config.PATH_CONFIG[
                   'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + md_simulations_tpr_file + " -pbc mol -ur compact -o " + \
               config.PATH_CONFIG[
@@ -1632,10 +1647,21 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
 def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input,md_mutation_folder,command_tool):
 
     #=======================  get user input ligand  ============================
-    ProjectToolEssentials_res_ligand_input = \
-        ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                   key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+
+    try:
+        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        ProjectToolEssentials_res_ligand_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ligand_input).latest('entry_time')
+        ligand_name = ProjectToolEssentials_res_ligand_input.values
+    except db.OperationalError as e:
+        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        db.close_old_connections()
+        ProjectToolEssentials_res_ligand_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_ligand_input).latest('entry_time')
+        ligand_name = ProjectToolEssentials_res_ligand_input.values
+
     #======================= End of get user input ligand  ======================
 
 
@@ -1899,8 +1925,8 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                             topology_content_dihedrals += line2
                     except IndexError:
                         pass
-            print "adding topology file contents are"
-            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            #print "adding topology file contents are"
+            #print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+ "complex.itp", "w") as new_topology_file:
                 new_topology_file.write(topology_initial_content + "\n" +
                                         topology_content_atoms + topology_file_atoms_content + "\n" +
@@ -3430,7 +3456,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         print("start grompp 33333333333333  ==========================================")
@@ -3444,7 +3470,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt 18")
 
         print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
         print("start grompp 44444444444  ==========================================")
@@ -3458,7 +3484,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt 18")
 
         print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         print("start grompp 5555555555  ==========================================")
@@ -3474,7 +3500,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
         os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt 18")
 
     return JsonResponse({'success': True})
 
