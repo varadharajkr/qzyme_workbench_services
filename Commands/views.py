@@ -5088,10 +5088,22 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
             #get make_complex parameters from DB
             make_complex_params_keyname = "make_complex_parameters"
-            ProjectToolEssentials_make_complex_params = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=make_complex_params_keyname).latest('entry_time')
-            make_complex_params = ProjectToolEssentials_make_complex_params.values
+            try:
+                print "in make_complex_parameters query try first DB operation"
+                ProjectToolEssentials_make_complex_params = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=make_complex_params_keyname).latest(
+                        'entry_time')
+                make_complex_params = ProjectToolEssentials_make_complex_params.values
+            except db.OperationalError as e:
+                print "in make_complex_parameters query except first DB operation"
+                db.close_old_connections()
+                ProjectToolEssentials_make_complex_params = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=make_complex_params_keyname).latest(
+                        'entry_time')
+                make_complex_params = ProjectToolEssentials_make_complex_params.values
+
 
             variant_protien_file = 'variant_'+str(variant_index_count)+'.pdb'
             # replace protien file in make_complex_params
