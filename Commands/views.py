@@ -776,6 +776,12 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         dest_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path'] + ligand_name_split[0] + ".itp"
         shutil.copyfile(source_itp_file, dest_itp_file)
 
+    # copy atom_types.itp file from MD dir
+    source_atomtype_itp_file = config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' +command_tool +"/"+ md_mutation_folder + tpr_file_split[0] + "/" + "atomtypes" + ".itp"
+    dest_atomtype_itp_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+ "/" +md_mutation_folder +"/" +config.PATH_CONFIG['mmpbsa_project_path'] + "atomtypes" + ".itp"
+    shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
+    
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
     pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_input_dict, key_name_ligand_input,md_mutation_folder,command_tool)
@@ -842,6 +848,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                                 config.PATH_CONFIG['mmpbsa_project_path'] + file_name,
                                 config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+ \
                                 config.PATH_CONFIG['mmpbsa_project_path'] + "trial/" + file_name)
+
 
     os.chdir(config.PATH_CONFIG[
                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + \
@@ -1918,8 +1925,8 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                             topology_content_dihedrals += line2
                     except IndexError:
                         pass
-            print "adding topology file contents are"
-            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            #print "adding topology file contents are"
+            #print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+ "complex.itp", "w") as new_topology_file:
                 new_topology_file.write(topology_initial_content + "\n" +
                                         topology_content_atoms + topology_file_atoms_content + "\n" +
