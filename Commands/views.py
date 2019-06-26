@@ -4920,6 +4920,8 @@ class Hotspot(APIView):
         command_tool = commandDetails_result.command_tool
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
         print os.system("pwd")
@@ -5377,7 +5379,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             print os.getcwd()
                             print "command is ----------------"
                             print make_complex_params_replaced
-                            os.system(make_complex_params_replaced)
+                            os.system("python3 make_complex.py "+make_complex_params_replaced)
 
                             '''
                               ____                __  __ ____    ____  _                 _       _   _                 
