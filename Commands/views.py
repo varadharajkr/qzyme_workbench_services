@@ -5142,18 +5142,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             print "execute make_complex.py-----------------"
             print make_complex_params_replaced
             print os.system("python3 make_complex.py "+make_complex_params_replaced)
-            # queue command to database make_complex
-            '''command_text_area = make_complex_params_replaced
-            status = config.CONSTS['status_queued']
-            comments = ""
-            command_title_as_variant = line.strip()
-            entry_time = datetime.now()
-            result_insert_QZwProjectCommands = commandDetails(project_id=project_id, user_id=user_id,
-                                                                  primary_command=command_text_area,
-                                                                  entry_time=entry_time,
-                                                                  status=status, command_tool=command_tool,
-                                                                  command_title=command_title_as_variant, comments=comments)
-            result = result_insert_QZwProjectCommands.save()'''
+
             '''
               ____                __  __ ____    ____  _                 _       _   _                 
              |  _ \ _   _ _ __   |  \/  |  _ \  / ___|(_)_ __ ___  _   _| | __ _| |_(_) ___  _ __  ___ 
@@ -5384,6 +5373,10 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             os.chdir(config.PATH_CONFIG[
                                          'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + line.strip() + '/' + mutations_dirs.strip() + "/")
                             # execute make_complex.py
+                            print "execute make complex"
+                            print os.getcwd()
+                            print "command is ----------------"
+                            print make_complex_params_replaced
                             os.system(make_complex_params_replaced)
 
                             '''
