@@ -5364,12 +5364,19 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                 config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
                                                     value.split('_')[0]) + ".itp")
+                                #.TOP file
+                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/CatMec/Ligand_Parametrization/' + str(
+                                    value.split('_')[0]) + ".top",
+                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                                    value.split('_')[0]) + ".top")
 
                             # copy "ATOMTYPES" file from CatMec module
                             shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                             + project_name + '/CatMec/Ligand_Parametrization/atomtypes.itp',
                                             config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                            + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + '/atomtypes.itp')
+                                            + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + 'atomtypes.itp')
 
                             # change DIR to Mutations list
                             os.chdir(config.PATH_CONFIG[
