@@ -5350,13 +5350,27 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             ligand_names = ProjectToolEssentials_ligand_name_res.values
                             ligand_file_data = ast.literal_eval(ligand_names)
                             for key, value in ligand_file_data.items():
-                                # value.split('_')[0]
-                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                                + project_name + '/CatMec/Ligand_Parametrization/' + str(
-                                    value.split('_')[0]) + ".gro",
-                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                                    value.split('_')[0]) + ".gro")
+                                # value.split('_')[0] is ligand name
+
+                                '''
+                                Process PDB file
+                                - generate ligand.pdb files
+                                - generate ligand.gro file
+                                '''
+                                print "string before grep ligand to PDB file "
+                                print "grep '" + str(value.split('_')[0]) + "' " + config.PATH_CONFIG[
+                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                    variants_dir.strip()) + " > " + config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + \
+                                      value.split('_')[0] + ".pdb"
+
+                                os.system("grep '" + str(value.split('_')[0]) + "' " + config.PATH_CONFIG[
+                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                    variants_dir.strip()) + " > " + config.PATH_CONFIG[
+                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
+                                          value.split('_')[0] + ".pdb")
+
+
                                 # .ITP files
                                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/CatMec/Ligand_Parametrization/' + str(
@@ -5364,13 +5378,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                 config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
                                                     value.split('_')[0]) + ".itp")
-                                #.TOP file
-                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                                + project_name + '/CatMec/Ligand_Parametrization/' + str(
-                                    value.split('_')[0]) + ".top",
-                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                                    value.split('_')[0]) + ".top")
+
 
                             # copy "ATOMTYPES" file from CatMec module
                             shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
