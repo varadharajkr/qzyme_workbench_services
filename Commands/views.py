@@ -4945,7 +4945,7 @@ class Hotspot(APIView):
         for dir_files in listdir(config.PATH_CONFIG[
                                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'):
             if dir_files.endswith(".pdb"):  # applying .pdb filter
-                os.system("mkdir " + "variant_" + str(ligand_dir_counter))
+                os.system("mkdir " + dir_files[:-4])
                 protien_without_ligand_lines = ""
                 with open(config.PATH_CONFIG[
                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+ dir_files, "r") as variant_pdb_file:
@@ -4958,7 +4958,7 @@ class Hotspot(APIView):
                             temp_ligant_content = ""
                             if ligand_l in variant_pdb_file_line:
                                 temp_ligant_content += variant_pdb_file_line
-                            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + "variant_"+ str(ligand_dir_counter)+"/"+str(ligand_l)+'.pdb' , "w+") as ligand_pdb_newfile:
+                            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + dir_files[:-4]+"/"+str(ligand_l)+'.pdb' , "w+") as ligand_pdb_newfile:
                                 ligand_pdb_newfile.write(temp_ligant_content)
 
                 # renaming protien file - backup protien file
