@@ -5401,16 +5401,6 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             for key, value in ligand_file_data.items():
                                 # value.split('_')[0] is ligand name
                                 ligand_names_list.append(value.split('_')[0])
-                                '''
-                                Process protien PDB file
-                                - generate ligand.gro files
-                                '''
-                                #creating .GRO files for ligands
-                                os.system("gmx editconf -f "+config.PATH_CONFIG[
-                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
-                                          value.split('_')[0] + ".pdb"+ " -o "+config.PATH_CONFIG[
-                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
-                                          value.split('_')[0] + ".gro")
 
                                 # .ITP files
                                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -5427,7 +5417,18 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                 config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +value.split('_')[0]+".pdb")
 
+                                '''
+                                Process protien PDB file
+                                - generate ligand.gro files
+                                '''
+                                # creating .GRO files for ligands
+                                os.system("gmx editconf -f " + config.PATH_CONFIG[
+                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
+                                          value.split('_')[0] + ".pdb" + " -o " + config.PATH_CONFIG[
+                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
+                                          value.split('_')[0] + ".gro")
 
+                                
 
                             # copy "ATOMTYPES" file from CatMec module
                             shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
