@@ -5435,6 +5435,12 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                     value.split('_')[0]) + ".itp")
 
 
+                                # copying ligand files
+                                shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/' + command_tool + '/'+value.split('_')[0]+".pdb",
+                                                config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
+                                                + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +value.split('_')[0]+".pdb")
+
 
 
                             # copy "ATOMTYPES" file from CatMec module
