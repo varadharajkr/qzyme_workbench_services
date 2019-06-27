@@ -1181,29 +1181,30 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
             for variants_dir in os.listdir(config.PATH_CONFIG[
                                                'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/"):
                 # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
-                for md_run_dir in os.listdir(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+variants_dir+"/md_run1/"):
-                    #filter for em.gro file
-                    if md_run_dir.strip() == "em.gro":
-                        em_gro_file_str += config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip() + " "
+                if variants_dir.strip() == "md_run1":
+                    for md_run_dir in os.listdir(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/"):
+                        #filter for em.gro file
+                        if md_run_dir.strip() == "em.gro":
+                            em_gro_file_str += config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/" + md_run_dir.strip() + " "
 
-                    # filter for em.tpr file
-                    if md_run_dir.strip() == "em.tpr":
-                        em_tpr_file_str = str(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip())
+                        # filter for em.tpr file
+                        if md_run_dir.strip() == "em.tpr":
+                            em_tpr_file_str = str(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/" + md_run_dir.strip())
 
-                    # filter for index file
-                    if md_run_dir.strip() == "index.ndx":
-                        md_index_file_str = str(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip())
+                        # filter for index file
+                        if md_run_dir.strip() == "index.ndx":
+                            md_index_file_str = str(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/" + md_run_dir.strip())
 
-                    # filter for topology file
-                    if md_run_dir.strip() == "topol.top":
-                        md_topology_file_str = str(config.PATH_CONFIG[
-                                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + variants_dir + "/md_run1/" + md_run_dir.strip())
+                        # filter for topology file
+                        if md_run_dir.strip() == "topol.top":
+                            md_topology_file_str = str(config.PATH_CONFIG[
+                                                        'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/" + md_run_dir.strip())
 
-                pdb_file_index_str += 1
+                    pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
     return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
