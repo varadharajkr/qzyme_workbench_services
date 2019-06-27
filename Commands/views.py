@@ -4942,8 +4942,8 @@ class Hotspot(APIView):
 
         # loop thru PDB files in dir
         ligand_dir_counter = 0
-        for dir_files in listdir(os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )):
+        for dir_files in listdir(config.PATH_CONFIG[
+                                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'):
             if dir_files.endswith(".pdb"):  # applying .pdb filter
                 os.system("mkdir " + "variant_" + str(ligand_dir_counter))
                 protien_without_ligand_lines = ""
