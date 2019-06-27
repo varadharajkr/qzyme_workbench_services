@@ -5403,22 +5403,8 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 ligand_names_list.append(value.split('_')[0])
                                 '''
                                 Process protien PDB file
-                                - generate ligand.pdb files
                                 - generate ligand.gro files
                                 '''
-                                print "string before grep ligand to PDB file "
-                                print "grep '" + str(value.split('_')[0]) + "' " + config.PATH_CONFIG[
-                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                    variants_dir.strip()) + " > " + config.PATH_CONFIG[
-                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + \
-                                      value.split('_')[0] + ".pdb"
-
-                                os.system("grep '" + str(value.split('_')[0]) + "' " + config.PATH_CONFIG[
-                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                    variants_dir.strip()) + " > " + config.PATH_CONFIG[
-                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
-                                          value.split('_')[0] + ".pdb")
-
                                 #creating .GRO files for ligands
                                 os.system("gmx editconf -f "+config.PATH_CONFIG[
                                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
