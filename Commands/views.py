@@ -5437,7 +5437,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
 
                                 # copying ligand files
                                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
-                                                + project_name + '/' + command_tool + '/'+value.split('_')[0]+".pdb",
+                                                + project_name + '/' + command_tool + '/'+"frames_"+str(mutations_dirs.strip()[-1])+"/"+value.split('_')[0]+".pdb",
                                                 config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +value.split('_')[0]+".pdb")
 
