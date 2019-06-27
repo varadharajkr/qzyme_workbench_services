@@ -4943,9 +4943,15 @@ class Hotspot(APIView):
         # loop thru PDB files in dir
         ligand_dir_counter = 0
         for dir_files in listdir(config.PATH_CONFIG[
-                                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'):
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool):
             if dir_files.endswith(".pdb"):  # applying .pdb filter
                 os.system("mkdir " + dir_files[:-4])
+                #create ligand files for each frame(PDB)
+                for ligand_l in ligand_names_list:
+                    os.system("grep '"+str(ligand_l)+"'"+" "+config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+ dir_files+" > "+config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+dir_files[:-4]+"/"+ligand_l+".pdb")
+
                 protien_without_ligand_lines = ""
                 with open(config.PATH_CONFIG[
                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+ dir_files, "r") as variant_pdb_file:
@@ -4953,13 +4959,7 @@ class Hotspot(APIView):
                     for variant_pdb_file_line in variant_pdb_file_lines:
                         if not any(ligand_l in variant_pdb_file_line for ligand_l in ligand_names_list):
                             protien_without_ligand_lines += variant_pdb_file_line
-                        # create ligabd PDB file(s)
-                        for ligand_l in ligand_names_list:
-                            temp_ligant_content = ""
-                            if ligand_l in variant_pdb_file_line:
-                                temp_ligant_content += variant_pdb_file_line
-                            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + dir_files[:-4]+"/"+str(ligand_l)+'.pdb' , "w+") as ligand_pdb_newfile:
-                                ligand_pdb_newfile.write(temp_ligant_content)
+
 
                 # renaming protien file - backup protien file
                 os.rename(config.PATH_CONFIG[
