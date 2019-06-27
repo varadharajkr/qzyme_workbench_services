@@ -5374,7 +5374,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 #creating .GRO files for ligands
                                 os.system("gmx editconf -f "+config.PATH_CONFIG[
                                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
-                                          value.split('_')[0] + ".pdb"+ " - o "+config.PATH_CONFIG[
+                                          value.split('_')[0] + ".pdb"+ " -o "+config.PATH_CONFIG[
                                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
                                           value.split('_')[0] + ".gro")
 
