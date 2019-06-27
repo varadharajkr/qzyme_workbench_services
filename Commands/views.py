@@ -5349,13 +5349,14 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 'entry_time')
                             ligand_names = ProjectToolEssentials_ligand_name_res.values
                             ligand_file_data = ast.literal_eval(ligand_names)
+                            ligand_names_list = []
                             for key, value in ligand_file_data.items():
                                 # value.split('_')[0] is ligand name
-
+                                ligand_names_list.append(value.split('_')[0])
                                 '''
-                                Process PDB file
+                                Process protien PDB file
                                 - generate ligand.pdb files
-                                - generate ligand.gro file
+                                - generate ligand.gro files
                                 '''
                                 print "string before grep ligand to PDB file "
                                 print "grep '" + str(value.split('_')[0]) + "' " + config.PATH_CONFIG[
@@ -5370,6 +5371,12 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                               'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
                                           value.split('_')[0] + ".pdb")
 
+                                #creating .GRO files for ligands
+                                os.system("gmx editconf -f "+config.PATH_CONFIG[
+                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
+                                          value.split('_')[0] + ".pdb"+ " - o "+config.PATH_CONFIG[
+                                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" +
+                                          value.split('_')[0] + ".gro")
 
                                 # .ITP files
                                 shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -5378,6 +5385,30 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                 config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                                 + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
                                                     value.split('_')[0]) + ".itp")
+
+
+                            #---------   remove ligand from protien file   ----------
+                            protien_without_ligand_lines = ""
+                            with open(config.PATH_CONFIG[
+                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                    variants_dir.strip()), "r") as variant_pdb_file:
+                                variant_pdb_file_lines = variant_pdb_file.readlines()
+                                for variant_pdb_file_line in variant_pdb_file_lines:
+                                    if not any(ligand_l in variant_pdb_file_line for ligand_l in ligand_names_list):
+                                        protien_without_ligand_lines += variant_pdb_file_line
+
+
+                            #renaming protien file - backup protien file
+                            os.rename(config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip(),config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/backup_" + variants_dir.strip()[:-4]+".txt")
+
+
+                            #write to protien file (without ligands)
+                            with open(config.PATH_CONFIG[
+                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
+                                variants_dir.strip()), "w+") as variant_pdb_newfile:
+                                variant_pdb_newfile.write(protien_without_ligand_lines)
 
 
                             # copy "ATOMTYPES" file from CatMec module
