@@ -4925,6 +4925,54 @@ class Hotspot(APIView):
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
         print os.system("pwd")
+        # fetch ligand names from DB
+        ligands_key_name = 'substrate_input'
+        ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(
+            project_id=project_id,
+            key_name=ligands_key_name).latest(
+            'entry_time')
+        ligand_names = ProjectToolEssentials_ligand_name_res.values
+        ligand_file_data = ast.literal_eval(ligand_names)
+        ligand_names_list = []
+        for key, value in ligand_file_data.items():
+            # value.split('_')[0] is ligand name
+            ligand_names_list.append(value.split('_')[0])
+
+        # ---------   remove ligand from protien file   ----------
+
+        # loop thru PDB files in dir
+        ligand_dir_counter = 0
+        for dir_files in listdir(os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )):
+            if dir_files.endswith(".pdb"):  # applying .pdb filter
+                os.system("mkdir " + "variant_" + str(ligand_dir_counter))
+                protien_without_ligand_lines = ""
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+ dir_files, "r") as variant_pdb_file:
+                    variant_pdb_file_lines = variant_pdb_file.readlines()
+                    for variant_pdb_file_line in variant_pdb_file_lines:
+                        if not any(ligand_l in variant_pdb_file_line for ligand_l in ligand_names_list):
+                            protien_without_ligand_lines += variant_pdb_file_line
+                        # create ligabd PDB file(s)
+                        for ligand_l in ligand_names_list:
+                            temp_ligant_content = ""
+                            if ligand_l in variant_pdb_file_line:
+                                temp_ligant_content += variant_pdb_file_line
+                            with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + "variant_"+ str(ligand_dir_counter)+"/"+str(ligand_l)+'.pdb' , "w+") as ligand_pdb_newfile:
+                                ligand_pdb_newfile.write(temp_ligant_content)
+
+                # renaming protien file - backup protien file
+                os.rename(config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/'+dir_files,
+                          config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + "/backup_" + dir_files[:-4] + ".txt")
+
+                # write to protien file (without ligands)
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' +dir_files, "w+") as variant_pdb_newfile:
+                    variant_pdb_newfile.write(protien_without_ligand_lines)
+            ligand_dir_counter += 1
+
         primary_command_runnable = commandDetails_result.primary_command
 
         # execute Hotspot Mutations
@@ -5387,28 +5435,6 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                                     value.split('_')[0]) + ".itp")
 
 
-                            #---------   remove ligand from protien file   ----------
-                            protien_without_ligand_lines = ""
-                            with open(config.PATH_CONFIG[
-                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                    variants_dir.strip()), "r") as variant_pdb_file:
-                                variant_pdb_file_lines = variant_pdb_file.readlines()
-                                for variant_pdb_file_line in variant_pdb_file_lines:
-                                    if not any(ligand_l in variant_pdb_file_line for ligand_l in ligand_names_list):
-                                        protien_without_ligand_lines += variant_pdb_file_line
-
-
-                            #renaming protien file - backup protien file
-                            os.rename(config.PATH_CONFIG[
-                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip(),config.PATH_CONFIG[
-                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/backup_" + variants_dir.strip()[:-4]+".txt")
-
-
-                            #write to protien file (without ligands)
-                            with open(config.PATH_CONFIG[
-                                          'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + str(
-                                variants_dir.strip()), "w+") as variant_pdb_newfile:
-                                variant_pdb_newfile.write(protien_without_ligand_lines)
 
 
                             # copy "ATOMTYPES" file from CatMec module
