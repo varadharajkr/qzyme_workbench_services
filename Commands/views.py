@@ -1094,6 +1094,15 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                             'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + ligand_name_split[0] + ".itp"
         shutil.copyfile(source_itp_file, dest_itp_file)
 
+    # copy atom_types.itp file from MD dir
+    source_atomtype_itp_file = config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + \
+                               trajcat_return_list[3][:-9] + "/" + "atomtypes" + ".itp"
+    dest_atomtype_itp_file = config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "atomtypes" + ".itp"
+    shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
+
+
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
     pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tpr_file, CatMec_input_dict,
