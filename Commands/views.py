@@ -1133,13 +1133,21 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/" + file_name)
         # -------------   copy .ITP files   ----------------------------------------------------------------------------
         if file_name.endswith(".itp"):
-            # renaming user input ligand as LIGAND
-            key_name_ligand_input = 'mmpbsa_input_ligand'
+            # check for multiple ligand
+            if multiple_ligand_input:
+                # for multiple ligand
+                # renaming user input ligand as LIGAND
+                key_name_ligand_input = 'mmpbsa_input_ligand'
 
-            ProjectToolEssentials_res_ligand_input = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ProjectToolEssentials_res_ligand_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_ligand_input).latest('entry_time')
+                ligand_name = ProjectToolEssentials_res_ligand_input.values
+            else:
+                # for single ligand
+                for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                    ligand_name = ligand_inputvalue.split("_")[0]
+                    
             if file_name[:-4] == ligand_name:
                 shutil.copyfile(config.PATH_CONFIG[
                                     'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
