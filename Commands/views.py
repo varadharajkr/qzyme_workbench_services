@@ -3581,12 +3581,12 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         #print("printing after %SOL% replace")
         #print(SOL_replace_str)
         #os.system(SOL_replace_str)
-        #os.system("echo q | gmx make_ndx -f solve_ions.gro")
+        os.system("echo q | gmx make_ndx -f newbox.gro")
 
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
 
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
-        
+
 
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
