@@ -1202,7 +1202,7 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                         # filter for topology file
                         if md_run_dir.strip() == "topol.top":
                             md_topology_file_str = str(config.PATH_CONFIG[
-                                                        'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/md_run1/" + md_run_dir.strip())
+                                                        'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
                     pdb_file_index_str += 1
     variant_index_dir += 1
