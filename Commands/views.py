@@ -1316,7 +1316,7 @@ def perform_cmd_trajconv_hotspot_mmpbsa(project_name,project_id,md_simulations_t
     # create input file for trjconv command
     file_gmx_trjconv_input = open(config.PATH_CONFIG[
                                       'local_shared_folder_path'] + project_name + '/' +command_tool+"/" +mutation_dir_mmpbsa+"/"+"gmx_trjconv_input.txt", "w")
-    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.write("1\n0\nq\n")
     file_gmx_trjconv_input.close()
     time.sleep(3)
     '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
