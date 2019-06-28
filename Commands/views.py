@@ -3559,33 +3559,35 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
-        group_value = sol_group_option()
-        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
-        SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
-        print("printing group value in MD$$$$$$$$$$$$$$$$$$")
-        print(group_value)
-        print("printing after %SOL% replace")
-        print(SOL_replace_str)
-        os.system(SOL_replace_str)
-        os.system("echo q | gmx make_ndx -f solve_ions.gro")
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+        #print(os.getcwd())
+        #os.chdir(source_file_path + '/md_run' + str(i + 1))
+        #print('after change directory')
+        #print(os.getcwd())
+        #os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        #print(os.getcwd())
+        #os.chdir(source_file_path + '/md_run' + str(i + 1))
+        #print('after change directory')
+        #print(os.getcwd())
+        #os.system("echo q | gmx make_ndx -f newbox.gro > gromacs_solve_gro_indexing.txt")
+
+        #os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+
+        #group_value = sol_group_option()
+        #SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
+        #SOL_replace_str = SOL_replace_backup
+        #SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
+        #print("printing group value in MD$$$$$$$$$$$$$$$$$$")
+        #print(group_value)
+        #print("printing after %SOL% replace")
+        #print(SOL_replace_str)
+        #os.system(SOL_replace_str)
+        #os.system("echo q | gmx make_ndx -f solve_ions.gro")
+
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
+
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
+        
+
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         # os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
