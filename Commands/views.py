@@ -1332,7 +1332,7 @@ def perform_cmd_trajconv_hotspot_mmpbsa(project_name,project_id,md_simulations_t
                       'md_simulations_path'] + "gmx_trjconv_input.txt"'''
 
     os.system("gmx trjconv -f " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged.xtc -s " + md_simulations_tpr_file + " -pbc mol -ur compact -o " +
+        'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged.xtc -s " + md_simulations_tpr_file + " -pbc mol -ur compact -o " +
               config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged-recentered.xtc -center -n " + md_simulations_ndx_file + " < " +
               config.PATH_CONFIG[
