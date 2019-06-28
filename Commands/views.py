@@ -1097,7 +1097,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     # copy atom_types.itp file from MD dir
     source_atomtype_itp_file = config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + \
-                               trajcat_return_list[3][:-9] + "/" + "atomtypes" + ".itp"
+                               trajcat_return_list[3][:-10] + "/" + "atomtypes" + ".itp"
     dest_atomtype_itp_file = config.PATH_CONFIG[
                                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "atomtypes" + ".itp"
     shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
