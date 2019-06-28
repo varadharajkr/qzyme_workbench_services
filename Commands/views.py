@@ -893,6 +893,10 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
 
     trajcat_return_list = get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, command_tool, project_id, user_id)
 
+    print "trajcat_return_list is ===================="
+    print trajcat_return_list
+    print "list  0000000 item is trajcat_return_list[0]"
+    print trajcat_return_list[0]
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
     # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
     # -----------------------------------------------------------------------------------------------------
