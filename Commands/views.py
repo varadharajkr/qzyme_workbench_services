@@ -1045,12 +1045,13 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         # print indexfile_input_dict[maximum_key_ndx_input]
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
+        ligand_name_index = protien_ligand_complex_index + 1
         file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt",
                                        "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\nq\n")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\n" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
@@ -1147,7 +1148,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                 # for single ligand
                 for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
                     ligand_name = ligand_inputvalue.split("_")[0]
-                    
+
             if file_name[:-4] == ligand_name:
                 shutil.copyfile(config.PATH_CONFIG[
                                     'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
