@@ -3536,12 +3536,12 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
 #Run MD Simulations for Hotspot module
 def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id,
                                                   user_id,variant_dir_md):
-    db.close_old_connections()
-    key_name = 'md_simulation_no_of_runs'
 
-    ProjectToolEssentials_res = \
-        ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                   key_name=key_name).latest('entry_time')
+    # key_name = 'md_simulation_no_of_runs'
+    #
+    # ProjectToolEssentials_res = \
+    #     ProjectToolEssentials.objects.all().filter(project_id=project_id,
+    #                                                key_name=key_name).latest('entry_time')
 
     md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -5406,12 +5406,22 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 + project_name + '/' + command_tool + "/" + line.strip() + "/" + mutations_dirs.strip() + "/" + "make_complex.py")
 
                             # get make_complex parameters from DB
-                            make_complex_params_keyname = "make_complex_parameters"
-                            ProjectToolEssentials_make_complex_params = \
-                                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=make_complex_params_keyname).latest(
-                                    'entry_time')
-                            make_complex_params = ProjectToolEssentials_make_complex_params.values
+                            try:
+                                make_complex_params_keyname = "make_complex_parameters"
+                                ProjectToolEssentials_make_complex_params = \
+                                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=make_complex_params_keyname).latest(
+                                        'entry_time')
+                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                            except db.OperationalError as e:
+                                db.close_old_connections()
+                                make_complex_params_keyname = "make_complex_parameters"
+                                ProjectToolEssentials_make_complex_params = \
+                                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=make_complex_params_keyname).latest(
+                                        'entry_time')
+                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+
 
                             variant_protien_file = 'variant_' + str(variant_index_count) + '.pdb'
                             # replace protien file in make_complex_params
