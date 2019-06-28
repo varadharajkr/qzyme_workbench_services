@@ -1019,7 +1019,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
 
         gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
@@ -1054,7 +1054,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
