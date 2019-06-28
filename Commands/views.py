@@ -1211,6 +1211,8 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                     pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
+    print "in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print em_gro_file_str
     return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
@@ -3583,7 +3585,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         os.system(SOL_replace_str)
         os.system("echo q | gmx make_ndx -f solve_ions.gro")
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         # os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
