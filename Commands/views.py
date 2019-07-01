@@ -3183,6 +3183,87 @@ def sol_group_option():
     return SOL_option_value
 
 
+def minimization_in_md_simulation_folder(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
+    # EXECUTION OF GROMACS FUNCTION UNTIL MINIMIZATION IN MD SIMULATION DIRECTORY
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
+    os.chdir(source_file_path)
+    print("start editconf==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
+
+    print("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+    print("start solvate==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+
+    print("start make_ndx==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
+
+    print("start grompp 11111111111111111111==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+
+    group_value = sol_group_option()
+    SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
+    SOL_replace_str = SOL_replace_backup
+    SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
+    print("printing group value in MD$$$$$$$$$$$$$$$$$$")
+    print(group_value)
+    print("printing after %SOL% replace")
+    print(SOL_replace_str)
+    print("start genion ==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system(SOL_replace_str)
+
+    print("echo q | gmx make_ndx -f solve_ions.gro")
+    print("start make_ndx 222222222222 ==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("echo q | gmx make_ndx -f solve_ions.gro")
+
+    print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+    print("start grompp 222222222222 ==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+
+    print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt 18")
+    print("start mdrun  ==========================================")
+    print('before change directory')
+    print(os.getcwd())
+    os.chdir(source_file_path)
+    print('after change directory')
+    print(os.getcwd())
+    os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
+
+
 @csrf_exempt
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
     status_id = config.CONSTS['status_initiated']
@@ -3202,7 +3283,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
-    print(source_file_path)
+    minimization_in_md_simulation_folder(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path)
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -3217,85 +3298,6 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print("start editconf==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-
-        print("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
-        print("start solvate==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
-
-        print("start make_ndx==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
-
-        print("start grompp 11111111111111111111==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
-
-
-        group_value = sol_group_option()
-        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
-        SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
-        print("printing group value in MD$$$$$$$$$$$$$$$$$$")
-        print(group_value)
-        print("printing after %SOL% replace")
-        print(SOL_replace_str)
-        print("start genion ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system(SOL_replace_str)
-
-
-        print("echo q | gmx make_ndx -f solve_ions.gro")
-        print("start make_ndx 222222222222 ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("echo q | gmx make_ndx -f solve_ions.gro")
-
-
-        print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
-        print("start grompp 222222222222 ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
-
-        print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt 18")
-        print("start mdrun  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         print("start grompp 33333333333333  ==========================================")
