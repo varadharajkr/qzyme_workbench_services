@@ -893,6 +893,10 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
 
     trajcat_return_list = get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, command_tool, project_id, user_id)
 
+    print "trajcat_return_list is ===================="
+    print trajcat_return_list
+    print "list  0000000 item is trajcat_return_list[0]"
+    print trajcat_return_list[0]
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
     # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
     # -----------------------------------------------------------------------------------------------------
@@ -1015,7 +1019,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
 
         gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
@@ -1041,16 +1045,17 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         # print indexfile_input_dict[maximum_key_ndx_input]
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
+        ligand_name_index = protien_ligand_complex_index + 1
         file_gmx_make_ndx_input = open(config.PATH_CONFIG[
                                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt",
                                        "w")
         file_gmx_make_ndx_input.write(
             str(protein_index) + "\nname " + str(receptor_index) + " receptor\n" + str(protein_index) + " | " + str(
-                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\nq\n")
+                ligandname_index) + "\nname " + str(protien_ligand_complex_index) + " complex"+"\n" +str(ligandname_index)+"\nname "+str(ligand_name_index)+" ligand"+"\nq\n")
         file_gmx_make_ndx_input.close()
         gmx_make_ndx = "gmx make_ndx -f " + md_simulations_tpr_file + " -n " + md_simulations_ndx_file + " -o " + \
                        config.PATH_CONFIG[
-                           'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
+                           'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + '/MMPBSA/' + "index.ndx < " + \
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
@@ -1088,6 +1093,13 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         dest_itp_file = config.PATH_CONFIG[
                             'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + ligand_name_split[0] + ".itp"
         shutil.copyfile(source_itp_file, dest_itp_file)
+
+    # copy atom_types.itp file from MD dir
+    source_atomtype_itp_file = trajcat_return_list[3][:-10] + "/" + "atomtypes" + ".itp"
+    dest_atomtype_itp_file = config.PATH_CONFIG[
+                                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "atomtypes" + ".itp"
+    shutil.copyfile(source_atomtype_itp_file, dest_atomtype_itp_file)
+
 
     key_name_ligand_input = 'mmpbsa_input_ligand'
     # processing itp files
@@ -1129,13 +1141,21 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/" + file_name)
         # -------------   copy .ITP files   ----------------------------------------------------------------------------
         if file_name.endswith(".itp"):
-            # renaming user input ligand as LIGAND
-            key_name_ligand_input = 'mmpbsa_input_ligand'
+            # check for multiple ligand
+            if multiple_ligand_input:
+                # for multiple ligand
+                # renaming user input ligand as LIGAND
+                key_name_ligand_input = 'mmpbsa_input_ligand'
 
-            ProjectToolEssentials_res_ligand_input = \
-                ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                           key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ProjectToolEssentials_res_ligand_input = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=key_name_ligand_input).latest('entry_time')
+                ligand_name = ProjectToolEssentials_res_ligand_input.values
+            else:
+                # for single ligand
+                for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+                    ligand_name = ligand_inputvalue.split("_")[0]
+
             if file_name[:-4] == ligand_name:
                 shutil.copyfile(config.PATH_CONFIG[
                                     'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + file_name,
@@ -1181,31 +1201,34 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
             for variants_dir in os.listdir(config.PATH_CONFIG[
                                                'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/"):
                 # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
-                for md_run_dir in os.listdir(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/md_run1/"):
-                    #filter for em.gro file
-                    if md_run_dir.strip() == "em.gro":
-                        em_gro_file_str += config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip() + " "
+                if variants_dir.strip() == "md_run1":
+                    for md_run_dir in os.listdir(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/"):
+                        #filter for em.gro file
+                        if md_run_dir.strip() == "em.gro":
+                            em_gro_file_str += config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip() + " "
 
-                    # filter for em.tpr file
-                    if md_run_dir.strip() == "em.tpr":
-                        em_tpr_file_str = str(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip())
+                        # filter for em.tpr file
+                        if md_run_dir.strip() == "em.tpr":
+                            em_tpr_file_str = str(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
-                    # filter for index file
-                    if md_run_dir.strip() == "index.ndx":
-                        md_index_file_str = str(config.PATH_CONFIG[
-                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/" +variants_dir+"/md_run1/" + md_run_dir.strip())
+                        # filter for index file
+                        if md_run_dir.strip() == "index.ndx":
+                            md_index_file_str = str(config.PATH_CONFIG[
+                                                       'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
-                    # filter for topology file
-                    if md_run_dir.strip() == "topol.top":
-                        md_topology_file_str = str(config.PATH_CONFIG[
-                                                    'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + variants_dir + "/md_run1/" + md_run_dir.strip())
+                        # filter for topology file
+                        if md_run_dir.strip() == "topol.top":
+                            md_topology_file_str = str(config.PATH_CONFIG[
+                                                        'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
-                pdb_file_index_str += 1
+                    pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
+    print "in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print em_gro_file_str
     return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
@@ -1309,7 +1332,7 @@ def perform_cmd_trajconv_hotspot_mmpbsa(project_name,project_id,md_simulations_t
     # create input file for trjconv command
     file_gmx_trjconv_input = open(config.PATH_CONFIG[
                                       'local_shared_folder_path'] + project_name + '/' +command_tool+"/" +mutation_dir_mmpbsa+"/"+"gmx_trjconv_input.txt", "w")
-    file_gmx_trjconv_input.write("1 \n24 \n ")
+    file_gmx_trjconv_input.write("1\n0\nq\n")
     file_gmx_trjconv_input.close()
     time.sleep(3)
     '''gmx_trjconv = "gmx trjconv -f " + config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
@@ -1325,7 +1348,7 @@ def perform_cmd_trajconv_hotspot_mmpbsa(project_name,project_id,md_simulations_t
                       'md_simulations_path'] + "gmx_trjconv_input.txt"'''
 
     os.system("gmx trjconv -f " + config.PATH_CONFIG[
-        'local_shared_folder_path'] + project_name + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged.xtc -s " + md_simulations_tpr_file + " -pbc mol -ur compact -o " +
+        'local_shared_folder_path'] + project_name +"/"+ command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged.xtc -s " + md_simulations_tpr_file + " -pbc mol -ur compact -o " +
               config.PATH_CONFIG[
                   'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "merged-recentered.xtc -center -n " + md_simulations_ndx_file + " < " +
               config.PATH_CONFIG[
@@ -3554,33 +3577,35 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("echo q | gmx make_ndx -f solve.gro > gromacs_solve_gro_indexing.txt")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
-        group_value = sol_group_option()
-        SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
-        SOL_replace_str = SOL_replace_backup
-        SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
-        print("printing group value in MD$$$$$$$$$$$$$$$$$$")
-        print(group_value)
-        print("printing after %SOL% replace")
-        print(SOL_replace_str)
-        os.system(SOL_replace_str)
-        os.system("echo q | gmx make_ndx -f solve_ions.gro")
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em")
+        #print(os.getcwd())
+        #os.chdir(source_file_path + '/md_run' + str(i + 1))
+        #print('after change directory')
+        #print(os.getcwd())
+        #os.system("gmx solvate -cp newbox.gro -cs spc216.gro -p topol.top -o solve.gro")
+        #print(os.getcwd())
+        #os.chdir(source_file_path + '/md_run' + str(i + 1))
+        #print('after change directory')
+        #print(os.getcwd())
+        #os.system("echo q | gmx make_ndx -f newbox.gro > gromacs_solve_gro_indexing.txt")
+
+        #os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+
+        #group_value = sol_group_option()
+        #SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
+        #SOL_replace_str = SOL_replace_backup
+        #SOL_replace_str = SOL_replace_str.replace('%SOL_value%', str(group_value[0]))
+        #print("printing group value in MD$$$$$$$$$$$$$$$$$$")
+        #print(group_value)
+        #print("printing after %SOL% replace")
+        #print(SOL_replace_str)
+        #os.system(SOL_replace_str)
+        os.system("echo q | gmx make_ndx -f newbox.gro")
+
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
+
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
+
+
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
         # os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
