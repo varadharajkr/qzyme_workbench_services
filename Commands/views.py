@@ -3206,7 +3206,7 @@ def sol_group_option():
     return SOL_option_value
 
 
-def md_simulation_minimization(project_id,project_name,command_tool,number_of_threads,md_simulation_path='',designer_module=True):
+def md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path='',designer_module=True):
     # EXECUTION OF GROMACS FUNCTION UNTIL MINIMIZATION IN MD SIMULATION DIRECTORY
     if designer_module:
         source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"+str(md_simulation_path)+"/"
@@ -3316,7 +3316,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
-    md_simulation_minimization(project_id,project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
+    md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
     for i in range(int(md_run_no_of_conformation)):
         print (source_file_path + 'md_run' + str(i + 1))
         os.mkdir(source_file_path + 'md_run' + str(i + 1))
@@ -3424,8 +3424,8 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool + "/"+str(md_mutation_folder)+"/"
     source_file_path2 = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/" + command_tool + "/" + str(
-        md_mutation_folder)     
-    md_simulation_minimization(project_id, project_name,command_tool,number_of_threads,md_mutation_folder,designer_module=True)
+        md_mutation_folder)
+    md_simulation_minimization(project_name,command_tool,number_of_threads,md_mutation_folder,designer_module=True)
     for i in range(int(md_run_no_of_conformation)):
         file_outpu_md = open("test_output_md_"+'md_run' + str(i + 1)+".txt", "w+")
         print (source_file_path + 'md_run' + str(i + 1))
