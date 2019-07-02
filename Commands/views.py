@@ -3280,14 +3280,14 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     print(os.getcwd())
     os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
 
-    print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt "+number_of_threads)
+    print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt "+str(number_of_threads))
     print("start mdrun  ==========================================")
     print('before change directory')
     print(os.getcwd())
     os.chdir(source_file_path)
     print('after change directory')
     print(os.getcwd())
-    os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+number_of_threads)
+    os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
 
 
 @csrf_exempt
@@ -3342,17 +3342,17 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+number_of_threads)
+        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
         print("start mdrun 2222222222222  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+number_of_threads)
+        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
 
 
-        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -nt "+number_of_threads)
+        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
         print("start grompp 44444444444  ==========================================")
         print('before change directory')
         print(os.getcwd())
@@ -3362,17 +3362,17 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+number_of_threads)
+        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
         print("start mdrun 333333333333  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
 
 
-        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -nt "+number_of_threads)
+        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         print("start grompp 5555555555  ==========================================")
         print('before change directory')
         print(os.getcwd())
@@ -3382,14 +3382,14 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
 
 
-        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+number_of_threads)
+        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
         print("start mdrun 4444444444444  ==========================================")
         print('before change directory')
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print('after change directory')
         print(os.getcwd())
-        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+number_of_threads)
+        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
 
     return JsonResponse({'success': True})\
 
@@ -3466,12 +3466,12 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         print(os.getcwd())
         os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx")
 
-        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt")
+        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
         print("start mdrun 333333333333  ==========================================")
         print(os.getcwd())
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt 18")
+        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
 
         print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx")
         print("start grompp 5555555555  ==========================================")
@@ -3487,7 +3487,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         os.chdir(source_file_path + '/md_run' + str(i + 1))
         print(os.getcwd())
         os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt 18")
+            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
 
     return JsonResponse({'success': True})
 
@@ -3505,6 +3505,13 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
     md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print md_run_no_of_conformation
+    no_of_thread_key = "number_of_threads"
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=no_of_thread_key).latest(
+        'entry_time')
+
+    number_of_threads = int(ProjectToolEssentials_res.values)
+    print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
     for mdp_file in MDP_filelist:
@@ -3560,7 +3567,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
 
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
 
-        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt 18")
+        os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
 
 
         # Hotspot MD RUN ends here ----
