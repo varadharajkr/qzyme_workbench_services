@@ -490,8 +490,13 @@ class analyse_mmpbsa(APIView):
 
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'])
+
         os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                 config.PATH_CONFIG['mmpbsa_project_path'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                 config.PATH_CONFIG['mmpbsa_project_path'])
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
 
         #update command status to database
@@ -1637,7 +1642,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                     except IndexError:
                         pass
             print "adding topology file contents are"
-            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            # print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                             config.PATH_CONFIG['mmpbsa_project_path']+ "complex.itp", "w") as new_topology_file:
                 new_topology_file.write(topology_initial_content + "\n" +
@@ -3111,7 +3116,7 @@ class Contact_Score(APIView):
                                ,|                                        
                                `'                                        
             '''
-        else: #Designer module
+        elif commandDetails_result.command_title == "Designer": #Designer module
             #Execute for Designer module
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
@@ -3183,7 +3188,11 @@ class Contact_Score(APIView):
                                         'local_shared_folder_path'] + project_name + "/" + 'Designer' + "/" + line_mutant + "/" + 'Analysis/Contact_score/whole_protein_contact.py')
 
                     #execute Contact Score primary command
+                    os.chdir(config.PATH_CONFIG[
+                                        'local_shared_folder_path'] + project_name + "/" + 'Designer' + "/" + line_mutant + "/" + 'Analysis/Contact_score/')
                     os.system(commandDetails_result.primary_command)
+        else:
+            pass
 
 def sol_group_option():
     print "=====================working directory in function is =============="
