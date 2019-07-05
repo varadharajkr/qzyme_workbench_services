@@ -1996,7 +1996,24 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
                 new_itp_file.write(initial_text_content)
 
-    #--------------------   update INPUT.dat file ---------------------------------
+    # --------------------   update INPUT.dat file ---------------------------------
+
+    # =======================  get user input temperature  ============================
+    key_name_temperature = "preliminary_temp_value"
+    ProjectToolEssentials_res_temperature_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_temperature).latest('entry_time')
+    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    # ======================= End of get user input temperature  ======================
+
+    # =======================  get user input threads  ============================
+    key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+    ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    # ======================= End of get user input threads  ======================
+
     new_input_lines = ""
     itp_ligand = "ligand.itp"
     itp_receptor = "complex.itp"
@@ -2007,6 +2024,12 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                 new_input_lines += line
             elif ("\titp_receptor" in line):
                 line = "\titp_receptor  " + itp_receptor + "\n"
+                new_input_lines += line
+            elif ("temp" in line):
+                line = "temp\t\t\t\t\t" + temperature_input + "\n"
+                new_input_lines += line
+            elif ("mnp" in line):
+                line = "mnp\t\t\t\t\t" + catmec_mmpbsa_threads_input + "\n"
                 new_input_lines += line
             else:
                 new_input_lines += line
@@ -2281,8 +2304,8 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                             topology_content_dihedrals += line2
                     except IndexError:
                         pass
-            print "adding topology file contents are"
-            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            #print "adding topology file contents are"
+            #print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "complex.itp", "w") as new_topology_file:
                 new_topology_file.write(topology_initial_content + "\n" +
                                         topology_content_atoms + topology_file_atoms_content + "\n" +
@@ -2296,6 +2319,23 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                 new_itp_file.write(initial_text_content)
 
     #--------------------   update INPUT.dat file ---------------------------------
+
+    # =======================  get user input temperature  ============================
+    key_name_temperature = "preliminary_temp_value"
+    ProjectToolEssentials_res_temperature_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_temperature).latest('entry_time')
+    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    # ======================= End of get user input temperature  ======================
+
+    # =======================  get user input threads  ============================
+    key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+    ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    # ======================= End of get user input threads  ======================
+
     new_input_lines = ""
     itp_ligand = "ligand.itp"
     itp_receptor = "complex.itp"
@@ -2306,6 +2346,12 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                 new_input_lines += line
             elif ("\titp_receptor" in line):
                 line = "\titp_receptor  " + itp_receptor + "\n"
+                new_input_lines += line
+            elif ("temp" in line):
+                line = "temp\t\t\t\t\t" + temperature_input + "\n"
+                new_input_lines += line
+            elif ("mnp" in line):
+                line = "mnp\t\t\t\t\t" + catmec_mmpbsa_threads_input + "\n"
                 new_input_lines += line
             else:
                 new_input_lines += line
