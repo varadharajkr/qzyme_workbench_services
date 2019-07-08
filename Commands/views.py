@@ -4463,6 +4463,81 @@ class CatMec(APIView):
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+        elif command_tool_title == "process_pdb_with_babel":
+            print command_tool_title
+            inp_command_id = request.POST.get("command_id")
+            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+            project_id = commandDetails_result.project_id
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id)
+            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
+            # ligand_name = QzwProjectEssentials_res.command_key
+            # print "+++++++++++++++ligand name is++++++++++++"
+            # print ligand_name
+
+            primary_command_runnable = re.sub("%input_folder_name%", config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
+                                              primary_command_runnable)
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
+            print os.system("pwd")
+            print os.getcwd()
+            print "=========== title is =============="
+            print commandDetails_result.command_title
+
+            print("primary_command_runnable.........................................")
+            print(primary_command_runnable)
+            print ("execute_command(primary_command_runnable, inp_command_id).......")
+            print (primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id)
+
+            command_title_folder = commandDetails_result.command_title
+
+            out, err = process_return.communicate()
+            process_return.wait()
+            print "process return code is "
+            print process_return.returncode
+            if process_return.returncode == 0:
+                print "inside success"
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(out)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                print "inside error"
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(err)
+                try:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+                except db.OperationalError as e:
+                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
             print command_tool_title
             inp_command_id = request.POST.get("command_id")
@@ -4493,16 +4568,6 @@ class CatMec(APIView):
             print os.getcwd()
             print "=========== title is =============="
             print commandDetails_result.command_title
-            if commandDetails_result.command_title == "GromacsGenion":
-                group_value = sol_group_option()
-                ndx_file = "index.ndx"
-                print config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
-                dir_value = config.PATH_CONFIG[
-                                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
-                os.system("rm " + dir_value + "/index.ndx")
-                primary_command_runnable = re.sub('%SOL_value%', group_value,
-                                                  primary_command_runnable)
 
             if commandDetails_result.command_title == "Parameterize":
                 print config.PATH_CONFIG[
