@@ -4913,24 +4913,7 @@ class CatMec(APIView):
             status_id = config.CONSTS['status_initiated']
             print("before command update")
             update_command_status(inp_command_id, status_id)
-            print("after command update")
-            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
-            # ligand_name = QzwProjectEssentials_res.command_key
-            # print "+++++++++++++++ligand name is++++++++++++"
-            # print ligand_name
-
-            primary_command_runnable = re.sub("%input_folder_name%", config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
-            primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
-            primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
-                'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
-                                              primary_command_runnable)
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
-            print(os.system("pwd"))
+            print("after command update ",os.getcwd())
             print(os.getcwd())
             print("=========== title is ==============")
             print(commandDetails_result.command_title)
