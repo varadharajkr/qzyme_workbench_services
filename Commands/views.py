@@ -4913,8 +4913,10 @@ class CatMec(APIView):
             status_id = config.CONSTS['status_initiated']
             print("before command update")
             update_command_status(inp_command_id, status_id)
-            print("after command update ",os.getcwd())
-            print(os.getcwd())
+            print("after command update")
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + config.PATH_CONFIG['ligand_parametrization_path'] + '/')
+            print('after change directory is ',os.getcwd())
             print("=========== title is ==============")
             print(commandDetails_result.command_title)
 
