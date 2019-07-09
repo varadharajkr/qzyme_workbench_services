@@ -1,4 +1,364 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import datetime
@@ -53,27 +413,27 @@ def execute_command(command,inp_command_id):
         stderr=PIPE,
         shell=True
     )
-    print "execute command"
+    print("execute command")
     process.wait()
     return process
 
 
 def execute_command_md_run(command, change_dir,source_file_path):
-    print "in md popen-----"
-    print change_dir
+    print("in md popen-----")
+    print(change_dir)
     os.chdir(source_file_path)
-    print "after go back"
-    print os.getcwd()
+    print("after go back")
+    print(os.getcwd())
     os.chdir(change_dir)
-    print "change to working again"
-    print os.getcwd()
+    print("change to working again")
+    print(os.getcwd())
     process =Popen(
         args=command,
         stdout=PIPE,
         stderr=PIPE,
         shell=True
     )
-    print "execute command md run"
+    print("execute command md run")
     process.wait()
     return process
 
@@ -136,7 +496,7 @@ class gromacs(APIView):
         #serializer = SnippetSerializer(commandDetails_result, many=True)
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
+        print(os.system("pwd"))
         process_return = execute_command(primary_command_runnable,inp_command_id)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -146,17 +506,17 @@ class gromacs(APIView):
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
         if process_return.returncode == 0:
-            print "inside success"
+            print("inside success")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
-            print "inside error"
+            print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
@@ -264,7 +624,7 @@ class analyse_mmpbsa(APIView):
         '''
         if multiple_ligand_input:
             #for multiple ligand input
-            print "for multiple ligand input"
+            print("for multiple ligand input")
             #get user input ligand name from DB
             key_name_ligand_input = 'mmpbsa_input_ligand'
 
@@ -301,8 +661,8 @@ class analyse_mmpbsa(APIView):
             indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
             indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
             reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
-            print reversed_indexfile_complex_option_input
-            print reversed_indexfile_receptor_option_input
+            print(reversed_indexfile_complex_option_input)
+            print(reversed_indexfile_receptor_option_input)
             maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
             protien_ligand_complex_index = receptor_index + 1
@@ -332,8 +692,8 @@ class analyse_mmpbsa(APIView):
                                'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'md_simulations_path'] + "gmx_make_ndx_input.txt"
-            print " make index command"
-            print gmx_make_ndx
+            print(" make index command")
+            print(gmx_make_ndx)
             os.system(gmx_make_ndx)
 
         else:
@@ -379,8 +739,8 @@ class analyse_mmpbsa(APIView):
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'md_simulations_path'] + "gmx_make_ndx_input.txt"
 
-            print " make index command"
-            print gmx_make_ndx
+            print(" make index command")
+            print(gmx_make_ndx)
             os.system(gmx_make_ndx)
 
         perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file)
@@ -501,11 +861,11 @@ class analyse_mmpbsa(APIView):
 
         #update command status to database
         try:
-            print "<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            print("<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id, status_id)
         except db.OperationalError as e:
-            print "<<<<<<<<<<<<<<<<<<<<<<< error except block CatMec MMPBSA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            print("<<<<<<<<<<<<<<<<<<<<<<< error except block CatMec MMPBSA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id, status_id)
@@ -518,10 +878,10 @@ class analyse_mmpbsa(APIView):
 def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     #if Mysql has timed out
     db.close_old_connections()
-    print "requst is ----"
-    print request
-    print "md_mutation_folder"
-    print md_mutation_folder
+    print("requst is ----")
+    print(request)
+    print("md_mutation_folder")
+    print(md_mutation_folder)
     entry_time = datetime.now()
     # get command details from database
     #create ANALYSIS and MMPBSA folder in Mutations respective folder
@@ -531,10 +891,10 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA/")
     inp_command_id = request.POST.get("command_id")
     try:
-        print "in designer_queue_analyse_mmpbsa try first DB operation"
+        print("in designer_queue_analyse_mmpbsa try first DB operation")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
     except db.OperationalError as e:
-        print "in designer_queue_analyse_mmpbsa except first DB operation"
+        print("in designer_queue_analyse_mmpbsa except first DB operation")
         db.close_old_connections()
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
 
@@ -558,14 +918,14 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                     if dir_files.endswith(".ndx"):  # applying .ndx file filter
                         index_file_list.append(os.path.join(dirs, dir_files))
                     if dir_files.endswith(".xtc"):  # applying .xtc file filter
-                        print "xtc file found"  # ^\[.*\]\n
+                        print("xtc file found")
                         xtc_files_list.update({xtc_file_list_count: os.path.join(dirs, dir_files)})
                         xtc_file_list_count += 1
 
     ndx_count = 0
     ndx_input_dict = {}
     #
-    print tpr_file_list
+    print(tpr_file_list)
     with open(mdsimulations_source + index_file_list[0], 'r'
               ) as fp:
         lines = fp.readlines()
@@ -639,7 +999,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     '''
     if multiple_ligand_input:
         # for multiple ligand input
-        print "for multiple ligand input"
+        print("for multiple ligand input")
         # get user input ligand name from DB
         key_name_ligand_input = 'mmpbsa_input_ligand'
 
@@ -676,8 +1036,8 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
         indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
         reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
-        print reversed_indexfile_complex_option_input
-        print reversed_indexfile_receptor_option_input
+        print(reversed_indexfile_complex_option_input)
+        print(reversed_indexfile_receptor_option_input)
         maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
@@ -711,8 +1071,8 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                            'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
 
-        print " make index command"
-        print gmx_make_ndx
+        print(" make index command")
+        print(gmx_make_ndx)
         os.system(gmx_make_ndx)
 
     else:
@@ -750,9 +1110,8 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                            'mmpbsa_project_path'] + "index.ndx < " + config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/" + "gmx_make_ndx_input.txt"
 
-
-        print " make index command"
-        print gmx_make_ndx
+        print(" make index command")
+        print(gmx_make_ndx)
         os.system(gmx_make_ndx)
 
     perform_cmd_trajconv_designer_queue(project_name, project_id, md_simulations_tpr_file, md_simulations_ndx_file,md_mutation_folder,command_tool)
@@ -898,10 +1257,10 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
 
     trajcat_return_list = get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, command_tool, project_id, user_id)
 
-    print "trajcat_return_list is ===================="
-    print trajcat_return_list
-    print "list  0000000 item is trajcat_return_list[0]"
-    print trajcat_return_list[0]
+    print("trajcat_return_list is ====================")
+    print(trajcat_return_list)
+    print("list  0000000 item is trajcat_return_list[0]")
+    print(trajcat_return_list[0])
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
     # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
     # -----------------------------------------------------------------------------------------------------
@@ -957,7 +1316,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     '''
     if multiple_ligand_input:
         # for multiple ligand input
-        print "for multiple ligand input"
+        print("for multiple ligand input")
         # get user input ligand name from DB
         key_name_ligand_input = 'mmpbsa_input_ligand'
 
@@ -994,8 +1353,8 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
         indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
         reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
-        print reversed_indexfile_complex_option_input
-        print reversed_indexfile_receptor_option_input
+        print(reversed_indexfile_complex_option_input)
+        print(reversed_indexfile_receptor_option_input)
         maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
         receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
         protien_ligand_complex_index = receptor_index + 1
@@ -1028,8 +1387,8 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
-        print " make index command in HOTSPOT MMPBSA"
-        print gmx_make_ndx
+        print(" make index command in HOTSPOT MMPBSA")
+        print(gmx_make_ndx)
         os.system(gmx_make_ndx)
 
     else:
@@ -1064,8 +1423,8 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                        config.PATH_CONFIG[
                            'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + mutation_dir_mmpbsa + "/" + "gmx_make_ndx_input.txt"
 
-        print " make index command in HOTSPOT MMPBSA"
-        print gmx_make_ndx
+        print(" make index command in HOTSPOT MMPBSA")
+        print(gmx_make_ndx)
         os.system(gmx_make_ndx)
 
     # -------------------------   Call to execute trajconv command -----------------------------------------------------
@@ -1232,8 +1591,8 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                     pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
-    print "in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    print em_gro_file_str
+    print("in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print(em_gro_file_str)
     return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
@@ -1641,7 +2000,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                             topology_content_dihedrals += line2
                     except IndexError:
                         pass
-            print "adding topology file contents are"
+            print("adding topology file contents are")
             # print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                             config.PATH_CONFIG['mmpbsa_project_path']+ "complex.itp", "w") as new_topology_file:
@@ -1706,13 +2065,13 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     #=======================  get user input ligand  ============================
 
     try:
-        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        print("in pre_process_designer_queue_mmpbsa_imput except first DB operation")
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
         ligand_name = ProjectToolEssentials_res_ligand_input.values
     except db.OperationalError as e:
-        print "in pre_process_designer_queue_mmpbsa_imput except first DB operation"
+        print("in pre_process_designer_queue_mmpbsa_imput except first DB operation")
         db.close_old_connections()
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
@@ -2686,8 +3045,8 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
                             topology_content_dihedrals += line2
                     except IndexError:
                         pass
-            print "adding topology file contents are"
-            print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+            print("adding topology file contents are")
+            print(topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n")
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
                             config.PATH_CONFIG['designer_mmpbsa_path']+ "complex.itp", "w") as new_topology_file:
                 new_topology_file.write(topology_initial_content + "\n" +
@@ -2776,11 +3135,11 @@ class pathanalysis(APIView):
             if process_return.returncode == 0:
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
-                print JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+                print(JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode}))
             if process_return.returncode != 0:
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
-                print JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+                print(JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode}))
 
         else:
             # Execute for Designer module Path Analysis
@@ -2879,24 +3238,24 @@ class get_activation_energy(APIView):
         print(primary_command_runnable)
 
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
+        print(os.system("pwd"))
         process_return = execute_command(primary_command_runnable,inp_command_id)
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
         if process_return.returncode == 0:
-            print "inside success"
+            print("inside success")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
-            print "inside error"
+            print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
@@ -2915,25 +3274,25 @@ class Hello_World(APIView):
         try:
             django_logger.info("Hey there it works!! and in post is"+str(request.POST)+"\nend of post data")
             django_logger.debug("Hey there it works!! and in post is" + str(request.POST) + "\nend of post data")
-            print "<<<<<<<<<<<<<<<<<<<<<<< in try >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            print("<<<<<<<<<<<<<<<<<<<<<<< in try >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
             QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
             project_name = QzwProjectDetails_res.project_name
-            print "project name after sleep is "
-            print project_name
+            print("project name after sleep is ")
+            print(project_name)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id, status_id)
             return JsonResponse({'success': True})
         except db.OperationalError as e:
-            print "<<<<<<<<<<<<<<<<<<<<<<< in except >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
             QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
             project_name = QzwProjectDetails_res.project_name
-            print "project name after sleep is "
-            print project_name
+            print("project name after sleep is ")
+            print(project_name)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id, status_id)
             return JsonResponse({'success': True})
@@ -2966,7 +3325,7 @@ class mmpbsa(APIView):
         #serializer = SnippetSerializer(commandDetails_result, many=True)
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
+        print(os.system("pwd"))
         process_return = execute_command(primary_command_runnable,inp_command_id)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -2976,17 +3335,17 @@ class mmpbsa(APIView):
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
         if process_return.returncode == 0:
-            print "inside success"
+            print("inside success")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
-            print "inside error"
+            print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
@@ -3057,10 +3416,10 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
                                                                           command_title="CatMec",
                                                                           command_tool="Contact_Score",
                                                                           user_id=user_id).order_by("-command_id")
-    print "0 th contact score command"
-    print  project_commands[0].primary_command
-    print "1 th contact score command"
-    print  project_commands[1].primary_command
+    print("0 th contact score command")
+    print(project_commands[0].primary_command)
+    print("1 th contact score command")
+    print(project_commands[1].primary_command)
     # execute contact score command
     os.system(project_commands[0].primary_command)
     os.system(project_commands[1].primary_command)
@@ -3170,13 +3529,13 @@ class Contact_Score(APIView):
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                         'mmpbsa_project_path'] + "complex_index.ndx ")
             else: # primary_command_runnable.split()[3].strip() == "S":
-                print "------   in contact score combine ----------"
+                print("------   in contact score combine ----------")
                 pass
 
-            print "primary_command_runnable is -------------"
-            print primary_command_runnable
+            print("primary_command_runnable is -------------")
+            print(primary_command_runnable)
             #execute contact score command
-            print os.system(primary_command_runnable)
+            print(os.system(primary_command_runnable))
             return JsonResponse({"success": True})
             '''
             .-,--.                                          .     .      
@@ -3265,8 +3624,8 @@ class Contact_Score(APIView):
             pass
 
 def sol_group_option():
-    print "=====================working directory in function is =============="
-    print os.getcwd()
+    print("=====================working directory in function is ==============")
+    print(os.getcwd())
     log_file = "gromacs_solve_gro_indexing.txt"
     string_data = " SOL "
     matched_data = ""
@@ -3278,10 +3637,10 @@ def sol_group_option():
         lines_data = lines
         if string_data in lines_data:
             matched_data = lines
-            print matched_data
+            print(matched_data)
     SOL_option_value = matched_data
     SOL_option_value = SOL_option_value.split()
-    print  SOL_option_value
+    print(SOL_option_value)
     return SOL_option_value
 
 
@@ -3373,7 +3732,7 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
-    print "inside md_simulation_preparation function"
+    print("inside md_simulation_preparation function")
     key_name = 'md_simulation_no_of_runs'
     print('md_simulation_path is')
     print(md_simulation_path)
@@ -3390,7 +3749,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     number_of_threads = int(ProjectToolEssentials_res.values)
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
-    print md_run_no_of_conformation
+    print(md_run_no_of_conformation)
 
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
@@ -3402,7 +3761,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         dest_file_path = source_file_path + 'md_run' + str(i + 1)
         for file_name in os.listdir(source_file_path):
             try:
-                print "inside try"
+                print("inside try")
                 shutil.copy(str(source_file_path) + file_name, dest_file_path)
             except IOError as e:
                 print("Unable to copy file. %s" % e)
@@ -3476,7 +3835,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     db.close_old_connections()
-    print "in execute_md_simulation definition"
+    print("in execute_md_simulation definition")
     key_name = 'md_simulation_no_of_runs'
 
     ProjectToolEssentials_res = \
@@ -3485,7 +3844,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
 
     md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
-    print md_run_no_of_conformation
+    print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
     ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
@@ -3512,7 +3871,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         dest_file_path = source_file_path + 'md_run' + str(i + 1)
         for file_name in os.listdir(source_file_path):
             try:
-                print "inside try"
+                print("inside try")
                 shutil.copy(str(source_file_path) + file_name, dest_file_path)
             except IOError as e:
                 print("Unable to copy file. %s" % e)
@@ -3520,8 +3879,8 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
-        print "in md_run loooppppp"
-        print source_file_path + '/md_run' + str(i + 1)
+        print("in md_run loooppppp")
+        print(source_file_path + '/md_run' + str(i + 1))
         os.chdir(source_file_path + '/md_run' + str(i + 1))
 
         print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
@@ -3583,7 +3942,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
 
     md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
-    print md_run_no_of_conformation
+    print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
     ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
@@ -3606,7 +3965,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         dest_file_path = source_file_path + 'md_run' + str(i + 1)
         for file_name in os.listdir(source_file_path):
             try:
-                print "inside try"
+                print("inside try")
                 shutil.copy(str(source_file_path) + file_name, dest_file_path)
             except IOError as e:
                 print("Unable to copy file. %s" % e)
@@ -3692,14 +4051,14 @@ class Complex_Simulations(APIView):
         primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/', primary_command_runnable)
         primary_command_runnable = re.sub('python run_md.py', '', primary_command_runnable)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
-        print os.system("pwd")
-        print os.getcwd()
-        print "=========== title is =============="
-        print commandDetails_result.command_title
+        print(os.system("pwd"))
+        print(os.getcwd())
+        print("=========== title is ==============")
+        print(commandDetails_result.command_title)
         if commandDetails_result.command_title == "GromacsGenion":
             group_value = sol_group_option()
             ndx_file = "index.ndx"
-            print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/'
+            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/')
             dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/'
             os.system("rm "+dir_value+"/index.ndx")
             primary_command_runnable = re.sub('%SOL_value%',group_value,
@@ -3736,8 +4095,8 @@ class Complex_Simulations(APIView):
             #                                   primary_command_runnable)
 
         if commandDetails_result.command_title == "Parameterize":
-            print config.PATH_CONFIG[
-                      'local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/'
+            print(config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/')
             dir_value = config.PATH_CONFIG[
                             'local_shared_folder_path'] + project_name + '/CatMec/MD_Simulation/'
             # os.system("rm "+dir_value+"/NEWPDB.PDB")
@@ -3750,17 +4109,17 @@ class Complex_Simulations(APIView):
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
         if process_return.returncode == 0:
-            print "inside success"
+            print("inside success")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
-            print "inside error"
+            print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
@@ -3790,7 +4149,7 @@ class Literature_Research(APIView):
 
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
+        print(os.system("pwd"))
         # search keyword
         search_keyword = primary_command_runnable
         # convert keyword to URL encoded
@@ -3806,12 +4165,12 @@ class Literature_Research(APIView):
         get_crawler_data_pmd(search_keyword,encoded_search_keyword)
         get_crawler_data_gs(search_keyword,encoded_search_keyword)
         if result_crawlerdata_save == True:
-            print "inside success"
+            print("inside success")
             status_id = config.CONSTS['status_success']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": True,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
         if result_crawlerdata_save == False:
-            print "inside error"
+            print("inside error")
             status_id = config.CONSTS['status_error']
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": False,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
@@ -3847,7 +4206,7 @@ class MakeSubstitution(APIView):
         #serializer = SnippetSerializer(commandDetails_result, many=True)
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print os.system("pwd")
+        print(os.system("pwd"))
         process_return = execute_command(primary_command_runnable,inp_command_id)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -3857,10 +4216,10 @@ class MakeSubstitution(APIView):
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
         if process_return.returncode == 0:
-            print "inside success"
+            print("inside success")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
@@ -3875,7 +4234,7 @@ class MakeSubstitution(APIView):
             #move_files_(inp_command_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
-            print "inside error"
+            print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
             fileobj.write(err)
@@ -3914,11 +4273,11 @@ class NMA(APIView):
         primary_command_runnable = re.sub('%tconcoord_input_filepath%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/input3.cpf', primary_command_runnable)
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
 
-        print "runnable command is "
+        print("runnable command is ")
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/')
-        print "working directory is"
-        print os.system("pwd")
+        print("working directory is")
+        print(os.system("pwd"))
         process_return = execute_command(primary_command_runnable,inp_command_id)
         process_return.wait()
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -3926,11 +4285,11 @@ class NMA(APIView):
 
         out, err = process_return.communicate()
         process_return.wait()
-        print "process return code is "
-        print process_return.returncode
+        print("process return code is ")
+        print(process_return.returncode)
 
         if process_return.returncode == 0:
-            print "success executing command"
+            print("success executing command")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
@@ -3938,7 +4297,7 @@ class NMA(APIView):
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
-            print "error executing command!!"
+            print("error executing command!!")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
@@ -3984,27 +4343,27 @@ class Homology_Modelling(APIView):
                                           primary_command_runnable)
         editable_string = primary_command_runnable
         editable_string = editable_string.split()
-        print"editable strign after split is"
+        print("editable strign after split is")
         target = editable_string[2]
-        print target
+        print(target)
         template = editable_string[3]
-        print template
+        print(template)
         residue_no = editable_string[4]
-        print residue_no
+        print(residue_no)
         ending_model_no = editable_string[5]
-        print ending_model_no
+        print(ending_model_no)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
 
         dirName = os.getcwd()
-        print "dirname"
+        print("dirname")
         print(os.getcwd())
 
-        print "runnable command is"
+        print("runnable command is")
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        print "working directory after changing CHDIR"
+        print("working directory after changing CHDIR")
         print(os.system("pwd"))
         # process_return = execute_command(primary_command_runnable)
         process_return = Popen(
@@ -4013,43 +4372,43 @@ class Homology_Modelling(APIView):
             stderr=PIPE,
             shell=True
         )
-        print "execute command"
+        print("execute command")
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
         command_title_folder = commandDetails_result.command_title
         command_tool_title = commandDetails_result.command_tool
-        print "printing status ofprocess"
-        print process_return.returncode
-        print "printing output of process"
-        print out
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
 
         if process_return.returncode == 0:
-            print "success executing command"
+            print("success executing command")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< success try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< success except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
-            print "error executing command!!"
+            print("error executing command!!")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< error try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< error try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< error except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
@@ -4096,27 +4455,27 @@ class Loop_Modelling(APIView):
                                           primary_command_runnable)
         editable_string = primary_command_runnable
         editable_string = editable_string.split()
-        print"editable strign after split is"
+        print("editable strign after split is")
         target = editable_string[2]
-        print target
+        print(target)
         template = editable_string[3]
-        print template
+        print(template)
         residue_no = editable_string[4]
-        print residue_no
+        print(residue_no)
         ending_model_no = editable_string[5]
-        print ending_model_no
+        print(ending_model_no)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
 
         dirName = os.getcwd()
-        print "dirname"
+        print("dirname")
         print(os.getcwd())
 
-        print "runnable command is"
+        print("runnable command is")
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        print "working directory after changing CHDIR"
+        print("working directory after changing CHDIR")
         print(os.system("pwd"))
         # process_return = execute_command(primary_command_runnable)
         process_return = Popen(
@@ -4125,43 +4484,43 @@ class Loop_Modelling(APIView):
             stderr=PIPE,
             shell=True
         )
-        print "execute command"
+        print("execute command")
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
         command_title_folder = commandDetails_result.command_title
         command_tool_title = commandDetails_result.command_tool
-        print "printing status ofprocess"
-        print process_return.returncode
-        print "printing output of process"
-        print out
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
 
         if process_return.returncode == 0:
-            print "success executing command"
+            print("success executing command")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< success try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< success except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
-            print "error executing command!!"
+            print("error executing command!!")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< error try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< error try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< error except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
@@ -4250,8 +4609,8 @@ class autodock(APIView):
         project_id = commandDetails_result.project_id
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
-        print "tool before"
-        print command_tool_title
+        print("tool before")
+        print(command_tool_title)
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         key_name = 'enzyme_file'
@@ -4294,9 +4653,9 @@ class autodock(APIView):
         #append mmtsb path to command for NMA
         primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
         primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
-        print primary_command_runnable
-        print "working directory before"
-        print os.system("pwd")
+        print(primary_command_runnable)
+        print("working directory before")
+        print(os.system("pwd"))
         '''check for command tool
             split command tool
            if command tool == NMA (normal mode analysis)
@@ -4305,11 +4664,11 @@ class autodock(APIView):
                 change DIR to Autodock
         '''
         str_command_tool_title = str(command_tool_title)
-        print type(str_command_tool_title)
+        print(type(str_command_tool_title))
         command_tool_title_split = str_command_tool_title.split('_')
-        print "split is---------------------------------------------------------------------------------"
-        print type(command_tool_title_split)
-        print command_tool_title_split
+        print("split is---------------------------------------------------------------------------------")
+        print(type(command_tool_title_split))
+        print(command_tool_title_split)
         if(command_tool_title_split[0] == "nma"):
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
@@ -4325,8 +4684,8 @@ class autodock(APIView):
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        print "working directory after changing CHDIR"
-        print os.system("pwd")
+        print("working directory after changing CHDIR")
+        print(os.system("pwd"))
         # process PDB file format with PDBFIXER(MMTSB)
         if command_tool_title == "PdbtoPdbqt":
             #split primary_command_runnable and get PDB file as input to PDBFIXER
@@ -4344,7 +4703,7 @@ class autodock(APIView):
             stderr=PIPE,
             shell=True
         )
-        print "execute command"
+        print("execute command")
         print(primary_command_runnable)
 
         out, err = process_return.communicate()
@@ -4353,26 +4712,26 @@ class autodock(APIView):
 
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
-        print "printing status ofprocess"
-        print process_return.returncode
-        print "printing output of process"
-        print out
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
 
         if process_return.returncode == 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except of autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4381,7 +4740,7 @@ class autodock(APIView):
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
@@ -4483,7 +4842,7 @@ class CatMec(APIView):
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
         if command_tool_title == "Replace_Charge":
-            print command_tool_title
+            print(command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -4508,10 +4867,10 @@ class CatMec(APIView):
                                               primary_command_runnable)
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/Ligand_Parametrization/')
-            print os.system("pwd")
-            print os.getcwd()
-            print "=========== title is =============="
-            print commandDetails_result.command_title
+            print(os.system("pwd"))
+            print(os.getcwd())
+            print("=========== title is ==============")
+            print(commandDetails_result.command_title)
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
@@ -4522,10 +4881,10 @@ class CatMec(APIView):
 
             out, err = process_return.communicate()
             process_return.wait()
-            print "process return code is "
-            print process_return.returncode
+            print("process return code is ")
+            print(process_return.returncode)
             if process_return.returncode == 0:
-                print "inside success"
+                print("inside success")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4534,7 +4893,7 @@ class CatMec(APIView):
                 update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                print "inside error"
+                print("inside error")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4543,7 +4902,8 @@ class CatMec(APIView):
                 update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "process_pdb_with_babel":
-            print command_tool_title
+            print('inside process_pdb_with_babel section')
+            print(command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -4551,7 +4911,9 @@ class CatMec(APIView):
             project_name = QzwProjectDetails_res.project_name
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
+            print("before command update")
             update_command_status(inp_command_id, status_id)
+            print("after command update")
             # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
@@ -4568,10 +4930,10 @@ class CatMec(APIView):
                                               primary_command_runnable)
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
-            print os.system("pwd")
-            print os.getcwd()
-            print "=========== title is =============="
-            print commandDetails_result.command_title
+            print(os.system("pwd"))
+            print(os.getcwd())
+            print("=========== title is ==============")
+            print(commandDetails_result.command_title)
 
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
@@ -4583,42 +4945,45 @@ class CatMec(APIView):
 
             out, err = process_return.communicate()
             process_return.wait()
-            print "process return code is "
-            print process_return.returncode
+            print("process return code is ")
+            print(process_return.returncode)
             if process_return.returncode == 0:
-                print "inside success"
+                print("inside success")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(out)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                print "inside error"
+                print("inside error")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(err)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
-            print command_tool_title
+            print(command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -4643,14 +5008,14 @@ class CatMec(APIView):
                                               primary_command_runnable)
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
-            print os.system("pwd")
-            print os.getcwd()
-            print "=========== title is =============="
-            print commandDetails_result.command_title
+            print(os.system("pwd"))
+            print(os.getcwd())
+            print("=========== title is ==============")
+            print(commandDetails_result.command_title)
 
             if commandDetails_result.command_title == "Parameterize":
-                print config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                print(config.PATH_CONFIG[
+                          'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
                 dir_value = config.PATH_CONFIG[
                                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
                 # os.system("rm "+dir_value+"/NEWPDB.PDB")
@@ -4665,43 +5030,46 @@ class CatMec(APIView):
 
             out, err = process_return.communicate()
             process_return.wait()
-            print "process return code is "
-            print process_return.returncode
+            print("process return code is ")
+            print(process_return.returncode)
             if process_return.returncode == 0:
-                print "inside success"
+                print("inside success")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(out)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                print "inside error"
+                print("inside error")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(err)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
-            print 'command_tool_title ----------------------'
-            print command_tool_title
+            print('command_tool_title ----------------------')
+            print(command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -4724,11 +5092,13 @@ class CatMec(APIView):
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,md_simulation_path)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
@@ -4743,47 +5113,51 @@ class CatMec(APIView):
 
             out, err = process_return.communicate()
             process_return.wait()
-            print "process return code is "
-            print process_return.returncode
+            print("process return code is ")
+            print(process_return.returncode)
             if process_return.returncode == 0:
-                print "inside success"
+                print("inside success")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(out)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
-                print "inside error"
+                print("inside error")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
                 fileobj.write(err)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         elif command_tool_title == "MD_Simulation":
-            print command_tool_title
+            print(command_tool_title)
         elif command_tool_title == "Docking":
-            print command_tool_title
-            print "tool before"
-            print command_tool_title
+            print(command_tool_title)
+            print("tool before")
+            print(command_tool_title)
             QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
             project_name = QzwProjectDetails_res.project_name
             key_name = 'enzyme_file'
@@ -4825,9 +5199,9 @@ class CatMec(APIView):
             #append mmtsb path to command for NMA
             primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
             primary_command_runnable = primary_command_runnable+" "+enzyme_file_name
-            print primary_command_runnable
-            print "working directory before"
-            print os.system("pwd")
+            print(primary_command_runnable)
+            print("working directory before")
+            print(os.system("pwd"))
             '''check for command tool
                 split command tool
                if command tool == NMA (normal mode analysis)
@@ -4836,17 +5210,17 @@ class CatMec(APIView):
                     change DIR to Autodock
             '''
             str_command_tool_title = str(command_tool_title)
-            print type(str_command_tool_title)
+            print(type(str_command_tool_title))
             command_tool_title_split = str_command_tool_title.split('_')
-            print "split is----------------------------"
-            print type(command_tool_title_split)
-            print command_tool_title_split
+            print("split is----------------------------")
+            print(type(command_tool_title_split))
+            print(command_tool_title_split)
             if(command_tool_title_split[0] == "nma"):
                 os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
             else:
                 os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'+ commandDetails_result.command_title + '/')
-            print "working directory after changing CHDIR"
-            print os.system("pwd")
+            print("working directory after changing CHDIR")
+            print(os.system("pwd"))
             # process PDB file format with PDBFIXER(MMTSB)
             if command_tool_title == "PdbtoPdbqt":
                 #split primary_command_runnable and get PDB file as input to PDBFIXER
@@ -4860,29 +5234,31 @@ class CatMec(APIView):
                 stderr=PIPE,
                 shell=True
             )
-            print "execute command"
+            print("execute command")
             out, err = process_return.communicate()
             process_return.wait()
             # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
             command_title_folder = commandDetails_result.command_title
             command_tool_title= commandDetails_result.command_tool
-            print "printing status ofprocess"
-            print process_return.returncode
-            print "printing output of process"
-            print out
+            print("printing status ofprocess")
+            print(process_return.returncode)
+            print("printing output of process")
+            print(out)
 
             if process_return.returncode == 0:
-                print "output of out is"
-                print out
+                print("output of out is")
+                print(out)
                 fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
                 fileobj.write(out)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success try block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< success except block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
@@ -4891,11 +5267,13 @@ class CatMec(APIView):
                 fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
                 fileobj.write(err)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error try block Catmec docking condition >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error try block Catmec docking condition >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< error except block Catmec docking condition  >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error except block Catmec docking condition  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
@@ -4920,7 +5298,7 @@ class Designer(APIView):
         project_name = QzwProjectDetails_res.project_name
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
-        print os.system("pwd")
+        print(os.system("pwd"))
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable_split = primary_command_runnable.split(" ")
         if primary_command_runnable.strip() == "python run_md.py":
@@ -4954,24 +5332,28 @@ class Designer(APIView):
                 '''
                 queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in success try mutations after make complex, md run and MMPBSA   >>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< in success try mutations after make complex, md run and MMPBSA   >>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in success except mutations after make complex, md run and MMPBSA >>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< in success except mutations after make complex, md run and MMPBSA >>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in error try mutations after make complex, md run and MMPBSA >>>>>>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< in error try mutations after make complex, md run and MMPBSA >>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in error except mutations after make complex, md run and MMPBSA  >>>"
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< in error except mutations after make complex, md run and MMPBSA  >>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
@@ -4990,12 +5372,12 @@ class Designer(APIView):
                 shell=True
             )
 
-            print "execute command"
+            print("execute command")
             out, err = process_return.communicate()
             process_return.wait()
             if process_return.returncode == 0:
-                print "output of out is"
-                print out
+                print("output of out is")
+                print(out)
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
@@ -5013,31 +5395,31 @@ class Designer(APIView):
                 shell=True
             )
 
-            print "execute command"
+            print("execute command")
             out, err = process_return.communicate()
             process_return.wait()
             if process_return.returncode == 0:
-                print "output of out is"
-                print out
+                print("output of out is")
+                print(out)
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in else success try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in else success try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in else success except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in else success except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 try:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in else error try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in else error try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
 
                 except db.OperationalError as e:
-                    print "<<<<<<<<<<<<<<<<<<<<<<< in else error except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in else error except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
@@ -5063,7 +5445,7 @@ class Hotspot(APIView):
         update_command_status(inp_command_id, status_id)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' )
-        print os.system("pwd")
+        print(os.system("pwd"))
         # fetch ligand names from DB
         ligands_key_name = 'substrate_input'
         ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(
@@ -5147,24 +5529,24 @@ class Hotspot(APIView):
 
 
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in try mutations error >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try mutations error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print "<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
@@ -5257,7 +5639,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                 outFile.write(designer_protonation_matrix)
                 outFile.close()
             except IOError as (errno, strerror):
-                print "I/O error({0}): {1}".format(errno, strerror)
+                print("I/O error({0}): {1}".format(errno, strerror))
 
             # prepare final protonation input text file
             with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -5278,14 +5660,14 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             #get make_complex parameters from DB
             make_complex_params_keyname = "make_complex_parameters"
             try:
-                print "in make_complex_parameters query try first DB operation"
+                print("in make_complex_parameters query try first DB operation")
                 ProjectToolEssentials_make_complex_params = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=make_complex_params_keyname).latest(
                         'entry_time')
                 make_complex_params = ProjectToolEssentials_make_complex_params.values
             except db.OperationalError as e:
-                print "in make_complex_parameters query except first DB operation"
+                print("in make_complex_parameters query except first DB operation")
                 db.close_old_connections()
                 ProjectToolEssentials_make_complex_params = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
@@ -5328,9 +5710,9 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] + project_name + '/' + command_tool+ '/' +line.strip() +'/' )
             #execute make_complex.py
-            print "execute make_complex.py-----------------"
-            print make_complex_params_replaced
-            print os.system("python3 make_complex.py "+make_complex_params_replaced)
+            print("execute make_complex.py-----------------")
+            print(make_complex_params_replaced)
+            print(os.system("python3 make_complex.py " + make_complex_params_replaced))
 
             '''
               ____                __  __ ____    ____  _                 _       _   _                 
@@ -5372,16 +5754,16 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
 #Hotspot module Make complex params
 def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool_title, command_tool, project_name):
-    print "in  hotspot_queue_make_complex_params  definition =================="
+    print("in  hotspot_queue_make_complex_params  definition ==================")
     # get mutation filename from keyname (designer_input_mutations_file)
     key_mutations_filename = "hotspot_input_mutations_file"
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
     hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
-    print "hotspot mutation file --------"
-    print "\n"
-    print hotspot_mutations_file
+    print("hotspot mutation file --------")
+    print("\n")
+    print(hotspot_mutations_file)
     # open mutated text file and loop thru to prepare files for make_complex.py
     with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
               + project_name + '/' + command_tool + '/' + hotspot_mutations_file, 'r'
@@ -5389,36 +5771,36 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
         mutated_list_lines = fp_mutated_list.readlines()
         variant_index_count = 0 # mutants entry
         for line in mutated_list_lines:
-            print "in mutations folder !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! and folder name is"
-            print line.strip()
+            print("in mutations folder !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! and folder name is")
+            print(line.strip())
             # ********** line loop in mutations file read ***********
             variant_index_dir = 0 # variant dirs counter
             for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
               + project_name + '/' + command_tool + '/' +line.strip()):
                 # ---------- loop for variant dirs ---------------
-                print "in mutants dir "
-                print os.path.isdir(os.path.join(config.PATH_CONFIG[
-                                                  'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
-                                              mutations_dirs))
+                print("in mutants dir ")
+                print(os.path.isdir(os.path.join(config.PATH_CONFIG[
+                                                     'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
+                                                 mutations_dirs)))
                 if os.path.isdir(os.path.join(config.PATH_CONFIG[
                                                   'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip(),
                                               mutations_dirs)):
                     # ------------ loop for mutations dir -----------------
-                    print "print mutations_dirs"
-                    print mutations_dirs
+                    print("print mutations_dirs")
+                    print(mutations_dirs)
                     pdb_file_index_str = 0 # index for PDB (file) variant
                     for variants_dir in os.listdir(config.PATH_CONFIG[
                                                         'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs + "/"):
-                        print "in variants dir ------"
-                        print  "variant_"+str(pdb_file_index_str)+".pdb"
-                        print variants_dir.endswith(".pdb")
-                        print variants_dir.strip() == "variant_"+str(pdb_file_index_str)+".pdb"
+                        print("in variants dir ------")
+                        print("variant_" + str(pdb_file_index_str) + ".pdb")
+                        print(variants_dir.endswith(".pdb"))
+                        print(variants_dir.strip() == "variant_" + str(pdb_file_index_str) + ".pdb")
                         # <<<<<<<<<<<<<< loop for variants dir >>>>>>>>>>>>>>>>>
                         if variants_dir.endswith(".pdb"):
                             # **************** PDB file  ********************"
-                            print "with pdb dir ---------------------"
-                            print config.PATH_CONFIG[
-                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip()
+                            print("with pdb dir ---------------------")
+                            print(config.PATH_CONFIG[
+                                      'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + line.strip() + "/" + mutations_dirs.strip() + "/" + variants_dir.strip())
 
                             # make_complex input preperation
                             # process  PDB file to get amino acids as python dict
@@ -5494,7 +5876,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 outFile.write(designer_protonation_matrix)
                                 outFile.close()
                             except IOError as (errno, strerror):
-                                print "I/O error({0}): {1}".format(errno, strerror)
+                                print("I/O error({0}): {1}".format(errno, strerror))
 
                             # prepare final protonation input text file
                             with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -5589,10 +5971,10 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             os.chdir(config.PATH_CONFIG[
                                          'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + line.strip() + '/' + mutations_dirs.strip() + "/")
                             # execute make_complex.py
-                            print "execute make complex"
-                            print os.getcwd()
-                            print "command is ----------------"
-                            print make_complex_params_replaced
+                            print("execute make complex")
+                            print(os.getcwd())
+                            print("command is ----------------")
+                            print(make_complex_params_replaced)
                             os.system("python3 make_complex.py "+make_complex_params_replaced)
 
                             '''
@@ -5728,7 +6110,7 @@ class Designer_Mmpbsa_analyse(APIView):
         '''
         if multiple_ligand_input:
             #for multiple ligand input
-            print "for multiple ligand input"
+            print("for multiple ligand input")
             #get user input ligand name from DB
             key_name_ligand_input = 'designer_mmpbsa_input_ligand'
 
@@ -5765,8 +6147,8 @@ class Designer_Mmpbsa_analyse(APIView):
             indexfile_receptor_option_input = indexfile_receptor_option_input.split(" | ")
             indexfile_receptor_option_input = indexfile_receptor_option_input[-1::-1]
             reversed_indexfile_receptor_option_input = ' | '.join(indexfile_receptor_option_input)
-            print reversed_indexfile_complex_option_input
-            print reversed_indexfile_receptor_option_input
+            print(reversed_indexfile_complex_option_input)
+            print(reversed_indexfile_receptor_option_input)
             maximum_key_ndx_input = max(indexfile_input_dict, key=indexfile_input_dict.get)
             receptor_index = indexfile_input_dict[maximum_key_ndx_input] + 1
             protien_ligand_complex_index = receptor_index + 1
@@ -5797,8 +6179,8 @@ class Designer_Mmpbsa_analyse(APIView):
                                'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                'designer_md_simulations_path'] + "gmx_make_ndx_input.txt"
 
-            print " make index command"
-            print gmx_make_ndx
+            print(" make index command")
+            print(gmx_make_ndx)
             os.system(gmx_make_ndx)
 
         else:
@@ -5834,8 +6216,8 @@ class Designer_Mmpbsa_analyse(APIView):
                                               'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                               'designer_md_simulations_path'] + "gmx_make_ndx_input.txt"
 
-            print " make index command"
-            print gmx_make_ndx
+            print(" make index command")
+            print(gmx_make_ndx)
             os.system(gmx_make_ndx)
 
         perform__designer_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file)
@@ -5986,7 +6368,7 @@ def makdir_designer_analysis(project_name,project_id):
             # directory already exists
             pass
         else:
-            print e.errno
+            print(e.errno)
             pass
 
 
@@ -6026,11 +6408,11 @@ def process_grid_file(commandDetails_result,QzwProjectDetails_res,request):
 
                 myfile = open(config.PATH_CONFIG['local_shared_folder_path'] + QzwProjectDetails_res.project_name + '/' + commandDetails_result.command_tool + '/grid.gpf', 'w')
                 myfile.writelines(filelst)
-    print "before return"
+    print("before return")
     return True
 #alter dock.dpf file with respective .PDBQT file paths
 def process_dock_file(commandDetails_result,QzwProjectDetails_res,request):
-    print "in process dock file"
+    print("in process dock file")
     ligand_file_name =""
     enzyme_file_name =""
     #get output enzyme PDBQT file name
@@ -6044,7 +6426,7 @@ def process_dock_file(commandDetails_result,QzwProjectDetails_res,request):
             ligand_file_name = after_keyword2
     dock_fileobj.close()
     PDBQT_dir = config.PATH_CONFIG['local_shared_folder_path'] + QzwProjectDetails_res.project_name + '/' + commandDetails_result.command_tool + '/'
-    print PDBQT_dir
+    print(PDBQT_dir)
     #read grid file
     for root, dirs, files in os.walk(PDBQT_dir):  # replace the . with your starting directory
         for file in files:
@@ -6052,12 +6434,12 @@ def process_dock_file(commandDetails_result,QzwProjectDetails_res,request):
                 filelst = []
                 dock_fileobj3 = open(config.PATH_CONFIG['local_shared_folder_path'] + QzwProjectDetails_res.project_name + '/' + commandDetails_result.command_tool + '/dock.dpf','r+')
                 if file !=  ligand_file_name+'.pdbqt':
-                    print "in HPMAE enzyme"
+                    print("in HPMAE enzyme")
                     enzyme_file_name = file
                 else:
                     pass
                 for line in dock_fileobj3:
-                    print "inside sinfle dockobj3"
+                    print("inside sinfle dockobj3")
                     if re.search('map ' + enzyme_file_name[:-6], line):
                         line = re.sub('map ' + enzyme_file_name[:-6], 'map ' + config.PATH_CONFIG['local_shared_folder_path'] + QzwProjectDetails_res.project_name + '/' + commandDetails_result.command_tool + '/' + enzyme_file_name[:-6],line)
                         filelst.append(line)
@@ -6074,7 +6456,7 @@ def process_dock_file(commandDetails_result,QzwProjectDetails_res,request):
                 myfile.writelines(filelst)
 
 def move_outputFiles(moveFile_source,moveFile_destination):
-    print "inside move outputfiles"
+    print("inside move outputfiles")
     for root, dirs, files in os.walk(moveFile_source):
         for file in files:
             path_file = os.path.join(root, file)
@@ -6113,41 +6495,41 @@ def copytree(source, destination, symlinks=False, ignore=None):
             if file.endswith(".log"):
                 #copy files to logfiles folder
                 path_file = os.path.join(root, file)
-                print path_file
-                print destination
+                print(path_file)
+                print(destination)
                 #print shutil.copy(path_file, destination+"")
             #path_file = os.path.join(root, file)
             #print shutil.copy(path_file, destination)  # change you destination dir
             #print os.system("cp "+path_file+" "+destination)
 
 def update_command_status(inp_command_id,status_id):
-    print "updating command execution status"
+    print("updating command execution status")
     QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id)
-    print "result of update command execution status"
-    print QzwProjectDetails_update_res
+    print("result of update command execution status")
+    print(QzwProjectDetails_update_res)
     return True
 
 #process science direct data crawler
 def get_crawler_data(start_offset,search_keyword):
     url = 'https://www.sciencedirect.com/search'+start_offset
-    print "http URL is -"
-    print url
+    print("http URL is -")
+    print(url)
 
     soup = BeautifulSoup(urlopen(url),"html.parser")
     for range_tag in soup.find_all('li', {'class': 'next-link'}):
-        print "in first loop"
+        print("in first loop")
         for rangespantag in range_tag.find_all('a'):
-            print "in second loop"
+            print("in second loop")
             if rangespantag.text == "next":
                 get_next_page(rangespantag.attrs['href'])
-                print "if next tag exists"
+                print("if next tag exists")
                 data_class_variable =  {'class' : 'ResultItem'}
                 data_attr_variable = soup.findAll(attrs=data_class_variable)
 
                 for looping_data in data_attr_variable:
-                    print "in looping data"
-                    print "title is-"
-                    print looping_data.h2.text.encode('utf-8').strip()
+                    print("in looping data")
+                    print("title is-")
+                    print(looping_data.h2.text.encode('utf-8').strip())
                     title = looping_data.h2.text.encode('utf-8').strip()
                     journal = looping_data.find(class_='subtype-srctitle-link').text.encode('utf-8').strip()
                     author = looping_data.find(class_='Authors').text.encode('utf-8').strip()
@@ -6172,24 +6554,24 @@ def get_crawler_data(start_offset,search_keyword):
 
 def get_initial_crawler_data(base_page,start_page,search_keyword):
     data = []
-    print "in crawler initial fetch"
+    print("in crawler initial fetch")
     base_url = 'https://www.sciencedirect.com/search'+base_page
     res = requests.get(base_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36'})
     soup = BeautifulSoup(res.text,"html.parser",from_encoding="iso-8859-1")
-    print "*******************pagination data is *********************"
+    print("*******************pagination data is *********************")
     paginationsdata_list = soup.select('ol.Pagination > li')[0].get_text(strip=True)
-    print paginationsdata_list
+    print(paginationsdata_list)
     page_offset_keyword = "Page1of"
     before_offset_keyword,page_offset_keyword,after_offset_keyword = paginationsdata_list.partition(page_offset_keyword)
-    print "================  pagination count is ================================="
-    print after_offset_keyword
+    print("================  pagination count is =================================")
+    print(after_offset_keyword)
     start_offset = 0
     for page_count in range(1,int(after_offset_keyword)):
-        print "=============== page count is ======================="
-        print page_count
+        print("=============== page count is =======================")
+        print(page_count)
         page_url = 'https://www.sciencedirect.com/search/api'+start_page+str(start_offset)
-        print "================ page URL is ========================="
-        print page_url
+        print("================ page URL is =========================")
+        print(page_url)
         url_json_content = requests.get(page_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36'}).json()
         for paper_data in url_json_content['searchResults']:
             authors = []
@@ -6223,13 +6605,13 @@ def get_initial_crawler_data(base_page,start_page,search_keyword):
 
 
 def get_crawler_data_gs(search_keyword,encoded_search_keyword):
-    print "in crawler google"
+    print("in crawler google")
     for page_count in range(1, 990):
-        print "=============== page count is ======================="
-        print page_count
+        print("=============== page count is =======================")
+        print(page_count)
         page_url = 'https://scholar.google.co.in/scholar?start=' + str(page_count)+'&q='+encoded_search_keyword+'&hl=en&as_sdt=0,5'
-        print "================ page URL is ========================="
-        print page_url
+        print("================ page URL is =========================")
+        print(page_url)
         url_content = requests.get(page_url, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36'})
         soup = BeautifulSoup(url_content.text, "html.parser", from_encoding="iso-8859-1")
@@ -6238,13 +6620,13 @@ def get_crawler_data_gs(search_keyword,encoded_search_keyword):
                 title = range_tag.h3.get_text().encode('utf-8').strip()
             except Exception as e:
                 title = ""
-            print title
-            print "================= anchor link is ================"
+            print(title)
+            print("================= anchor link is ================")
             try:
                 paper_link = range_tag.h3.a['href'].encode('utf-8').strip()
             except Exception as a_href:
                 paper_link= ""
-            print "================= authors are ==================="
+            print("================= authors are ===================")
             try:
                 authors_data= range_tag.find('div', {'class': 'gs_a'}).get_text().encode("utf-8")
             except Exception as authors:
@@ -6261,18 +6643,18 @@ def get_crawler_data_gs(search_keyword,encoded_search_keyword):
 
 #pubmed crawler
 def get_crawler_data_pmd(search_keyword,encoded_search_keyword):
-    print "in pubmed crawler"
+    print("in pubmed crawler")
     initial_page_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=&term="+str(encoded_search_keyword)
-    print "---------------- initial page URL is --------------------"
-    print initial_page_url
+    print("---------------- initial page URL is --------------------")
+    print(initial_page_url)
     url_content = requests.get(initial_page_url, headers={
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36'}).json()
-    print "-------------- json content is --------------------"
-    print url_content
+    print("-------------- json content is --------------------")
+    print(url_content)
     #get total id_list count
     count_id_list = url_content['esearchresult']['count']
-    print "------------- id count is --------------"
-    print count_id_list
+    print("------------- id count is --------------")
+    print(count_id_list)
     #call API to get all ids list with total count if ids list
     page_url_count_all = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax="+str(count_id_list)+"&term=" + str(encoded_search_keyword)
     page_url_count_allcontent = requests.get(page_url_count_all, headers={
@@ -6281,8 +6663,8 @@ def get_crawler_data_pmd(search_keyword,encoded_search_keyword):
     for id_s in page_url_count_allcontent['esearchresult']['idlist']:
         fetch_paper_details_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&rettype=abstract&id=" + str(
             id_s)
-        print "------------------ IDS URL is -----------------------"
-        print fetch_paper_details_url
+        print("------------------ IDS URL is -----------------------")
+        print(fetch_paper_details_url)
         paper_details_content = requests.get(fetch_paper_details_url, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36'}).json()
         for data_json_key, data_json_val in paper_details_content['result'][id_s].iteritems():
@@ -6292,19 +6674,19 @@ def get_crawler_data_pmd(search_keyword,encoded_search_keyword):
             journal= ""
             authors_str_data = ""
             if data_json_key == "title":
-                print data_json_val.encode("utf-8")
+                print(data_json_val.encode("utf-8"))
                 try:
                     title = data_json_val.encode('utf-8')
                 except Exception as e:
                     title = ""
             if data_json_key == "elocationid":
-                print data_json_val.encode("utf-8")
+                print(data_json_val.encode("utf-8"))
                 try:
                     doi = data_json_val.encode('utf-8')
                 except Exception as e:
                     doi = ""
             if data_json_key == "fulljournalname":
-                print data_json_val.encode("utf-8")
+                print(data_json_val.encode("utf-8"))
                 try:
                     journal= data_json_val.encode('utf-8')
                 except Exception as e:
@@ -6313,7 +6695,7 @@ def get_crawler_data_pmd(search_keyword,encoded_search_keyword):
                 for authors in data_json_val:
                     authors_list.append(authors['name'])
                 authors_str_data = ' '.join(authors_list)
-                print authors_str_data
+                print(authors_str_data)
 
             QzwResearchPapers_create = QzwResearchPapers.objects.create(
                 research_paper_title=title,
@@ -6358,8 +6740,8 @@ def get_offset_crawler_data(url_part_api,url_part,search_keyword):
     for range_tag2 in soup.find_all('li', {'class': 'next-link'}):
         for rangespantag in range_tag2.find_all('a'):
             if rangespantag.text == "next":
-                print "in offset next exists and URL is -------------------"
-                print rangespantag.attrs['href'][7:]
+                print("in offset next exists and URL is -------------------")
+                print(rangespantag.attrs['href'][7:])
                 url_part_offset = 'https://www.sciencedirect.com/search' + rangespantag.attrs['href'][7:]
                 url_part_api_offset = 'https://www.sciencedirect.com/search/api' + rangespantag.attrs['href'][7:]
                 return get_offset_crawler_data(url_part_api_offset, url_part_offset,search_keyword)
@@ -6391,8 +6773,8 @@ def copy_function():
     with open(filesali) as user_file:
         with open(rename_name, "w") as new_user_file:
             for file_lines in user_file:
-                print "printinh file lines"
-                print file_lines
+                print("printinh file lines")
+                print(file_lines)
 
                 new_user_file.write(file_lines)
     env = environ()
@@ -6403,8 +6785,8 @@ def copy_function():
     #                              #soap_protein_od.Scorer(),
     #                              assess.GA341))
     alnfile_alias = str(target) + '-' + str(template) + '.ali'
-    print "printing alnfile_alias name in model_step2.py"
-    print alnfile_alias
+    print("printing alnfile_alias name in model_step2.py")
+    print(alnfile_alias)
     a = automodel(env, alnfile=alnfile_alias,
                   knowns=str(template), sequence=str(target),
                   assess_methods=(assess.DOPE,
