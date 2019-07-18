@@ -638,6 +638,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     "Y88888P'                                                                                                                                      
     '''
     if multiple_ligand_input:
+        ligand_name_input = ""
         # for multiple ligand input
         print "for multiple ligand input"
         # get user input ligand name from DB
