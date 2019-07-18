@@ -623,6 +623,7 @@ class analyse_mmpbsa(APIView):
         "Y88888P'                                                                                                                                      
         '''
         if multiple_ligand_input:
+            ligand_name_input = ""
             #for multiple ligand input
             print("for multiple ligand input")
             #get user input ligand name from DB
