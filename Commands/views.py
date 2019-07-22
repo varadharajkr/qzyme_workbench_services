@@ -3761,8 +3761,9 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     print(source_file_path)
     md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
     for i in range(int(md_run_no_of_conformation)):
-        print (source_file_path + 'md_run' + str(i + 1))
-        os.mkdir(source_file_path + 'md_run' + str(i + 1))
+        if not (os.path.exists(source_file_path + 'md_run' + str(i + 1))):
+            print (source_file_path + 'md_run' + str(i + 1))
+            os.mkdir(source_file_path + 'md_run' + str(i + 1))
         dest_file_path = source_file_path + 'md_run' + str(i + 1)
         for file_name in os.listdir(source_file_path):
             try:
