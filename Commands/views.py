@@ -1969,7 +1969,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                             config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
-                    if line2.strip() == '[ pairs ]':
+                    if line2.strip() == '[ angles ]':
                         topology_content_angles += line2
                         break
 
@@ -2311,7 +2311,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
             # =======================   angles content   ==============================
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
-                    if line2.strip() == '[ pairs ]':
+                    if line2.strip() == '[ angles ]':
                         topology_content_angles += line2
                         break
 
@@ -2633,7 +2633,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
             # =======================   angles content   ==============================
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
-                    if line2.strip() == '[ pairs ]':
+                    if line2.strip() == '[ angles ]':
                         topology_content_angles += line2
                         break
 
@@ -3014,7 +3014,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
                             config.PATH_CONFIG['designer_mmpbsa_path']+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
-                    if line2.strip() == '[ pairs ]':
+                    if line2.strip() == '[ angles ]':
                         topology_content_angles += line2
                         break
 
