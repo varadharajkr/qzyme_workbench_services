@@ -387,15 +387,20 @@ class analyse_mmpbsa(APIView):
 
         perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file)
         print("perform_cmd_trajconv def>>>>>>>>>>>>>>>>>")
+        print("md_simulations_tpr_file")
+        print(md_simulations_tpr_file)
         #===================   post processing after make index  ===============================
         # copy MD .tpr file to MMPBSA working directory
         source_tpr_md_file = config.PATH_CONFIG[
                                  'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
                                  'md_simulations_path'] + md_simulations_tpr_file
+        print("source_tpr_md_file")
+        print(source_tpr_md_file)
         tpr_file_split = md_simulations_tpr_file.split("/")
         dest_tpr_md_file = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                            config.PATH_CONFIG['mmpbsa_project_path'] + tpr_file_split[1]
-
+        print("dest_tpr_md_file")
+        print(dest_tpr_md_file)
         shutil.copyfile(source_tpr_md_file, dest_tpr_md_file)
 
         # copy topology file from MS to MMPBSA working directory
