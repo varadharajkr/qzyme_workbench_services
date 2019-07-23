@@ -2016,28 +2016,25 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
             #         except IndexError:
             #             pass
             # ======================   dihedrals content for multiple   ========================
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "topol.top",
-                      "r+") as topology_bak_file:
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
                     if line2.strip() == '[ dihedrals ]':
                         dihedrals_count += 1
             if dihedrals_count > 1:
-                with open(config.PATH_CONFIG[
-                              'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "topol.top",
-                          "r+") as topology_bak_file:
-                    for line2 in topology_bak_file:
-                        if line2.strip() == '[ dihedrals ]':
-                            topology_content_dihedrals += line2
-                            break
-                    for line2 in topology_bak_file:
-                        if line2.strip() == "\n":
-                            break
-                        try:
-                            if (line2.split()[0].isdigit()):
-                                topology_content_dihedrals += "    " + line2
-                        except IndexError:
-                            pass
+                pass
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        topology_content_dihedrals += line2
+                        break
+                for line2 in topology_bak_file:
+                    if line2.strip() == "\n":
+                        break
+                    try:
+                        if (line2.split()[0].isdigit()):
+                            topology_content_dihedrals += "    " + line2
+                    except IndexError:
+                        pass
             topology_content_dihedrals_filtered = '\n'.join(topology_content_dihedrals.split('\n')[:-2])
             #print "adding topology file contents are"
             #print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
