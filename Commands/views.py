@@ -1651,12 +1651,14 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
             #         except IndexError:
             #             pass
             # ======================   dihedrals content for multiple   ========================
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
                 for line2 in topology_bak_file:
                     if line2.strip() == '[ dihedrals ]':
                         dihedrals_count += 1
             if dihedrals_count > 1:
-                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
                     for line2 in topology_bak_file:
                         if line2.strip() == '[ dihedrals ]':
                             topology_content_dihedrals += line2
