@@ -1640,7 +1640,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                         break
 
                 for line2 in topology_bak_file:
-                    if line2.strip() == "\n":
+                    if re.search(r"\[(\s\w+\s)\]", line2):
                         break
                     try:
                         if (line2.split()[0] != ";"):
@@ -1981,7 +1981,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                         break
 
                 for line2 in topology_bak_file:
-                    if line2.strip() == "\n":
+                    if re.search(r"\[(\s\w+\s)\]", line2):
                         break
                     try:
                         if (line2.split()[0] != ";"):
@@ -2303,7 +2303,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                         break
 
                 for line2 in topology_bak_file:
-                    if line2.strip() == "\n":
+                    if re.search(r"\[(\s\w+\s)\]", line2):
                         break
                     try:
                         if (line2.split()[0] != ";"):
