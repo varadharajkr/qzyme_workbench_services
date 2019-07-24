@@ -4420,12 +4420,7 @@ class autodock(APIView):
             print("primary_command_runnable %%%%%%%%%%%%%%%%%%%%%%%%%%%% ^^^^^^^^^^^^^^^^^^^")
             print(primary_command_runnable)
         process_return = execute_command(primary_command_runnable)
-        process_return = Popen(
-            args=primary_command_runnable,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True
-        )
+        
         print("execute command")
         print(primary_command_runnable)
 
