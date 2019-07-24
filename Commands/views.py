@@ -58,7 +58,7 @@ def execute_command(command,inp_command_id):
         shell=True
     )
     print("execute command in execute command function")
-    process.wait()
+    # process.wait()
     return process
 
 
