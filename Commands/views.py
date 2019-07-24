@@ -4419,7 +4419,7 @@ class autodock(APIView):
             # os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
             print("primary_command_runnable %%%%%%%%%%%%%%%%%%%%%%%%%%%% ^^^^^^^^^^^^^^^^^^^")
             print(primary_command_runnable)
-        #process_return = execute_command(primary_command_runnable)
+        process_return = execute_command(primary_command_runnable)
         process_return = Popen(
             args=primary_command_runnable,
             stdout=PIPE,
@@ -4454,7 +4454,7 @@ class autodock(APIView):
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock status error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4463,7 +4463,7 @@ class autodock(APIView):
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
