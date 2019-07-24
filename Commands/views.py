@@ -57,7 +57,7 @@ def execute_command(command,inp_command_id):
         stderr=PIPE,
         shell=True
     )
-    print("execute command")
+    print("execute command in execute command function")
     process.wait()
     return process
 
@@ -4349,9 +4349,9 @@ class autodock(APIView):
         print('\nbefore replacing primary_command_runnable')
         print(primary_command_runnable)
         #shared_scripts
-        primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
-        primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
-        primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
+        # primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
+        # primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
+        # primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
 
         #rplace string / paths for normal mode analysis
         primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
