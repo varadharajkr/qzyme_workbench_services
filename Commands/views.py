@@ -4349,16 +4349,6 @@ class autodock(APIView):
         primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
         primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
         primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%add_python_file_path%",config.PATH_CONFIG['add_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%make_gpf_dpf_python_file_path%",config.PATH_CONFIG['make_gpf_dpf_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%grid_dock_map_python_file_path%",config.PATH_CONFIG['grid_dock_map_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_distance_python_file_path%",config.PATH_CONFIG['multiple_distance_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_angle_python_file_path%",config.PATH_CONFIG['multiple_angle_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_torsion_python_file_path%",config.PATH_CONFIG['multiple_torsion_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
-        # primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
-        #     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
-        #                                   primary_command_runnable)
 
         #rplace string / paths for normal mode analysis
         primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
@@ -4373,9 +4363,9 @@ class autodock(APIView):
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
                                           primary_command_runnable)
-        #append mmtsb path to command for NMA
-        primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-        primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
+        # #append mmtsb path to command for NMA
+        # primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
+        # primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
         print(primary_command_runnable)
         print("working directory before")
         print(os.system("pwd"))
@@ -4419,8 +4409,8 @@ class autodock(APIView):
             # os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
             print("primary_command_runnable %%%%%%%%%%%%%%%%%%%%%%%%%%%% ^^^^^^^^^^^^^^^^^^^")
             print(primary_command_runnable)
-        process_return = execute_command(primary_command_runnable)
-        
+        process_return = execute_command(primary_command_runnable, inp_command_id)
+
         print("execute command")
         print(primary_command_runnable)
 
