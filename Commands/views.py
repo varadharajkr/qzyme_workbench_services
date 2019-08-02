@@ -46,6 +46,9 @@ import logging # for default django logging
 django_logger = logging.getLogger(__name__)
 # to run command in shell
 def execute_command(command,inp_command_id):
+    print('inside execute_command')
+    print('command to execute is ',command)
+    print('inp command id is ',inp_command_id)
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
     process =Popen(
@@ -54,8 +57,8 @@ def execute_command(command,inp_command_id):
         stderr=PIPE,
         shell=True
     )
-    print("execute command")
-    process.wait()
+    print("execute command in execute command function")
+    # process.wait()
     return process
 
 
@@ -4562,22 +4565,12 @@ class autodock(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
-        print('before replacing primary_command_runnable')
+        print('\nbefore replacing primary_command_runnable')
         print(primary_command_runnable)
         #shared_scripts
-        primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
-        primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
-        primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%add_python_file_path%",config.PATH_CONFIG['add_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%make_gpf_dpf_python_file_path%",config.PATH_CONFIG['make_gpf_dpf_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%grid_dock_map_python_file_path%",config.PATH_CONFIG['grid_dock_map_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_distance_python_file_path%",config.PATH_CONFIG['multiple_distance_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_angle_python_file_path%",config.PATH_CONFIG['multiple_angle_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%multiple_torsion_python_file_path%",config.PATH_CONFIG['multiple_torsion_python_file_path'],primary_command_runnable)
-        # primary_command_runnable = re.sub("%input_folder_name%",config.PATH_CONFIG['local_shared_folder_path']+ project_name + '/' + commandDetails_result.command_tool + '/',primary_command_runnable)
-        # primary_command_runnable = re.sub('%output_folder_name%', config.PATH_CONFIG[
-        #     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
-        #                                   primary_command_runnable)
+        # primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ "/pdb_to_pdbqt.py",primary_command_runnable)
+        # primary_command_runnable = re.sub("%python_sh_path%",config.PATH_CONFIG['python_sh_path'],primary_command_runnable)
+        # primary_command_runnable = re.sub("%prepare_ligand4_py_path%",config.PATH_CONFIG['prepare_ligand4_py_path'],primary_command_runnable)
 
         #rplace string / paths for normal mode analysis
         primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
@@ -4592,12 +4585,10 @@ class autodock(APIView):
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
                                           primary_command_runnable)
-        #append mmtsb path to command for NMA
-        primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-        primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
+
         print(primary_command_runnable)
-        print("working directory before")
-        print(os.system("pwd"))
+        print("\nworking directory before")
+        print('\n',os.system("pwd"))
         '''check for command tool
             split command tool
            if command tool == NMA (normal mode analysis)
@@ -4608,10 +4599,17 @@ class autodock(APIView):
         str_command_tool_title = str(command_tool_title)
         print(type(str_command_tool_title))
         command_tool_title_split = str_command_tool_title.split('_')
-        print("split is---------------------------------------------------------------------------------")
+        print("\nsplit is---------------------------------------------------------------------------------")
         print(type(command_tool_title_split))
         print(command_tool_title_split)
-        if(command_tool_title_split[0] == "nma"):
+        # #append mmtsb path to command for NMA
+        if (command_tool_title_split[1] == "nma"):
+            primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
+            primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        elif(command_tool_title_split[0] == "nma"):
+            print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
         elif(str(command_tool_title) == "tconcord_dlg"):
@@ -4621,32 +4619,20 @@ class autodock(APIView):
             nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
             nma_path = nma_enzyme_file[:-4]
             print(str(nma_path[:-4]))
-            print('nma_path ****************************************')
+            print('\nnma_path ****************************************')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
+            print('inside else')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        print("working directory after changing CHDIR")
+        print("\nworking directory after changing CHDIR")
         print(os.system("pwd"))
-        # process PDB file format with PDBFIXER(MMTSB)
-        if command_tool_title == "PdbtoPdbqt":
-            #split primary_command_runnable and get PDB file as input to PDBFIXER
-            primary_command_runnable_split = primary_command_runnable.split()
-            print(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
-            os.system(config.PATH_CONFIG['mmtsb_path']+"/convpdb.pl "+primary_command_runnable_split[2]+" "+"-out generic > fixer_test.pdb")
-            print("mv fixer_test.pdb "+primary_command_runnable_split[2])
-            os.system("mv fixer_test.pdb "+primary_command_runnable_split[2])
-            print("primary_command_runnable %%%%%%%%%%%%%%%%%%%%%%%%%%%% ^^^^^^^^^^^^^^^^^^^")
-            print(primary_command_runnable)
-        #process_return = execute_command(primary_command_runnable)
-        process_return = Popen(
-            args=primary_command_runnable,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True
-        )
-        print("execute command")
+
+
+        print("\nexecute command before ")
         print(primary_command_runnable)
+
+        process_return = execute_command(primary_command_runnable, inp_command_id)
 
         out, err = process_return.communicate()
         process_return.wait()
@@ -4654,9 +4640,9 @@ class autodock(APIView):
 
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
-        print("printing status ofprocess")
+        print("\nprinting status ofprocess")
         print(process_return.returncode)
-        print("printing output of process")
+        print("\nprinting output of process")
         print(out)
 
         if process_return.returncode == 0:
@@ -4673,7 +4659,7 @@ class autodock(APIView):
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
-                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock status error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
                                'w+')
@@ -4682,7 +4668,7 @@ class autodock(APIView):
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
                                    'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
