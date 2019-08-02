@@ -4366,9 +4366,7 @@ class autodock(APIView):
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
                                           primary_command_runnable)
-        #append mmtsb path to command for NMA
-        primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-        primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
+
         print(primary_command_runnable)
         print("\nworking directory before")
         print('\n',os.system("pwd"))
@@ -4385,11 +4383,14 @@ class autodock(APIView):
         print("\nsplit is---------------------------------------------------------------------------------")
         print(type(command_tool_title_split))
         print(command_tool_title_split)
-        if(command_tool_title_split[1] == "nma"):
-            #append mmtsb path to command for NMA
-            # print('inside command title nma')
-            # primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-            # primary_command_runnable = primary_command_runnable +" " + enzyme_file_name
+        # #append mmtsb path to command for NMA
+        if (command_tool_title_split[1] == "nma"):
+            primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
+            primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
+            os.chdir(config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        elif(command_tool_title_split[0] == "nma"):
+            print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
         elif(str(command_tool_title) == "tconcord_dlg"):
