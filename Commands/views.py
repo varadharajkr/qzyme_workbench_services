@@ -4774,7 +4774,7 @@ class autodock(APIView):
         print(command_tool_title_split)
         # #append mmtsb path to command for NMA
 
-        if(len(command_tool_title_split)>0):
+        if not len(command_tool_title_split) <= 0:
             if (command_tool_title_split[1] == "nma"):
                 primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
