@@ -4779,7 +4779,7 @@ class autodock(APIView):
         print('len(command_tool_title.split)++++++++++++++++++++++++++++++++++++++++++++++')
         print(len(command_tool_title.split('_')))
         print(type(command_tool_title.split('_')))
-        if not len(command_tool_title_split) <= 0:
+        if not len(command_tool_title_split) <= 1:
             print('length is more than one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             if (command_tool_title_split[1] == "nma"):
                 primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
