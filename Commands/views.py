@@ -532,6 +532,7 @@ class analyse_mmpbsa(APIView):
                         pass
                     else:
                         topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                        topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                         ligand_itp_exists = False
                 else:
                     topology_contents_part3 += line_seg + '\n'
@@ -956,6 +957,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                     pass
                 else:
                     topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                    topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                     ligand_itp_exists = False
             else:
                 topology_contents_part3 += line_seg + '\n'
@@ -1336,6 +1338,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                     pass
                 else:
                     topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                    topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                     ligand_itp_exists = False
             else:
                 topology_contents_part3 += line_seg + '\n'
