@@ -4776,11 +4776,19 @@ class autodock(APIView):
         print(type(command_tool_title_split))
         print(command_tool_title_split)
         # #append mmtsb path to command for NMA
-        if (command_tool_title_split[1] == "nma"):
-            primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
-            primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        print('printing command tool title split length ++++++++++++++++++++++++++++++')
+        print(len(command_tool_title_split))
+        print(type(command_tool_title_split))
+        print('len(command_tool_title.split)++++++++++++++++++++++++++++++++++++++++++++++')
+        print(len(command_tool_title.split('_')))
+        print(type(command_tool_title.split('_')))
+        if not len(command_tool_title_split) <= 1:
+            print('length is more than one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+            if (command_tool_title_split[1] == "nma"):
+                primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
+                primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
         elif(command_tool_title_split[0] == "nma"):
             print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
