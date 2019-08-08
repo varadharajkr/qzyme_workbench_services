@@ -1741,7 +1741,10 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2): # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
@@ -2185,7 +2188,10 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
@@ -2595,7 +2601,10 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
