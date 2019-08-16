@@ -3308,7 +3308,10 @@ class pathanalysis(APIView):
 
 #designer queue  path analysis
 def designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
-    commandDetails_result = commandDetails.objects.get(project_id=project_id,user_id=user_id,command_tool='Path_Analysis',command_title='CatMec').latest('entry_time')
+    primary_run_command = ""
+    input_atom_number = ""
+    ''' (SAGAR) commented on 14-08-2019 to fetch new parameters(from CatMec module ) from database
+    commandDetails_result = commandDetails.objects.get(project_id=project_id,user_id=user_id,command_tool='Path_Analysis',command_title='CatMec').latest('entry_time')'''
     try:
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/')
@@ -3335,8 +3338,46 @@ def designer_queue_path_analysis(request, md_mutation_folder, project_name, comm
         shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Path_Analysis/' + script_dir_file, config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/'+ script_dir_file)
 
+    #get path_analysis parameters from database
+    ProjectToolEssentials_res_catmec_pathanalysis = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name='catmec_path_analysis_input_atom_starting_point').latest('entry_time')
+    #catmec_pathanalysis_atom_input = ProjectToolEssentials_res_catmec_pathanalysis.values
+    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.values)
+    chain_id_input = ""
+    recidue_number_input = ""
+    probe_radius_input = ""
+    for inputkey, inputvalue in catmec_pathanalysis_atom_input.iteritems():
+        if inputkey == "chain_id":
+            chain_id_input = inputvalue
+        if inputkey == "recidue_number":
+            recidue_number_input = inputvalue
+        if inputkey == "probe_radius":
+            probe_radius_input = inputvalue
+    #open PDB file to get atom number based on CatMec module path analysis
+    pdb_file_path = config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/frames_0.pdb'
+    with open(pdb_file_path) as pdb_frame:
+        lines = pdb_frame.readlines()
+        for line in lines:
+            ''' PDB PARSER
+                   ATOM / HETAATM  STRING line[0:6]
+                   INDEX           STRING line[6:11]
+                   ATOM TYPE       STRING line[12:16]
+                   AMINO ACID      STRING line[17:20]
+                   CHAIN ID        STRING line[21:22]
+                   RESIDUE NO      STRING line[22:26]
+                   X CO-ORDINATE   STRING line[30:38]
+                   Y CO-ORDINATE   STRING line[38:46]
+                   Z CO-ORDINATE   STRING line[46:54]
+                   '''
+            if line[0:6].strip() == "ATOM" or line[0:6].strip() == "HETAATM":
+                if line[21:22].stripi() == str(chain_id_input) and line[22:26].strip() == str(recidue_number_input):
+                    input_atom_number = str(line[6:11].strip())
+
+    primary_run_command = "python3 perform_path_analysis.py "+probe_radius_input+" "+input_atom_number
     #run Path analysis last executed command(executed in CatMec module)
-    os.system(commandDetails_result.primary_command)
+    os.system(primary_run_command)
 
 
 #Extract Activation energy
@@ -3477,19 +3518,20 @@ class mmpbsa(APIView):
 def designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     entry_time = datetime.now()
     try:
+        # ======= change working directory ==========
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/" )
     except OSError as e:  # excep path error
         error_num, error_msg = e
         if error_msg.strip() == "The system cannot find the file specified":
-            # create directory
+            # =========  create directory  ==========
             os.system("mkdir " + config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/")
-            # change directory
+            # =========   change directory  =========
             os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/")
 
-    # ------   create PDBS folder -----------
+    # =======   create PDBS folder ==============
     os.system("mkdir " + config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + '/' + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/pdbs/")
 
@@ -3532,7 +3574,21 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
             'local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+'Analysis/Contact_score/readpdb2.py')
     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + "Contact_Score/whole_protein_contact.py", config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + 'Analysis/Contact_score/whole_protein_contact.py')
+
+    #  ==========  get new contact score parameters from DB   =========================
+    command_tootl_title = 'Contact_Score'
+    ProjectToolEssentials_res_catmec_contact_score = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                   key_name='catmec_contact_score').latest('entry_time')
+    designer_contact_score_cmd_calculate = ""
+    designer_contact_score_cmd_combine = ""
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
+        if inputkey == 'command':
+            designer_contact_score_cmd_calculate = inputvalue
+            designer_contact_score_cmd_combine = designer_contact_score_cmd_calculate.replace(" C "," S ")
     #get contact_score parameters from DB
+    ''' (SAGAR) commented on 14-08-2019 to fetch new details of contact score command from database
     project_commands = commandDetails.objects.all().filter(project_id=project_id,
                                                                           command_title="CatMec",
                                                                           command_tool="Contact_Score",
@@ -3540,10 +3596,15 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
     print("0 th contact score command")
     print(project_commands[0].primary_command)
     print("1 th contact score command")
-    print(project_commands[1].primary_command)
+    print(project_commands[1].primary_command)'''
     # execute contact score command
-    os.system(project_commands[0].primary_command)
-    os.system(project_commands[1].primary_command)
+    # change to contact score working directory
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    os.system(designer_contact_score_cmd_calculate)
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    os.system(designer_contact_score_cmd_combine)
 
 
 class Contact_Score(APIView):
@@ -5848,8 +5909,17 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              | |__| (_) | | | | || (_| | (__| |_   ___) | (_| (_) | | |  __/
               \____\___/|_| |_|\__\__,_|\___|\__| |____/ \___\___/|_|  \___|
             '''
-            #designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
+            #EXECUTE PATH ANALYSIS
+            '''
+              ____   _  _____ _   _      _    _   _    _    _  __   ______ ___ ____  
+             |  _ \ / \|_   _| | | |    / \  | \ | |  / \  | | \ \ / / ___|_ _/ ___| 
+             | |_) / _ \ | | | |_| |   / _ \ |  \| | / _ \ | |  \ V /\___ \| |\___ \ 
+             |  __/ ___ \| | |  _  |  / ___ \| |\  |/ ___ \| |___| |  ___) | | ___) |
+             |_| /_/   \_\_| |_| |_| /_/   \_\_| \_/_/   \_\_____|_| |____/___|____/ 
+            '''
+            designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
             #counter for next mutant folder
             variant_index_count +=1
     return JsonResponse({'success': True})
