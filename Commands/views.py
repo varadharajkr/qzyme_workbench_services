@@ -4191,7 +4191,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         #os.system(SOL_replace_str)
         os.system("echo q | gmx make_ndx -f newbox.gro")
 
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr -maxwarn 10")
 
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
 
