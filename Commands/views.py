@@ -4209,7 +4209,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         file_gmx_trjconv_input = open("md_run_gmx_trjconv_input.txt","w+")
         file_gmx_trjconv_input.write("1\n0\nq\n")
         file_gmx_trjconv_input.close()
-        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc < md_run_gmx_trjconv_input.txt")
+        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc -pbc mol -ur compact -center < md_run_gmx_trjconv_input.txt")
 
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
