@@ -1039,7 +1039,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     # --------------------    TRJCAT RUN   ----------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------------
 
-    gmx_trjcat_cmd = "gmx tajcat -f" + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
+    gmx_trjcat_cmd = "gmx trjcat -f" + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
        'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc -keeplast -cat"
 
     os.system(gmx_trjcat_cmd)
@@ -1421,7 +1421,7 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                         # filter for em_em.xtc file
                         if md_run_dir.strip() == "em_em.xtc":
                             em_em_xtc_file_str += str(config.PATH_CONFIG[
-                                                           'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/" + variants_dir + "/" + md_run_dir.strip())
+                                                           'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/" + variants_dir + "/" + md_run_dir.strip()+" ")
 
                     pdb_file_index_str += 1
     variant_index_dir += 1
