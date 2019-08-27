@@ -1420,7 +1420,7 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                         #em_em
                         # filter for em_em.xtc file
                         if md_run_dir.strip() == "em_em.xtc":
-                            em_em_xtc_file_str = str(config.PATH_CONFIG[
+                            em_em_xtc_file_str += str(config.PATH_CONFIG[
                                                            'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/" + variants_dir + "/" + md_run_dir.strip())
 
                     pdb_file_index_str += 1
