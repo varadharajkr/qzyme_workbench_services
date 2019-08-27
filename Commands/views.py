@@ -4205,7 +4205,11 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
 
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
         # generate input files for trajcat
-        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc")
+        # create input file for trjconv command
+        file_gmx_trjconv_input = open("md_run_gmx_trjconv_input.txt","w+")
+        file_gmx_trjconv_input.write("1\n0\nq\n")
+        file_gmx_trjconv_input.close()
+        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc < md_run_gmx_trjconv_input.txt")
 
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
