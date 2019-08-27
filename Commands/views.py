@@ -1030,14 +1030,17 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     print(trajcat_return_list)
     print("list  0000000 item is trajcat_return_list[0]")
     print(trajcat_return_list[0])
+
+    print("list  44444 item is trajcat_return_list[4]")
+    print(trajcat_return_list[4])
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
     # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
     # -----------------------------------------------------------------------------------------------------
     # --------------------    TRJCAT RUN   ----------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------------
 
-    gmx_trjcat_cmd = "cat " + trajcat_return_list[0] + " > " + config.PATH_CONFIG[
-       'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc"
+    gmx_trjcat_cmd = "gmx tajcat -f" + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
+       'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc -keeplast -cat"
 
     os.system(gmx_trjcat_cmd)
 
@@ -1378,6 +1381,7 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
     em_tpr_file_str = ""
     md_index_file_str = ""
     md_topology_file_str = ""
+    em_em_xtc_file_str = ""
     variant_index_dir = 0  # variant dirs counter
     for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                      + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa):
@@ -1413,12 +1417,18 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                             md_topology_file_str = str(config.PATH_CONFIG[
                                                         'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
+                        #em_em
+                        # filter for em_em.xtc file
+                        if md_run_dir.strip() == "em_em.xtc":
+                            em_em_xtc_file_str = str(config.PATH_CONFIG[
+                                                           'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/" + variants_dir + "/" + md_run_dir.strip())
+
                     pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
     print("in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     print(em_gro_file_str)
-    return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
+    return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str,em_em_xtc_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
     '''
@@ -4194,7 +4204,8 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr -maxwarn 10")
 
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
-
+        # generate input files for trajcat
+        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc")
 
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
