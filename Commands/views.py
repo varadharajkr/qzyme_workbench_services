@@ -1039,7 +1039,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     # --------------------    TRJCAT RUN   ----------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------------
 
-    gmx_trjcat_cmd = "gmx trjcat -f" + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
+    gmx_trjcat_cmd = "gmx trjcat -f " + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
        'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc -keeplast -cat"
 
     os.system(gmx_trjcat_cmd)
