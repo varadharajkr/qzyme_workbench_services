@@ -4142,7 +4142,14 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
-    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+
+    try:
+        ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=no_of_thread_key).latest(
+            'entry_time')
+    except db.OperationalError as e:
+        db.close_old_connections()
+        ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
