@@ -4051,7 +4051,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
     number_of_threads = int(ProjectToolEssentials_res.values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
-    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
+    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt','vac_em']
     for mdp_file in MDP_filelist:
         shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                         + project_name + '/CatMec/MD_Simulation/' + mdp_file + '.mdp',
