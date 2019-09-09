@@ -532,6 +532,7 @@ class analyse_mmpbsa(APIView):
                         pass
                     else:
                         topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                        topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                         ligand_itp_exists = False
                 else:
                     topology_contents_part3 += line_seg + '\n'
@@ -956,6 +957,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                     pass
                 else:
                     topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                    topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                     ligand_itp_exists = False
             else:
                 topology_contents_part3 += line_seg + '\n'
@@ -1028,13 +1030,16 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     print(trajcat_return_list)
     print("list  0000000 item is trajcat_return_list[0]")
     print(trajcat_return_list[0])
+
+    print("list  44444 item is trajcat_return_list[4]")
+    print(trajcat_return_list[4])
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str, 3 - topology file)
     # [em_gro_file_str, em_tpr_file_str, md_index_file_str,md_topology_file_str]
     # -----------------------------------------------------------------------------------------------------
     # --------------------    TRJCAT RUN   ----------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------------
 
-    gmx_trjcat_cmd = "gmx trjcat -f " + trajcat_return_list[0] + " -o " + config.PATH_CONFIG[
+    gmx_trjcat_cmd = "gmx trjcat -f " + trajcat_return_list[4] + " -o " + config.PATH_CONFIG[
        'local_shared_folder_path'] + project_name + "/" +command_tool + "/" +mutation_dir_mmpbsa+"/MMPBSA/"+ "merged.xtc -keeplast -cat"
 
     os.system(gmx_trjcat_cmd)
@@ -1336,6 +1341,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                     pass
                 else:
                     topology_contents_part3 += '#include "complex.itp" ' + '\n'
+                    topology_contents_part3 += '#include "ligand.itp" ' + '\n'
                     ligand_itp_exists = False
             else:
                 topology_contents_part3 += line_seg + '\n'
@@ -1375,6 +1381,7 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
     em_tpr_file_str = ""
     md_index_file_str = ""
     md_topology_file_str = ""
+    em_em_xtc_file_str = ""
     variant_index_dir = 0  # variant dirs counter
     for mutations_dirs in os.listdir(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                                      + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa):
@@ -1410,12 +1417,18 @@ def get_hotspot_trjcat_command_str(request,mutation_dir_mmpbsa,  project_name, c
                             md_topology_file_str = str(config.PATH_CONFIG[
                                                         'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa +"/"+mutations_dirs+"/"+variants_dir+"/" + md_run_dir.strip())
 
+                        #em_em
+                        # filter for em_em.xtc file
+                        if md_run_dir.strip() == "em_em.xtc":
+                            em_em_xtc_file_str += str(config.PATH_CONFIG[
+                                                           'local_shared_folder_path_project'] + 'Project/' + project_name + '/' + command_tool + '/' + mutation_dir_mmpbsa + "/" + mutations_dirs + "/" + variants_dir + "/" + md_run_dir.strip()+" ")
+
                     pdb_file_index_str += 1
     variant_index_dir += 1
     # return list of values (0 - gro files str, 1 - tpr file str, 2 - index file str)
     print("in get_hotspot_trjcat_command_str function >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     print(em_gro_file_str)
-    return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str]
+    return [em_gro_file_str,em_tpr_file_str,md_index_file_str,md_topology_file_str,em_em_xtc_file_str]
 
 def perform_cmd_trajconv(project_name,project_id,md_simulations_tpr_file,md_simulations_ndx_file):
     '''
@@ -1738,7 +1751,10 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2): # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
@@ -2182,7 +2198,10 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
@@ -2592,7 +2611,10 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
                     if line2.strip() == '[ atoms ]':
                         topology_content_atoms += line2
                         break
-                    topology_initial_content += line2
+                    if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                        topology_initial_content += ";"+line2
+                    else:
+                        topology_initial_content += line2
                 for line2 in topology_bak_file:
                     if re.search(r"\[(\s\w+\s)\]", line2):
                         break
@@ -3296,7 +3318,10 @@ class pathanalysis(APIView):
 
 #designer queue  path analysis
 def designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
-    commandDetails_result = commandDetails.objects.get(project_id=project_id,user_id=user_id,command_tool='Path_Analysis',command_title='CatMec').latest('entry_time')
+    primary_run_command = ""
+    input_atom_number = ""
+    ''' (SAGAR) commented on 14-08-2019 to fetch new parameters(from CatMec module ) from database
+    commandDetails_result = commandDetails.objects.get(project_id=project_id,user_id=user_id,command_tool='Path_Analysis',command_title='CatMec').latest('entry_time')'''
     try:
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/')
@@ -3323,8 +3348,46 @@ def designer_queue_path_analysis(request, md_mutation_folder, project_name, comm
         shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Path_Analysis/' + script_dir_file, config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/'+ script_dir_file)
 
+    #get path_analysis parameters from database
+    ProjectToolEssentials_res_catmec_pathanalysis = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name='catmec_path_analysis_input_atom_starting_point').latest('entry_time')
+    #catmec_pathanalysis_atom_input = ProjectToolEssentials_res_catmec_pathanalysis.values
+    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.values)
+    chain_id_input = ""
+    recidue_number_input = ""
+    probe_radius_input = ""
+    for inputkey, inputvalue in catmec_pathanalysis_atom_input.iteritems():
+        if inputkey == "chain_id":
+            chain_id_input = inputvalue
+        if inputkey == "recidue_number":
+            recidue_number_input = inputvalue
+        if inputkey == "probe_radius":
+            probe_radius_input = inputvalue
+    #open PDB file to get atom number based on CatMec module path analysis
+    pdb_file_path = config.PATH_CONFIG[
+                'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/frames_0.pdb'
+    with open(pdb_file_path) as pdb_frame:
+        lines = pdb_frame.readlines()
+        for line in lines:
+            ''' PDB PARSER
+                   ATOM / HETAATM  STRING line[0:6]
+                   INDEX           STRING line[6:11]
+                   ATOM TYPE       STRING line[12:16]
+                   AMINO ACID      STRING line[17:20]
+                   CHAIN ID        STRING line[21:22]
+                   RESIDUE NO      STRING line[22:26]
+                   X CO-ORDINATE   STRING line[30:38]
+                   Y CO-ORDINATE   STRING line[38:46]
+                   Z CO-ORDINATE   STRING line[46:54]
+                   '''
+            if line[0:6].strip() == "ATOM" or line[0:6].strip() == "HETAATM":
+                if line[21:22].stripi() == str(chain_id_input) and line[22:26].strip() == str(recidue_number_input):
+                    input_atom_number = str(line[6:11].strip())
+
+    primary_run_command = "python3 perform_path_analysis.py "+probe_radius_input+" "+input_atom_number
     #run Path analysis last executed command(executed in CatMec module)
-    os.system(commandDetails_result.primary_command)
+    os.system(primary_run_command)
 
 
 #Extract Activation energy
@@ -3465,19 +3528,20 @@ class mmpbsa(APIView):
 def designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     entry_time = datetime.now()
     try:
+        # ======= change working directory ==========
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/" )
     except OSError as e:  # excep path error
         error_num, error_msg = e
         if error_msg.strip() == "The system cannot find the file specified":
-            # create directory
+            # =========  create directory  ==========
             os.system("mkdir " + config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/")
-            # change directory
+            # =========   change directory  =========
             os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/")
 
-    # ------   create PDBS folder -----------
+    # =======   create PDBS folder ==============
     os.system("mkdir " + config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + '/' + '/'+command_tool+"/"+md_mutation_folder+"/Analysis/Contact_score/pdbs/")
 
@@ -3520,7 +3584,21 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
             'local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+'Analysis/Contact_score/readpdb2.py')
     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + "Contact_Score/whole_protein_contact.py", config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + 'Analysis/Contact_score/whole_protein_contact.py')
+
+    #  ==========  get new contact score parameters from DB   =========================
+    command_tootl_title = 'Contact_Score'
+    ProjectToolEssentials_res_catmec_contact_score = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                   key_name='catmec_contact_score').latest('entry_time')
+    designer_contact_score_cmd_calculate = ""
+    designer_contact_score_cmd_combine = ""
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
+        if inputkey == 'command':
+            designer_contact_score_cmd_calculate = inputvalue
+            designer_contact_score_cmd_combine = designer_contact_score_cmd_calculate.replace(" C "," S ")
     #get contact_score parameters from DB
+    ''' (SAGAR) commented on 14-08-2019 to fetch new details of contact score command from database
     project_commands = commandDetails.objects.all().filter(project_id=project_id,
                                                                           command_title="CatMec",
                                                                           command_tool="Contact_Score",
@@ -3528,10 +3606,15 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
     print("0 th contact score command")
     print(project_commands[0].primary_command)
     print("1 th contact score command")
-    print(project_commands[1].primary_command)
+    print(project_commands[1].primary_command)'''
     # execute contact score command
-    os.system(project_commands[0].primary_command)
-    os.system(project_commands[1].primary_command)
+    # change to contact score working directory
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    os.system(designer_contact_score_cmd_calculate)
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    os.system(designer_contact_score_cmd_combine)
 
 
 class Contact_Score(APIView):
@@ -3618,7 +3701,7 @@ class Contact_Score(APIView):
                         'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n " +
                     config.PATH_CONFIG[
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                        'mmpbsa_project_path'] + "complex_index.ndx < gmx_trajconv_input.txt")
+                        'mmpbsa_project_path'] + "index.ndx < gmx_trajconv_input.txt")
 
                 '''os.system(
                     "gmx trjconv -f merged_center.xtc -s " +
@@ -3636,7 +3719,7 @@ class Contact_Score(APIView):
                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n " +
                     config.PATH_CONFIG[
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                        'mmpbsa_project_path'] + "complex_index.ndx ")
+                        'mmpbsa_project_path'] + "index.ndx ")
             else: # primary_command_runnable.split()[3].strip() == "S":
                 print("------   in contact score combine ----------")
                 pass
@@ -3968,7 +4051,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
     number_of_threads = int(ProjectToolEssentials_res.values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
-    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
+    MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt','vac_em']
     for mdp_file in MDP_filelist:
         shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
                         + project_name + '/CatMec/MD_Simulation/' + mdp_file + '.mdp',
@@ -4059,7 +4142,14 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
-    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+
+    try:
+        ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=no_of_thread_key).latest(
+            'entry_time')
+    except db.OperationalError as e:
+        db.close_old_connections()
+        ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
@@ -4118,10 +4208,15 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
         #os.system(SOL_replace_str)
         os.system("echo q | gmx make_ndx -f newbox.gro")
 
-        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr")
+        os.system("gmx grompp -f em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o em.tpr -maxwarn 10")
 
         os.system("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em -nt "+str(number_of_threads))
-
+        # generate input files for trajcat
+        # create input file for trjconv command
+        file_gmx_trjconv_input = open("md_run_gmx_trjconv_input.txt","w+")
+        file_gmx_trjconv_input.write("1\n0\nq\n")
+        file_gmx_trjconv_input.close()
+        os.system("gmx trjconv -s em.tpr -f em.gro -o em_em.xtc -pbc mol -ur compact -center < md_run_gmx_trjconv_input.txt")
 
         # Hotspot MD RUN ends here ----
         # os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx")
@@ -5839,8 +5934,17 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              | |__| (_) | | | | || (_| | (__| |_   ___) | (_| (_) | | |  __/
               \____\___/|_| |_|\__\__,_|\___|\__| |____/ \___\___/|_|  \___|
             '''
-            #designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
+            #EXECUTE PATH ANALYSIS
+            '''
+              ____   _  _____ _   _      _    _   _    _    _  __   ______ ___ ____  
+             |  _ \ / \|_   _| | | |    / \  | \ | |  / \  | | \ \ / / ___|_ _/ ___| 
+             | |_) / _ \ | | | |_| |   / _ \ |  \| | / _ \ | |  \ V /\___ \| |\___ \ 
+             |  __/ ___ \| | |  _  |  / ___ \| |\  |/ ___ \| |___| |  ___) | | ___) |
+             |_| /_/   \_\_| |_| |_| /_/   \_\_| \_/_/   \_\_____|_| |____/___|____/ 
+            '''
+            designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
             #counter for next mutant folder
             variant_index_count +=1
     return JsonResponse({'success': True})
