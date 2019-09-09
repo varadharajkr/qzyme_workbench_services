@@ -4782,15 +4782,18 @@ class autodock(APIView):
         if not len(command_tool_title_split) <= 1:
             print('length is more than one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             if (command_tool_title_split[1] == "nma"):
+                print('command_tool_title_split[1] (one) is nma ',command_tool_title_split[1])
                 primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
         elif(command_tool_title_split[0] == "nma"):
+            print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
             print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
         elif(str(command_tool_title) == "tconcord_dlg"):
+            print('inside command_tool_title is tconcord_dlg ',command_tool_title)
             enzyme_file_key = 'autodock_nma_final_protein_conformation'
             ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
                 project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
