@@ -4882,22 +4882,22 @@ class autodock(APIView):
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        elif(command_tool_title_split[0] == "nma"):
-            print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
-            print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+            elif(command_tool_title_split[0] == "nma"):
+                print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
+                print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
-        elif(str(command_tool_title) == "tconcord_dlg"):
-            print('inside command_tool_title is tconcord_dlg ',command_tool_title)
-            enzyme_file_key = 'autodock_nma_final_protein_conformation'
-            ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
-                project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
-            nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
-            nma_path = nma_enzyme_file[:-4]
-            print(str(nma_path[:-4]))
-            print('\nnma_path ****************************************')
-            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+            elif(str(command_tool_title) == "tconcord_dlg"):
+                print('inside command_tool_title is tconcord_dlg ',command_tool_title)
+                enzyme_file_key = 'autodock_nma_final_protein_conformation'
+                ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
+                    project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
+                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
+                nma_path = nma_enzyme_file[:-4]
+                print(str(nma_path[:-4]))
+                print('\nnma_path ****************************************')
+                print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
         else:
             print('inside else')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
