@@ -4882,6 +4882,9 @@ class autodock(APIView):
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+
+            else:
+                pass
         elif(command_tool_title_split[0] == "nma"):
             print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
             print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
