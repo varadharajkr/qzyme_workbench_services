@@ -3721,6 +3721,8 @@ class Contact_Score(APIView):
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                         'mmpbsa_project_path'] + "index.ndx ")
             else: # primary_command_runnable.split()[3].strip() == "S":
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
                 print("------   in contact score combine ----------")
                 pass
 
