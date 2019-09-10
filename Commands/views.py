@@ -4900,6 +4900,10 @@ class autodock(APIView):
                 print('\nnma_path ****************************************')
                 print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
                 os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+            else:
+                print('inside else and lenght of split is more than 1')
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
         else:
             print('inside else')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
