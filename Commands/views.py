@@ -4882,6 +4882,7 @@ class autodock(APIView):
                 print('command_tool_title_split[1] (one) is nma ',command_tool_title_split[1])
                 primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
+                print('primary_command_runnable ',primary_command_runnable)
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
             elif(command_tool_title_split[0] == "nma"):
