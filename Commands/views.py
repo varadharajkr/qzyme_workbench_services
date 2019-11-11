@@ -4006,7 +4006,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
     temp_value = float(temp_ProjectToolEssentials_res.values)
 
-    nsteps_key = "nsteps_value"
+    nsteps_key = "md_simulation_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=nsteps_key).latest(
         'entry_time')
