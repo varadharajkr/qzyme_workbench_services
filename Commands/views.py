@@ -4011,7 +4011,9 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                                                                            key_name=nsteps_key).latest(
         'entry_time')
 
-    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+    nsteps = int(nsteps_ProjectToolEssentials_res.values)
+    to_be_multiplied_by = pow(10,6)
+    nsteps_value = nsteps * to_be_multiplied_by
 
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
