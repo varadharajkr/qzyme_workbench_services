@@ -3939,8 +3939,6 @@ def replace_temp_and_nsteps_in_mdp_file(file_path,  temp_value, nsteps_value):
             for line in content:
                 if 'QZTEMP' in line:
                     original_nvt_mdp_lines += line.replace('QZTEMP', str(temp_value))
-                elif 'QZNSTEPS' in line:
-                    original_nvt_mdp_lines += line.replace('QZNSTEPS', str(nsteps_value))
                 else:
                     original_nvt_mdp_lines += line
 
@@ -3949,8 +3947,6 @@ def replace_temp_and_nsteps_in_mdp_file(file_path,  temp_value, nsteps_value):
             for line in content:
                 if 'QZTEMP' in line:
                     original_npt_mdp_lines += line.replace('QZTEMP', str(temp_value))
-                elif 'QZNSTEPS' in line:
-                    original_npt_mdp_lines += line.replace('QZNSTEPS', str(nsteps_value))
                 else:
                     original_npt_mdp_lines += line
 
