@@ -3976,6 +3976,8 @@ class Contact_Score(APIView):
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
                         'mmpbsa_project_path'] + "index.ndx ")
             else: # primary_command_runnable.split()[3].strip() == "S":
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
                 print("------   in contact score combine ----------")
                 pass
 
@@ -4105,10 +4107,10 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     print('after change directory')
     print(os.getcwd())
     print("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-    print("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr")
+    print("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr -maxwarn 2")
     print("gmx mdrun -v -s vac_em.tpr -o vac_em.trr -cpo vac_em.cpt -c vac_em.gro -e vac_em.edr -g vac_em.log -deffnm vac_em -nt " + str(number_of_threads))
     os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-    os.system("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr")
+    os.system("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr -maxwarn 2")
     os.system("gmx mdrun -v -s vac_em.tpr -o vac_em.trr -cpo vac_em.cpt -c vac_em.gro -e vac_em.edr -g vac_em.log -deffnm vac_em -nt " + str(number_of_threads))
 
     print("gmx solvate -cp vac_em.gro -cs spc216.gro -p topol.top -o solve.gro")
@@ -4134,7 +4136,7 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     os.chdir(source_file_path)
     print('after change directory')
     print(os.getcwd())
-    os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
+    os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr -maxwarn 2")
 
     group_value = sol_group_option()
     SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
@@ -4181,6 +4183,54 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
 
 
 @csrf_exempt
+def replace_temp_and_nsteps_in_mdp_file(file_path,  temp_value, nsteps_value):
+    print('inside replace_temp_and_nsteps_in_mdp_file function')
+    try:
+        original_nvt_mdp_lines = ''
+        original_npt_mdp_lines = ''
+        original_md_mdp_lines = ''
+        with open(file_path+'pre_nvt.mdp', 'r') as pre_processed_mdb:
+            content = pre_processed_mdb.readlines()
+            for line in content:
+                if 'QZTEMP' in line:
+                    original_nvt_mdp_lines += line.replace('QZTEMP', str(temp_value))
+                else:
+                    original_nvt_mdp_lines += line
+
+        with open(file_path+'pre_npt.mdp', 'r') as pre_processed_mdb:
+            content = pre_processed_mdb.readlines()
+            for line in content:
+                if 'QZTEMP' in line:
+                    original_npt_mdp_lines += line.replace('QZTEMP', str(temp_value))
+                else:
+                    original_npt_mdp_lines += line
+
+        with open(file_path+'pre_md.mdp', 'r') as pre_processed_mdb:
+            content = pre_processed_mdb.readlines()
+            for line in content:
+                if 'QZTEMP' in line:
+                    original_md_mdp_lines += line.replace('QZTEMP', str(temp_value))
+                elif 'QZNSTEPS' in line:
+                    original_md_mdp_lines += line.replace('QZNSTEPS', str(nsteps_value))
+                else:
+                    original_md_mdp_lines += line
+
+        with open(file_path+'nvt.mdp', 'w+') as nvt_source_file:
+            nvt_source_file.write(original_nvt_mdp_lines)
+
+        with open(file_path+'npt.mdp', 'w+') as npt_source_file:
+            npt_source_file.write(original_npt_mdp_lines)
+
+        with open(file_path+'md.mdp', 'w+') as md_source_file:
+            md_source_file.write(original_md_mdp_lines)
+        return True
+    except Exception as e:
+        print('exception in replacing mdp file is ',str(e))
+        return False
+
+
+
+@csrf_exempt
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
@@ -4199,6 +4249,21 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         'entry_time')
 
     number_of_threads = int(ProjectToolEssentials_res.values)
+
+    temp_key = "preliminary_temp_value"
+    temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=temp_key).latest(
+        'entry_time')
+
+    temp_value = float(temp_ProjectToolEssentials_res.values)
+
+    nsteps_key = "md_simulation_nsteps_value"
+    nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=nsteps_key).latest(
+        'entry_time')
+
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
@@ -4206,83 +4271,89 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
-    md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
-    for i in range(int(md_run_no_of_conformation)):
-        if not (os.path.exists(source_file_path + 'md_run' + str(i + 1))):
-            print (source_file_path + 'md_run' + str(i + 1))
-            os.mkdir(source_file_path + 'md_run' + str(i + 1))
-        dest_file_path = source_file_path + 'md_run' + str(i + 1)
-        for file_name in os.listdir(source_file_path):
-            try:
-                print("inside try")
-                shutil.copy(str(source_file_path) + file_name, dest_file_path)
-            except IOError as e:
-                print("Unable to copy file. %s" % e)
-                pass
-            except Exception:
-                print("Unexpected error:", sys.exc_info())
-                pass
+    function_returned_value = replace_temp_and_nsteps_in_mdp_file(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + config.PATH_CONFIG['md_simulations_path'], temp_value, nsteps_value)
+    if function_returned_value:
+        print('replace mdp file function returned true')
+        md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
+        for i in range(int(md_run_no_of_conformation)):
+            if not (os.path.exists(source_file_path + 'md_run' + str(i + 1))):
+                print (source_file_path + 'md_run' + str(i + 1))
+                os.mkdir(source_file_path + 'md_run' + str(i + 1))
+            dest_file_path = source_file_path + 'md_run' + str(i + 1)
+            for file_name in os.listdir(source_file_path):
+                try:
+                    print("inside try")
+                    shutil.copy(str(source_file_path) + file_name, dest_file_path)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+                    pass
+                except Exception:
+                    print("Unexpected error:", sys.exc_info())
+                    pass
 
-        print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 33333333333333  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-
-
-        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
-        print("start mdrun 2222222222222  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
+            print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 33333333333333  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
 
 
-        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 44444444444  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+            print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
+            print("start mdrun 2222222222222  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
 
 
-        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
-        print("start mdrun 333333333333  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+            print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 44444444444  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
 
 
-        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 5555555555  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+            print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+            print("start mdrun 333333333333  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
 
 
-        print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
-        print("start mdrun 4444444444444  ==========================================")
-        print('before change directory')
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print('after change directory')
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+            print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 5555555555  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
 
-    return JsonResponse({'success': True})\
+
+            print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+            print("start mdrun 4444444444444  ==========================================")
+            print('before change directory')
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print('after change directory')
+            print(os.getcwd())
+            os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+
+        return JsonResponse({'success': True})
+    else:
+        print('replace mdp file function returned False')
+        return JsonResponse({'success': False})
 
 
 
@@ -4529,7 +4600,7 @@ class Complex_Simulations(APIView):
             primary_command_runnable = re.sub('%SOL_value%',group_value,
                                               primary_command_runnable)
         if commandDetails_result.command_title == "md_run":
-            md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
+            returned_preparation_value = md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
             # print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # os.system("rm "+dir_value+"/index.ndx")
@@ -5132,24 +5203,32 @@ class autodock(APIView):
         if not len(command_tool_title_split) <= 1:
             print('length is more than one @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             if (command_tool_title_split[1] == "nma"):
+                print('command_tool_title_split[1] (one) is nma ',command_tool_title_split[1])
                 primary_command_runnable = primary_command_runnable+" "+config.PATH_CONFIG['mmtsb_path']
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
+                print('primary_command_runnable ',primary_command_runnable)
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-        elif(command_tool_title_split[0] == "nma"):
-            print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+            elif(command_tool_title_split[0] == "nma"):
+                print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
+                print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
 
-        elif(str(command_tool_title) == "tconcord_dlg"):
-            enzyme_file_key = 'autodock_nma_final_protein_conformation'
-            ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
-                project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
-            nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
-            nma_path = nma_enzyme_file[:-4]
-            print(str(nma_path[:-4]))
-            print('\nnma_path ****************************************')
-            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+            elif(str(command_tool_title) == "tconcord_dlg"):
+                print('inside command_tool_title is tconcord_dlg ',command_tool_title)
+                enzyme_file_key = 'autodock_nma_final_protein_conformation'
+                ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
+                    project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
+                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
+                nma_path = nma_enzyme_file[:-4]
+                print(str(nma_path[:-4]))
+                print('\nnma_path ****************************************')
+                print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+            else:
+                print('inside else and lenght of split is more than 1')
+                os.chdir(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
         else:
             print('inside else')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
