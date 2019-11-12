@@ -1966,7 +1966,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                           config.PATH_CONFIG['mmpbsa_project_path'] + "new_" + ligand_inputvalue.split("_")[0] + ".itp",
                           "w") as new_itp_file:
                     new_itp_file.write(initial_text_content)
-    else
+    else:
         #single ligand
         initial_text_content = ""
         topology_file_atoms_content = ""
