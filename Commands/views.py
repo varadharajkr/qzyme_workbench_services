@@ -4235,8 +4235,9 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
     new_shell_script_lines = ''
     pre_simulation_script_file_name = 'pre_simulation.sh'
     simulation_script_file_name = 'simulation.sh'
-
+    print('before opening ',file_path + pre_simulation_script_file_name)
     with open(file_path + pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path + pre_simulation_script_file_name)
         content = source_file.readlines()
         for line in content:
             if 'QZSERVER' in line:
@@ -4246,8 +4247,10 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path + simulation_script_file_name):
+        print('removing ',file_path + simulation_script_file_name)
         os.remove(file_path + simulation_script_file_name)
     with open(file_path + simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path + simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines)
         new_bash_script.write('\n')
         new_bash_script.write('gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10')
@@ -4262,6 +4265,8 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
         new_bash_script.write('\n')
         new_bash_script.write("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
         new_bash_script.write('\n')
+    print('outside the loop')
+    return True
 
 
 @csrf_exempt
@@ -4344,17 +4349,23 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                     print("Unexpected error:", sys.exc_info())
                     pass
             if slurm_value == "yes":
+                print('slurm value selected is yes')
                 initial_string = 'QZW'
                 module_name = 'CatMec'
                 job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+                print('after generate_slurm_script ************************************************************************')
                 print('before changing directory')
                 print(os.getcwd())
                 print('after changing directory')
                 os.chdir(source_file_path + '/md_run' + str(i + 1))
                 print(os.getcwd())
+                print('queuing **********************************************************************************')
+                print('sbatch ',+ dest_file_path +'simulation.sh')
                 os.system('sbatch ',+ dest_file_path +'simulation.sh')
+                print('queued')
             elif slurm_value == "No":
+                print('slurm value selected is no')
                 print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
                 print("start grompp 33333333333333  ==========================================")
                 print('before change directory')
