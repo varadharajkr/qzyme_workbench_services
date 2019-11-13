@@ -1582,292 +1582,209 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     atoms_final_count = line_list[-1].split()[0]
     dihedrals_count = 0
     #==================== End of get ATOMS final count  ===========================
-    for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
-        if ligand_inputvalue.split("_")[0] != ligand_name: # Filter with user input ligand
-            initial_text_content = ""
-            topology_file_atoms_content = ""
-            topology_file_bonds_content = ""
-            topology_file_pairs_content = ""
-            topology_file_angles_content = ""
-            topology_file_dihedrals_content = ""
-            topology_content_atoms = ""
-            topology_content_bonds = ""
-            topology_content_pairs = ""
-            topology_content_angles = ""
-            topology_content_dihedrals = ""
-            topology_content_dihedrals2 = ""
-            topology_initial_content = ""
-            dihedrals_list = []
+    #check length of ligands inputs from ligand_parameterization
+    if len(CatMec_input_dict) > 1:
+        #multiple ligands
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            if ligand_inputvalue.split("_")[0] != ligand_name:  # Filter with user input ligand
+                initial_text_content = ""
+                topology_file_atoms_content = ""
+                topology_file_bonds_content = ""
+                topology_file_pairs_content = ""
+                topology_file_angles_content = ""
+                topology_file_dihedrals_content = ""
+                topology_content_atoms = ""
+                topology_content_bonds = ""
+                topology_content_pairs = ""
+                topology_content_angles = ""
+                topology_content_dihedrals = ""
+                topology_content_dihedrals2 = ""
+                topology_initial_content = ""
+                dihedrals_list = []
 
-            atoms_lastcount = atoms_final_count
-            # initial_text_content = initial_text_content+itp_file_inp[:-4]
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
-                for line2 in itp_file:
-                    if line2.strip() == '[ atoms ]':
+                atoms_lastcount = atoms_final_count
+                # initial_text_content = initial_text_content+itp_file_inp[:-4]
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + ligand_inputvalue.split("_")[
+                              0] + ".itp", "r+") as itp_file:
+                    for line2 in itp_file:
+                        if line2.strip() == '[ atoms ]':
+                            initial_text_content += line2
+                            break
                         initial_text_content += line2
-                        break
-                    initial_text_content += line2
-                for line2 in itp_file:
-                    if line2.strip() == '[ bonds ]':
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            atoms_lastcount = int(line2.split()[0]) + int(atoms_final_count)
-                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
-                                                  1)
-                            line2 = line2.lstrip()
-                            initial_text_content += "    " + line2
-                            topology_file_atoms_content += "    " + line2
-                        else:
-                            initial_text_content += line2
-                            topology_file_atoms_content += line2
-                    except IndexError:
-                        pass
+                    for line2 in itp_file:
+                        if line2.strip() == '[ bonds ]':
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                atoms_lastcount = int(line2.split()[0]) + int(atoms_final_count)
+                                line2 = line2.replace(line2.split()[0],
+                                                      str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                      1)
+                                line2 = line2.lstrip()
+                                initial_text_content += "    " + line2
+                                topology_file_atoms_content += "    " + line2
+                            else:
+                                initial_text_content += line2
+                                topology_file_atoms_content += line2
+                        except IndexError:
+                            pass
 
-            # append edited data fo bonds section
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
-                for line2 in itp_file:
-                    if line2.strip() == '[ bonds ]':
-                        initial_text_content += "\n" + line2
-                        break
-                for line2 in itp_file:
-                    if line2.strip() == '[ pairs ]':
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            # pat = re.compile("^\S(.*\S)?$")
-                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
-                                                  1)
-                            line2 = line2.replace(" " + line2.split()[1] + " ",
-                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
-                            line2 = line2.lstrip()
-                            initial_text_content += "    " + line2
-                            topology_file_bonds_content += "    " + line2
-                        else:
-                            initial_text_content += line2
-                            topology_file_bonds_content += line2
-                    except IndexError:
-                        pass
+                # append edited data fo bonds section
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + ligand_inputvalue.split("_")[
+                              0] + ".itp", "r+") as itp_file:
+                    for line2 in itp_file:
+                        if line2.strip() == '[ bonds ]':
+                            initial_text_content += "\n" + line2
+                            break
+                    for line2 in itp_file:
+                        if line2.strip() == '[ pairs ]':
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                # pat = re.compile("^\S(.*\S)?$")
+                                line2 = line2.replace(line2.split()[0],
+                                                      str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                      1)
+                                line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                      str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                                line2 = line2.lstrip()
+                                initial_text_content += "    " + line2
+                                topology_file_bonds_content += "    " + line2
+                            else:
+                                initial_text_content += line2
+                                topology_file_bonds_content += line2
+                        except IndexError:
+                            pass
 
-            # append edited data for pairs section
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
-                for line2 in itp_file:
-                    if line2.strip() == '[ pairs ]':
-                        initial_text_content += "\n" + line2
-                        break
-                for line2 in itp_file:
-                    if line2.strip() == '[ angles ]':
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            # pat = re.compile("^\S(.*\S)?$")
-                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
-                                                  1)
-                            line2 = line2.replace(" " + line2.split()[1] + " ",
-                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
-                            line2 = line2.lstrip()
-                            initial_text_content += "    " + line2
-                            topology_file_pairs_content += "    " + line2
-                        else:
-                            initial_text_content += line2
-                            topology_file_pairs_content += line2
-                    except IndexError:
-                        pass
+                # append edited data for pairs section
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + ligand_inputvalue.split("_")[
+                              0] + ".itp", "r+") as itp_file:
+                    for line2 in itp_file:
+                        if line2.strip() == '[ pairs ]':
+                            initial_text_content += "\n" + line2
+                            break
+                    for line2 in itp_file:
+                        if line2.strip() == '[ angles ]':
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                # pat = re.compile("^\S(.*\S)?$")
+                                line2 = line2.replace(line2.split()[0],
+                                                      str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                      1)
+                                line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                      str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                                line2 = line2.lstrip()
+                                initial_text_content += "    " + line2
+                                topology_file_pairs_content += "    " + line2
+                            else:
+                                initial_text_content += line2
+                                topology_file_pairs_content += line2
+                        except IndexError:
+                            pass
 
-                        # append edited data for angles section
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
-                for line2 in itp_file:
-                    if line2.strip() == '[ angles ]':
-                        initial_text_content += "\n" + line2
-                        break
-                for line2 in itp_file:
-                    if line2.strip() == '[ dihedrals ]':
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            # pat = re.compile("^\S(.*\S)?$")
-                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
-                                                  1)
-                            line2 = line2.replace(" " + line2.split()[1] + " ",
-                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
-                            line2 = line2.replace(" " + line2.split()[2] + " ",
-                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
-                            line2 = line2.lstrip()
-                            initial_text_content += "    " + line2
-                            topology_file_angles_content += "    " + line2
-                        else:
-                            initial_text_content += line2
-                            topology_file_angles_content += line2
-                    except IndexError:
-                        pass
-
-                        # apend edited data for dihedrals section
-            with open(config.PATH_CONFIG[
-                          'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
-                          'md_simulations_path'] +tpr_file_split[0]+"/"+ ligand_inputvalue.split("_")[0]+".itp", "r+") as itp_file:
-                for line2 in itp_file:
-                    if line2.strip() == '[ dihedrals ]':
-                        initial_text_content += "\n" + line2
-                        break
-
-                for line2 in itp_file:
-                    if line2.strip() == '\n':
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            # pat = re.compile("^\S(.*\S)?$")
-                            line2 = line2.replace(line2.split()[0], str(int(line2.split()[0]) + int(atoms_final_count)),
-                                                  1)
-                            line2 = line2.replace(" " + line2.split()[1] + " ",
-                                                  str(int(line2.split()[1]) + int(atoms_final_count)), 1)
-                            line2 = line2.replace(" " + line2.split()[2] + " ",
-                                                  str(int(line2.split()[2]) + int(atoms_final_count)), 1)
-                            line2 = line2.replace(" " + line2.split()[3] + " ",
-                                                  str(int(line2.split()[3]) + int(atoms_final_count)), 1)
-                            line2 = line2.lstrip()
-                            initial_text_content += "    " + line2
-                            topology_file_dihedrals_content += "    " + line2
-                        else:
-                            initial_text_content += line2
-                            topology_file_dihedrals_content += line2
-                    except IndexError:
-                        pass
-
-            # ================================================================================================
-            # ====================================== TOPOLOGY FILE ===========================================
-            # ================================================================================================
-            # write respective contents to topology file
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-                for line2 in topology_bak_file:
-                    if line2.strip() == '[ atoms ]':
-                        topology_content_atoms += line2
-                        break
-                    if re.match('^#include\s*', line2): # commenting forcefield and atomtypes lines
-                        topology_initial_content += ";"+line2
-                    else:
-                        topology_initial_content += line2
-                for line2 in topology_bak_file:
-                    if re.search(r"\[(\s\w+\s)\]", line2):
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            topology_content_atoms += "    " + line2
-                        else:
-                            topology_content_atoms += line2
-                    except IndexError:
-                        pass
-
-            # ===================  bonds content  ===========================
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-                for line2 in topology_bak_file:
-                    if line2.strip() == '[ bonds ]':
-                        topology_content_bonds += line2
-                        break
-
-                for line2 in topology_bak_file:
-                    if re.search(r"\[(\s\w+\s)\]", line2):
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            topology_content_bonds += "    " + line2
-                        else:
-                            topology_content_bonds += line2
-                    except IndexError:
-                        pass
-
-            # ==================   pairs content  ===============================
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-                for line2 in topology_bak_file:
-                    if line2.strip() == '[ pairs ]':
-                        topology_content_pairs += line2
-                        break
-
-                for line2 in topology_bak_file:
-                    if re.search(r"\[(\s\w+\s)\]", line2):
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            topology_content_pairs += "    " + line2
-                        else:
-                            topology_content_pairs += line2
-                    except IndexError:
-                        pass
-
-            # =======================   angles content   ==============================
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-                for line2 in topology_bak_file:
-                    if line2.strip() == '[ angles ]':
-                        topology_content_angles += line2
-                        break
-
-                for line2 in topology_bak_file:
-                    if re.search(r"\[(\s\w+\s)\]", line2):
-                        break
-                    try:
-                        if (line2.split()[0] != ";"):
-                            topology_content_angles += "    " + line2
-                        else:
-                            topology_content_angles += line2
-                    except IndexError:
-                        pass
-
-            # ======================   dihedrals content   ========================
-            # --- commented on 23-07-2019 to implement new code dihedrals multiple sections
-            # with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
-            #     for line2 in topology_bak_file:
-            #         if line2.strip() == '[ dihedrals ]':
-            #             topology_content_dihedrals += line2
-            #             break
-            #
-            #     for line2 in topology_bak_file:
-            #         if line2.strip() == "\n":
-            #             break
-            #         try:
-            #             if (line2.split()[0] != ";"):
-            #                 topology_content_dihedrals += "    " + line2
-            #             else:
-            #                 topology_content_dihedrals += line2
-            #         except IndexError:
-            #             pass
-            # ======================   dihedrals content for multiple   ========================
-            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-                for line2 in topology_bak_file:
-                    if line2.strip() == '[ dihedrals ]':
-                        dihedrals_count += 1
-            if dihedrals_count > 1:
-                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "topol.top", "r+") as topology_bak_file:
-
-                    # ---------------- commented on 02-08-2019 to fix multiple dihedrals bug
-                    # for line2 in topology_bak_file:
-                    #     if line2.strip() == '[ dihedrals ]':
-                    #         topology_content_dihedrals += line2
-                    #         break
-                    # for line2 in topology_bak_file:
-                    #     if line2.strip() == "\n":
-                    #         break
-                    #     try:
-                    #         if (line2.split()[0].isdigit()):
-                    #             topology_content_dihedrals += "    " + line2
-                    #     except IndexError:
-                    #         pass
-                    for line2 in topology_bak_file:
+                            # append edited data for angles section
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + ligand_inputvalue.split("_")[
+                              0] + ".itp", "r+") as itp_file:
+                    for line2 in itp_file:
+                        if line2.strip() == '[ angles ]':
+                            initial_text_content += "\n" + line2
+                            break
+                    for line2 in itp_file:
                         if line2.strip() == '[ dihedrals ]':
-                            topology_content_dihedrals += line2
-                            dihedrals_list.append(line2.replace(" ", ""))
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                # pat = re.compile("^\S(.*\S)?$")
+                                line2 = line2.replace(line2.split()[0],
+                                                      str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                      1)
+                                line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                      str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                                line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                      str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                                line2 = line2.lstrip()
+                                initial_text_content += "    " + line2
+                                topology_file_angles_content += "    " + line2
+                            else:
+                                initial_text_content += line2
+                                topology_file_angles_content += line2
+                        except IndexError:
+                            pass
+
+                            # apend edited data for dihedrals section
+                with open(config.PATH_CONFIG[
+                              'local_shared_folder_path'] + project_name + '/' + config.PATH_CONFIG[
+                              'md_simulations_path'] + tpr_file_split[0] + "/" + ligand_inputvalue.split("_")[
+                              0] + ".itp", "r+") as itp_file:
+                    for line2 in itp_file:
+                        if line2.strip() == '[ dihedrals ]':
+                            initial_text_content += "\n" + line2
+                            break
+
+                    for line2 in itp_file:
+                        if line2.strip() == '\n':
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                # pat = re.compile("^\S(.*\S)?$")
+                                line2 = line2.replace(line2.split()[0],
+                                                      str(int(line2.split()[0]) + int(atoms_final_count)),
+                                                      1)
+                                line2 = line2.replace(" " + line2.split()[1] + " ",
+                                                      str(int(line2.split()[1]) + int(atoms_final_count)), 1)
+                                line2 = line2.replace(" " + line2.split()[2] + " ",
+                                                      str(int(line2.split()[2]) + int(atoms_final_count)), 1)
+                                line2 = line2.replace(" " + line2.split()[3] + " ",
+                                                      str(int(line2.split()[3]) + int(atoms_final_count)), 1)
+                                line2 = line2.lstrip()
+                                initial_text_content += "    " + line2
+                                topology_file_dihedrals_content += "    " + line2
+                            else:
+                                initial_text_content += line2
+                                topology_file_dihedrals_content += line2
+                        except IndexError:
+                            pass
+
+                # ================================================================================================
+                # ====================================== TOPOLOGY FILE ===========================================
+                # ================================================================================================
+                # write respective contents to topology file
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                    for line2 in topology_bak_file:
+                        if line2.strip() == '[ atoms ]':
+                            topology_content_atoms += line2
+                            break
+                        if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                            topology_initial_content += ";" + line2
+                        else:
+                            topology_initial_content += line2
+                    for line2 in topology_bak_file:
+                        if re.search(r"\[(\s\w+\s)\]", line2):
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                topology_content_atoms += "    " + line2
+                            else:
+                                topology_content_atoms += line2
+                        except IndexError:
+                            pass
+
+                # ===================  bonds content  ===========================
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                    for line2 in topology_bak_file:
+                        if line2.strip() == '[ bonds ]':
+                            topology_content_bonds += line2
                             break
 
                     for line2 in topology_bak_file:
@@ -1875,83 +1792,421 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                             break
                         try:
                             if (line2.split()[0] != ";"):
-                                topology_content_dihedrals += "    " + line2
-                                dihedrals_list.append(line2.replace(" ", ""))
+                                topology_content_bonds += "    " + line2
                             else:
+                                topology_content_bonds += line2
+                        except IndexError:
+                            pass
+
+                # ==================   pairs content  ===============================
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                    for line2 in topology_bak_file:
+                        if line2.strip() == '[ pairs ]':
+                            topology_content_pairs += line2
+                            break
+
+                    for line2 in topology_bak_file:
+                        if re.search(r"\[(\s\w+\s)\]", line2):
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                topology_content_pairs += "    " + line2
+                            else:
+                                topology_content_pairs += line2
+                        except IndexError:
+                            pass
+
+                # =======================   angles content   ==============================
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                    for line2 in topology_bak_file:
+                        if line2.strip() == '[ angles ]':
+                            topology_content_angles += line2
+                            break
+
+                    for line2 in topology_bak_file:
+                        if re.search(r"\[(\s\w+\s)\]", line2):
+                            break
+                        try:
+                            if (line2.split()[0] != ";"):
+                                topology_content_angles += "    " + line2
+                            else:
+                                topology_content_angles += line2
+                        except IndexError:
+                            pass
+
+                # ======================   dihedrals content   ========================
+                # --- commented on 23-07-2019 to implement new code dihedrals multiple sections
+                # with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+                #     for line2 in topology_bak_file:
+                #         if line2.strip() == '[ dihedrals ]':
+                #             topology_content_dihedrals += line2
+                #             break
+                #
+                #     for line2 in topology_bak_file:
+                #         if line2.strip() == "\n":
+                #             break
+                #         try:
+                #             if (line2.split()[0] != ";"):
+                #                 topology_content_dihedrals += "    " + line2
+                #             else:
+                #                 topology_content_dihedrals += line2
+                #         except IndexError:
+                #             pass
+                # ======================   dihedrals content for multiple   ========================
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                    for line2 in topology_bak_file:
+                        if line2.strip() == '[ dihedrals ]':
+                            dihedrals_count += 1
+                if dihedrals_count > 1:
+                    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                              config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+
+                        # ---------------- commented on 02-08-2019 to fix multiple dihedrals bug
+                        # for line2 in topology_bak_file:
+                        #     if line2.strip() == '[ dihedrals ]':
+                        #         topology_content_dihedrals += line2
+                        #         break
+                        # for line2 in topology_bak_file:
+                        #     if line2.strip() == "\n":
+                        #         break
+                        #     try:
+                        #         if (line2.split()[0].isdigit()):
+                        #             topology_content_dihedrals += "    " + line2
+                        #     except IndexError:
+                        #         pass
+                        for line2 in topology_bak_file:
+                            if line2.strip() == '[ dihedrals ]':
                                 topology_content_dihedrals += line2
                                 dihedrals_list.append(line2.replace(" ", ""))
-                        except IndexError:
-                            pass
-
-                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
-                    # =================    for second '[ dihedral ]' section    ===================================
-                    for line22 in topology_bak_file:
-                        if line22.strip() == '[ dihedrals ]':
-                            if line22.replace(" ", "") in dihedrals_list:
-                                topology_content_dihedrals2 += line22
                                 break
 
-                    for line22 in topology_bak_file:
-                        if line22.strip() in ['\n', '\r\n']:
-                            if line22.replace(" ", "") not in dihedrals_list:
+                        for line2 in topology_bak_file:
+                            if re.search(r"\[(\s\w+\s)\]", line2):
                                 break
-                        try:
-                            if line22.replace(" ", "") not in dihedrals_list:
-                                if (line22.split()[0].isdigit()):
-                                    topology_content_dihedrals2 += "    " + line22
+                            try:
+                                if (line2.split()[0] != ";"):
+                                    topology_content_dihedrals += "    " + line2
+                                    dihedrals_list.append(line2.replace(" ", ""))
+                                else:
+                                    topology_content_dihedrals += line2
+                                    dihedrals_list.append(line2.replace(" ", ""))
+                            except IndexError:
+                                pass
 
-                            else:
+                    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                              config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                        # =================    for second '[ dihedral ]' section    ===================================
+                        for line22 in topology_bak_file:
+                            if line22.strip() == '[ dihedrals ]':
+                                if line22.replace(" ", "") in dihedrals_list:
+                                    topology_content_dihedrals2 += line22
+                                    break
+
+                        for line22 in topology_bak_file:
+                            if line22.strip() in ['\n', '\r\n']:
+                                if line22.replace(" ", "") not in dihedrals_list:
+                                    break
+                            try:
                                 if line22.replace(" ", "") not in dihedrals_list:
                                     if (line22.split()[0].isdigit()):
-                                        topology_content_dihedrals2 += line22
+                                        topology_content_dihedrals2 += "    " + line22
 
-                        except IndexError:
-                            pass
+                                else:
+                                    if line22.replace(" ", "") not in dihedrals_list:
+                                        if (line22.split()[0].isdigit()):
+                                            topology_content_dihedrals2 += line22
 
-            else:
-                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                          config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
-                    # =================    for second '[ dihedral ]' section    ===================================
-                    for line22 in topology_bak_file:
-                        if line22.strip() == '[ dihedrals ]':
-                            if line22.replace(" ", "") in dihedrals_list:
-                                topology_content_dihedrals2 += line22
-                                break
+                            except IndexError:
+                                pass
 
-                    for line22 in topology_bak_file:
-                        if line22.strip() in ['\n', '\r\n']:
-                            if line22.replace(" ", "") not in dihedrals_list:
-                                break
-                        try:
-                            if line22.replace(" ", "") not in dihedrals_list:
-                                if (line22.split()[0].isdigit()):
-                                    topology_content_dihedrals2 += "    " + line22
+                else:
+                    with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                              config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                        # =================    for second '[ dihedral ]' section    ===================================
+                        for line22 in topology_bak_file:
+                            if line22.strip() == '[ dihedrals ]':
+                                if line22.replace(" ", "") in dihedrals_list:
+                                    topology_content_dihedrals2 += line22
+                                    break
 
-                            else:
+                        for line22 in topology_bak_file:
+                            if line22.strip() in ['\n', '\r\n']:
+                                if line22.replace(" ", "") not in dihedrals_list:
+                                    break
+                            try:
                                 if line22.replace(" ", "") not in dihedrals_list:
                                     if (line22.split()[0].isdigit()):
-                                        topology_content_dihedrals2 += line22
+                                        topology_content_dihedrals2 += "    " + line22
 
-                        except IndexError:
-                            pass
+                                else:
+                                    if line22.replace(" ", "") not in dihedrals_list:
+                                        if (line22.split()[0].isdigit()):
+                                            topology_content_dihedrals2 += line22
 
-            topology_content_dihedrals_filtered = '\n'.join(topology_content_dihedrals2.split('\n')[:-2])
-            print("adding topology file contents are")
-            # print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+                            except IndexError:
+                                pass
+
+                topology_content_dihedrals_filtered = '\n'.join(topology_content_dihedrals2.split('\n')[:-2])
+                print("adding topology file contents are")
+                # print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "complex.itp", "w") as new_topology_file:
+                    new_topology_file.write(topology_initial_content + "\n" +
+                                            topology_content_atoms + topology_file_atoms_content + "\n" +
+                                            topology_content_bonds + topology_file_bonds_content + "\n" +
+                                            topology_content_pairs + topology_file_pairs_content + "\n" +
+                                            topology_content_angles + topology_file_angles_content + "\n" +
+                                            topology_content_dihedrals + topology_file_dihedrals_content + "\n" + topology_content_dihedrals_filtered)
+
+                atoms_final_count = atoms_lastcount
+                with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                          config.PATH_CONFIG['mmpbsa_project_path'] + "new_" + ligand_inputvalue.split("_")[0] + ".itp",
+                          "w") as new_itp_file:
+                    new_itp_file.write(initial_text_content)
+    else:
+        #single ligand
+        initial_text_content = ""
+        topology_file_atoms_content = ""
+        topology_file_bonds_content = ""
+        topology_file_pairs_content = ""
+        topology_file_angles_content = ""
+        topology_file_dihedrals_content = ""
+        topology_content_atoms = ""
+        topology_content_bonds = ""
+        topology_content_pairs = ""
+        topology_content_angles = ""
+        topology_content_dihedrals = ""
+        topology_content_dihedrals2 = ""
+        topology_initial_content = ""
+        dihedrals_list = []
+
+        atoms_lastcount = atoms_final_count
+
+        ''' append edited data fo bonds section
+
+
+        append edited data for pairs section
+
+
+        append edited data for angles section
+
+
+        apend edited data for dihedrals section
+        '''
+
+        # ================================================================================================
+        # ====================================== TOPOLOGY FILE ===========================================
+        # ================================================================================================
+        # write respective contents to topology file
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+            for line2 in topology_bak_file:
+                if line2.strip() == '[ atoms ]':
+                    topology_content_atoms += line2
+                    break
+                if re.match('^#include\s*', line2):  # commenting forcefield and atomtypes lines
+                    topology_initial_content += ";" + line2
+                else:
+                    topology_initial_content += line2
+            for line2 in topology_bak_file:
+                if re.search(r"\[(\s\w+\s)\]", line2):
+                    break
+                try:
+                    if (line2.split()[0] != ";"):
+                        topology_content_atoms += "    " + line2
+                    else:
+                        topology_content_atoms += line2
+                except IndexError:
+                    pass
+
+        # ===================  bonds content  ===========================
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+            for line2 in topology_bak_file:
+                if line2.strip() == '[ bonds ]':
+                    topology_content_bonds += line2
+                    break
+
+            for line2 in topology_bak_file:
+                if re.search(r"\[(\s\w+\s)\]", line2):
+                    break
+                try:
+                    if (line2.split()[0] != ";"):
+                        topology_content_bonds += "    " + line2
+                    else:
+                        topology_content_bonds += line2
+                except IndexError:
+                    pass
+
+        # ==================   pairs content  ===============================
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+            for line2 in topology_bak_file:
+                if line2.strip() == '[ pairs ]':
+                    topology_content_pairs += line2
+                    break
+
+            for line2 in topology_bak_file:
+                if re.search(r"\[(\s\w+\s)\]", line2):
+                    break
+                try:
+                    if (line2.split()[0] != ";"):
+                        topology_content_pairs += "    " + line2
+                    else:
+                        topology_content_pairs += line2
+                except IndexError:
+                    pass
+
+        # =======================   angles content   ==============================
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+            for line2 in topology_bak_file:
+                if line2.strip() == '[ angles ]':
+                    topology_content_angles += line2
+                    break
+
+            for line2 in topology_bak_file:
+                if re.search(r"\[(\s\w+\s)\]", line2):
+                    break
+                try:
+                    if (line2.split()[0] != ";"):
+                        topology_content_angles += "    " + line2
+                    else:
+                        topology_content_angles += line2
+                except IndexError:
+                    pass
+
+        # ======================   dihedrals content   ========================
+        # --- commented on 23-07-2019 to implement new code dihedrals multiple sections
+        # with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name +"/"+command_tool+"/"+mutation_dir_mmpbsa+"/MMPBSA/"+ "topol.top", "r+") as topology_bak_file:
+        #     for line2 in topology_bak_file:
+        #         if line2.strip() == '[ dihedrals ]':
+        #             topology_content_dihedrals += line2
+        #             break
+        #
+        #     for line2 in topology_bak_file:
+        #         if line2.strip() == "\n":
+        #             break
+        #         try:
+        #             if (line2.split()[0] != ";"):
+        #                 topology_content_dihedrals += "    " + line2
+        #             else:
+        #                 topology_content_dihedrals += line2
+        #         except IndexError:
+        #             pass
+        # ======================   dihedrals content for multiple   ========================
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+            for line2 in topology_bak_file:
+                if line2.strip() == '[ dihedrals ]':
+                    dihedrals_count += 1
+        if dihedrals_count > 1:
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+ "complex.itp", "w") as new_topology_file:
-                new_topology_file.write(topology_initial_content + "\n" +
-                                        topology_content_atoms + topology_file_atoms_content + "\n" +
-                                        topology_content_bonds + topology_file_bonds_content + "\n" +
-                                        topology_content_pairs + topology_file_pairs_content + "\n" +
-                                        topology_content_angles + topology_file_angles_content + "\n" +
-                                        topology_content_dihedrals + topology_file_dihedrals_content + "\n" + topology_content_dihedrals_filtered)
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
 
-            atoms_final_count = atoms_lastcount
+                # ---------------- commented on 02-08-2019 to fix multiple dihedrals bug
+                # for line2 in topology_bak_file:
+                #     if line2.strip() == '[ dihedrals ]':
+                #         topology_content_dihedrals += line2
+                #         break
+                # for line2 in topology_bak_file:
+                #     if line2.strip() == "\n":
+                #         break
+                #     try:
+                #         if (line2.split()[0].isdigit()):
+                #             topology_content_dihedrals += "    " + line2
+                #     except IndexError:
+                #         pass
+                for line2 in topology_bak_file:
+                    if line2.strip() == '[ dihedrals ]':
+                        topology_content_dihedrals += line2
+                        dihedrals_list.append(line2.replace(" ", ""))
+                        break
+
+                for line2 in topology_bak_file:
+                    if re.search(r"\[(\s\w+\s)\]", line2):
+                        break
+                    try:
+                        if (line2.split()[0] != ";"):
+                            topology_content_dihedrals += "    " + line2
+                            dihedrals_list.append(line2.replace(" ", ""))
+                        else:
+                            topology_content_dihedrals += line2
+                            dihedrals_list.append(line2.replace(" ", ""))
+                    except IndexError:
+                        pass
+
             with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
-                            config.PATH_CONFIG['mmpbsa_project_path']+"new_" +ligand_inputvalue.split("_")[0]+".itp", "w") as new_itp_file:
-                new_itp_file.write(initial_text_content)
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                # =================    for second '[ dihedral ]' section    ===================================
+                for line22 in topology_bak_file:
+                    if line22.strip() == '[ dihedrals ]':
+                        if line22.replace(" ", "") in dihedrals_list:
+                            topology_content_dihedrals2 += line22
+                            break
+
+                for line22 in topology_bak_file:
+                    if line22.strip() in ['\n', '\r\n']:
+                        if line22.replace(" ", "") not in dihedrals_list:
+                            break
+                    try:
+                        if line22.replace(" ", "") not in dihedrals_list:
+                            if (line22.split()[0].isdigit()):
+                                topology_content_dihedrals2 += "    " + line22
+
+                        else:
+                            if line22.replace(" ", "") not in dihedrals_list:
+                                if (line22.split()[0].isdigit()):
+                                    topology_content_dihedrals2 += line22
+
+                    except IndexError:
+                        pass
+
+        else:
+            with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                      config.PATH_CONFIG['mmpbsa_project_path'] + "topol.top", "r+") as topology_bak_file:
+                # =================    for second '[ dihedral ]' section    ===================================
+                for line22 in topology_bak_file:
+                    if line22.strip() == '[ dihedrals ]':
+                        if line22.replace(" ", "") in dihedrals_list:
+                            topology_content_dihedrals2 += line22
+                            break
+
+                for line22 in topology_bak_file:
+                    if line22.strip() in ['\n', '\r\n']:
+                        if line22.replace(" ", "") not in dihedrals_list:
+                            break
+                    try:
+                        if line22.replace(" ", "") not in dihedrals_list:
+                            if (line22.split()[0].isdigit()):
+                                topology_content_dihedrals2 += "    " + line22
+
+                        else:
+                            if line22.replace(" ", "") not in dihedrals_list:
+                                if (line22.split()[0].isdigit()):
+                                    topology_content_dihedrals2 += line22
+
+                    except IndexError:
+                        pass
+
+        topology_content_dihedrals_filtered = '\n'.join(topology_content_dihedrals2.split('\n')[:-2])
+        print("adding topology file contents are")
+        # print topology_initial_content + "\n" + topology_content_atoms + topology_file_atoms_content + "\n"
+        with open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "complex.itp", "w") as new_topology_file:
+            new_topology_file.write(topology_initial_content + "\n" +
+                                    topology_content_atoms + topology_file_atoms_content + "\n" +
+                                    topology_content_bonds + topology_file_bonds_content + "\n" +
+                                    topology_content_pairs + topology_file_pairs_content + "\n" +
+                                    topology_content_angles + topology_file_angles_content + "\n" +
+                                    topology_content_dihedrals + topology_file_dihedrals_content + "\n" + topology_content_dihedrals_filtered)
+
+        atoms_final_count = atoms_lastcount
+        
+
 
     #--------------------   update INPUT.dat file ---------------------------------
 
