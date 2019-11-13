@@ -4363,8 +4363,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 os.chdir(source_file_path + '/md_run' + str(i + 1))
                 print(os.getcwd())
                 print('queuing **********************************************************************************')
-                print('sbatch ',+ dest_file_path +'simulation.sh')
-                os.system('sbatch ',+ dest_file_path +'simulation.sh')
+                print('sbatch ',+ dest_file_path +'/'+'simulation.sh')
+                os.system('sbatch ',+ dest_file_path +'/'+'simulation.sh')
                 print('queued')
             elif slurm_value == "No":
                 print('slurm value selected is no')
