@@ -4244,6 +4244,8 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
                 new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
             elif 'QZJOBNAME' in line:
                 new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path + simulation_script_file_name):
@@ -4352,7 +4354,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 print('slurm value selected is yes')
                 initial_string = 'QZW'
                 module_name = 'CatMec'
-                job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_' + str(md_run_no_of_conformation)
+                job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
                 print('after generate_slurm_script ************************************************************************')
                 print('before changing directory')
