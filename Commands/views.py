@@ -3974,6 +3974,40 @@ def replace_temp_and_nsteps_in_mdp_file(file_path,  temp_value, nsteps_value):
         return False
 
 
+@csrf_exempt
+def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
+    print('inside generate_slurm_script function')
+    new_shell_script_lines = ''
+    pre_simulation_script_file_name = 'pre_simulation.sh'
+    simulation_script_file_name = 'simulation.sh'
+
+    with open(file_path + pre_simulation_script_file_name,'r') as source_file:
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path + simulation_script_file_name):
+        os.remove(file_path + simulation_script_file_name)
+    with open(file_path + simulation_script_file_name,'w+')as new_bash_script:
+        new_bash_script.write(new_shell_script_lines)
+        new_bash_script.write('\n')
+        new_bash_script.write('gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10')
+        new_bash_script.write('\n')
+        new_bash_script.write("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
+        new_bash_script.write('\n')
+        new_bash_script.write('gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10')
+        new_bash_script.write('\n')
+        new_bash_script.write("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+        new_bash_script.write('\n')
+        new_bash_script.write("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+        new_bash_script.write('\n')
+        new_bash_script.write("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+        new_bash_script.write('\n')
+
 
 @csrf_exempt
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
@@ -4009,6 +4043,21 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
     nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
 
+    slurm_key = "md_simulation_slurm_selection_value"
+    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=slurm_key).latest(
+        'entry_time')
+
+    slurm_value = slurm_ProjectToolEssentials_res.values
+
+
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
@@ -4016,6 +4065,9 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
+
+    print('server_value,slurm_value --------------------------------------------')
+    print(server_value,'\n', slurm_value)
     function_returned_value = replace_temp_and_nsteps_in_mdp_file(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + config.PATH_CONFIG['md_simulations_path'], temp_value, nsteps_value)
     if function_returned_value:
         print('replace mdp file function returned true')
@@ -4035,65 +4087,71 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 except Exception:
                     print("Unexpected error:", sys.exc_info())
                     pass
-
-            print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-            print("start grompp 33333333333333  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-
-
-            print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
-            print("start mdrun 2222222222222  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
+            if slurm_value == "yes":
+                initial_string = 'QZW'
+                module_name = 'CatMec'
+                job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_' + str(md_run_no_of_conformation)
+                generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+                os.system('sbatch ',+ dest_file_path +'simulation.sh')
+            elif slurm_value == "No":
+                print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
+                print("start grompp 33333333333333  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
 
 
-            print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
-            print("start grompp 44444444444  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+                print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
+                print("start mdrun 2222222222222  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
 
 
-            print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
-            print("start mdrun 333333333333  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+                print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+                print("start grompp 44444444444  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
 
 
-            print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
-            print("start grompp 5555555555  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+                print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+                print("start mdrun 333333333333  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
 
 
-            print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
-            print("start mdrun 4444444444444  ==========================================")
-            print('before change directory')
-            print(os.getcwd())
-            os.chdir(source_file_path + '/md_run' + str(i + 1))
-            print('after change directory')
-            print(os.getcwd())
-            os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+                print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+                print("start grompp 5555555555  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+
+
+                print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+                print("start mdrun 4444444444444  ==========================================")
+                print('before change directory')
+                print(os.getcwd())
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print('after change directory')
+                print(os.getcwd())
+                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
 
         return JsonResponse({'success': True})
     else:
