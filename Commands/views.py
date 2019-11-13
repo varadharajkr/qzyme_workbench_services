@@ -4332,6 +4332,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 print (source_file_path + 'md_run' + str(i + 1))
                 os.mkdir(source_file_path + 'md_run' + str(i + 1))
             dest_file_path = source_file_path + 'md_run' + str(i + 1)
+            # copying MD Simulation files in to md_run(1/2/3...) folder
             for file_name in os.listdir(source_file_path):
                 try:
                     print("inside try")
@@ -4347,6 +4348,11 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 module_name = 'CatMec'
                 job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+                print('before changing directory')
+                print(os.getcwd())
+                print('after changing directory')
+                os.chdir(source_file_path + '/md_run' + str(i + 1))
+                print(os.getcwd())
                 os.system('sbatch ',+ dest_file_path +'simulation.sh')
             elif slurm_value == "No":
                 print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
