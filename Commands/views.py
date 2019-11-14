@@ -4787,7 +4787,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
         print('removing ',file_path + simulation_script_file_name)
         os.remove(file_path + simulation_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-    with open(file_path +'/'+ simulation_script_file_name,'wb+')as new_bash_script:
+    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines,'\n')
         new_bash_script.write('gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10','\n')
