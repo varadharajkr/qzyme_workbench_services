@@ -4354,23 +4354,22 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 # generating slurm batch script
                 with open(dest_file_path+'/simulation.sh', 'w+') as slurm_bash_script:
                     slurm_bash_script.write('''\
-                #!/bin/bash
-                #SBATCH --partition=$1     ### Partition
-                #SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
-                #SBATCH --time=100:00:00     ### WallTime
-                #SBATCH --nodes=1            ### Number of Nodes
-                #SBATCH --ntasks-per-node=1 ### Number of tasks (MPI processes)
-                #SBATCH --cpus-per-task=$3
+#!/bin/bash
+#SBATCH --partition=$1     ### Partition
+#SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
+#SBATCH --time=100:00:00     ### WallTime
+#SBATCH --nodes=1            ### Number of Nodes
+#SBATCH --ntasks-per-node=1 ### Number of tasks (MPI processes)
+#SBATCH --cpus-per-task=$3
 
-                module load gromacs/2019.2
+module load gromacs/2019.2
 
-                gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10
-                gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt $3
-                gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10
-                gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt $3
-                gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10
-                gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt $3
-                ''')
+gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10
+gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt $3
+gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10
+gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt $3
+gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10
+gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt $3''')
                 print('after generate_slurm_script ************************************************************************')
                 print('before changing directory')
                 print(os.getcwd())
