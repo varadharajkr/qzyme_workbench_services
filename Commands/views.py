@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import datetime
 import sys
+import commands
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -4768,7 +4769,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
     print('inside generate_slurm_script function')
     new_shell_script_lines = ''
     pre_simulation_script_file_name = 'pre_simulation.sh'
-    simulation_script_file_name = 'simulation.sh'
+    simulation_script_file_name = 'simulation_windows_format.sh'
     print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
     with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
         print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
@@ -4883,38 +4884,51 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 initial_string = 'QZW'
                 module_name = 'CatMec'
                 job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
-
+                generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
                 # generating slurm batch script
-                with open(dest_file_path+'/simulation.sh', 'w+') as slurm_bash_script:
-                    slurm_bash_script.write('''\
-#!/bin/bash
-#SBATCH --partition=$1     ### Partition
-#SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
-#SBATCH --time=100:00:00     ### WallTime
-#SBATCH --nodes=1            ### Number of Nodes
-#SBATCH --ntasks-per-node=1 ### Number of tasks (MPI processes)
-#SBATCH --cpus-per-task=$3
-
-module load gromacs/2019.2
-
-gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10
-gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt $3
-gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10
-gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt $3
-gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10
-gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt $3''')
+#                 with open(dest_file_path+'/simulation.sh', 'w+') as slurm_bash_script:
+#                     slurm_bash_script.write('''\
+# #!/bin/bash
+#
+# module load gromacs/2019.2
+#
+# gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10
+# gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt $3
+# gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10
+# gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt $3
+# gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10
+# gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt $3''')
                 print('after generate_slurm_script ************************************************************************')
                 print('before changing directory')
                 print(os.getcwd())
                 print('after changing directory')
                 os.chdir(source_file_path + '/md_run' + str(i + 1))
                 print(os.getcwd())
+                print("Converting from windows to unix format")
+                print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+                os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
                 print('queuing **********************************************************************************')
-                print('sbatch '
-                          + dest_file_path + '/' + 'simulation.sh ' + str(server_value) + ' ' + str(job_name) + ' ' + str(number_of_threads))
-                os.system('sbatch '
-                          + dest_file_path + '/' + 'simulation.sh ' + str(server_value) + ' ' + str(job_name) + ' ' + str(number_of_threads))
+                cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
+                print("Submitting Job1 with command: %s" % cmd)
+                status, jobnum = commands.getstatusoutput(cmd)
+                print("job id is ", jobnum)
+                print("status is ", status)
+                print("job id is ", jobnum)
+                print("status is ", status)
+                print(jobnum.split())
+                lenght_of_split = len(jobnum.split())
+                index_value = lenght_of_split - 1
+                print(jobnum.split()[index_value])
+                job_id = jobnum.split()[index_value]
+                # save job id
+                job_id_key_name = "job_id"
+                entry_time = datetime.now()
+                ProjectToolEssentials_save_job_id = ProjectToolEssentials(tool_title=command_title,
+                                                                                       project_id=project_id,
+                                                                                       key_name=job_id_key_name,
+                                                                                       values=job_id,
+                                                                                       entry_time=entry_time)
+                ProjectToolEssentials_save_job_id.save()
                 print('queued')
             elif slurm_value == "No":
                 print('slurm value selected is no')
