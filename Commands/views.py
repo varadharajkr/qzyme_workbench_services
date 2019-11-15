@@ -4923,12 +4923,16 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 # save job id
                 job_id_key_name = "job_id"
                 entry_time = datetime.now()
-                ProjectToolEssentials_save_job_id = ProjectToolEssentials(tool_title=command_title,
-                                                                                       project_id=project_id,
-                                                                                       key_name=job_id_key_name,
-                                                                                       values=job_id,
-                                                                                       entry_time=entry_time)
-                ProjectToolEssentials_save_job_id.save()
+                try:
+                    ProjectToolEssentials_save_job_id = ProjectToolEssentials(tool_title=command_title,
+                                                                                           project_id=project_id,
+                                                                                           key_name=job_id_key_name,
+                                                                                           values=job_id,
+                                                                                           entry_time=entry_time)
+                    ProjectToolEssentials_save_job_id.save()
+                except Exception as e:
+                    print('exception is ',str(e))
+                    pass
                 print('queued')
             elif slurm_value == "No":
                 print('slurm value selected is no')
