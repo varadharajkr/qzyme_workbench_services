@@ -6255,6 +6255,7 @@ class CatMec(APIView):
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
             print('command_tool_title ----------------------')
             print(command_tool_title)
+            user_id = commandDetails_result.user_id
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -6275,7 +6276,7 @@ class CatMec(APIView):
                 print('md simulation path in md_run is')
                 print(md_simulation_path)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
-                                          commandDetails_result.command_title,md_simulation_path)
+                                          commandDetails_result.command_title,user_id,md_simulation_path)
                 try:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
