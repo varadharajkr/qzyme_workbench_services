@@ -12,7 +12,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import request
 from rest_framework import status
-from .models import runCommands, gromacsSample , serverDetails ,commandDetails,QzwProjectDetails,QzwResearchPapers,ProjectToolEssentials
+from .models import runCommands, gromacsSample, serverDetails, commandDetails, QzwProjectDetails, QzwResearchPapers, \
+    ProjectToolEssentials, QzwSlurmJobDetails
 from .serializers import runCommandSerializer , serverrDetailsSerializer
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -4801,7 +4802,9 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
 
 
 @csrf_exempt
-def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, md_simulation_path=''):
+def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, user_id='', md_simulation_path=''):
+    print("inside md_simulation_preparation function")
+    print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
     print("inside md_simulation_preparation function")
@@ -4924,22 +4927,31 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 job_id_key_name = "job_id"
                 entry_time = datetime.now()
                 try:
-                    ProjectToolEssentials_save_job_id = ProjectToolEssentials(tool_title=command_title,
+                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
                                                                                            project_id=project_id,
-                                                                                           key_name=job_id_key_name,
-                                                                                           values=job_id,
-                                                                                           entry_time=entry_time)
-                    ProjectToolEssentials_save_job_id.save()
+                                                                                           entry_time=entry_time,
+                                                                                           job_id=job_id)
+                    QzwSlurmJobDetails_save_job_id.save()
                 except db.OperationalError as e:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
-                    ProjectToolEssentials_save_job_id = ProjectToolEssentials(tool_title=command_title,
+                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
                                                                                            project_id=project_id,
-                                                                                           key_name=job_id_key_name,
-                                                                                           values=job_id,
-                                                                                           entry_time=entry_time)
-                    ProjectToolEssentials_save_job_id.save()
+                                                                                           entry_time=entry_time,
+                                                                                           job_id=job_id)
+                    QzwSlurmJobDetails_save_job_id.save()
                     print("saved")
+                except Exception as e:
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    print("exception is ",str(e))
+                    pass
+                    '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                           project_id=project_id,
+                                                                                           entry_time=entry_time,
+                                                                                           values=job_id,
+                                                                                           job_id=job_id)
+                    QzwSlurmJobDetails_save_job_id.save()
+                    print("saved")'''
                 print('queued')
             elif slurm_value == "No":
                 print('slurm value selected is no')
@@ -5224,7 +5236,8 @@ class Complex_Simulations(APIView):
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
-
+        user_id = commandDetails_result.user_id
+        print("user_id is ",user_id)
         print('before replacing primary_command_runnable')
         print(primary_command_runnable)
 
@@ -5252,7 +5265,7 @@ class Complex_Simulations(APIView):
             primary_command_runnable = re.sub('%SOL_value%',group_value,
                                               primary_command_runnable)
         if commandDetails_result.command_title == "md_run":
-            returned_preparation_value = md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title)
+            returned_preparation_value = md_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
             # print config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # dir_value = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool +'/'
             # os.system("rm "+dir_value+"/index.ndx")

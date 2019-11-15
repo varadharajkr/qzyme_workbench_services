@@ -82,6 +82,20 @@ class ProjectToolEssentials(models.Model):
     def __str__(self):
         return u'%s %s %s %s %s' % (self.tool_title,self.project_id,self.key_name,self.values,self.entry_time)
 
+
+class QzwSlurmJobDetails(models.Model):
+    user_id = models.IntegerField()
+    project_id = models.IntegerField()
+    entry_time = models.DateTimeField()
+    job_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'qzw_slurm_job_details'
+
+    def __str__(self):
+        return u'%s %s %s %s' % (self.user_id,self.project_id,self.entry_time,self.job_id)
+
 class QzwProjectEssentials(models.Model):
     id = models.AutoField(primary_key=True)
     project_id = models.IntegerField()
