@@ -1365,15 +1365,64 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                   'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + "trial/topol.top"
               )
     # ----------------   END of re-creating topology file   -------------------------
-    os.chdir(config.PATH_CONFIG[
-                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" )
-    os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
-    os.chdir(config.PATH_CONFIG[
-                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/")
-    os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+
+    #changing directory to MMPBSA
     os.chdir(config.PATH_CONFIG[
                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/")
-    os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
+    # --- get server slected by user ----
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+    # -- get the slurm boolean value from DB
+    slurm_key = "md_simulation_slurm_selection_value"
+    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                 key_name=slurm_key).latest(
+        'entry_time')
+
+    slurm_value = slurm_ProjectToolEssentials_res.values
+    if slurm_value == "yes": # queue to slurm
+        initial_string = 'QZW'
+        module_name = 'Hotspot_Mutations_'
+        job_name = initial_string + '_' + str(project_id) + '_' + module_name
+        # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+
+        # generating slurm batch script
+        with open(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh', 'w+') as slurm_bash_script:
+            slurm_bash_script.write('''\
+                        #!/bin/bash
+                        #SBATCH --partition=$1     ### Partition
+                        #SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
+                        #SBATCH --time=100:00:00     ### WallTime
+                        #SBATCH --nodes=1            ### Number of Nodes
+                        #SBATCH --ntasks-per-node=1 ### Number of tasks (MPI processes)
+                        
+                        sh $3
+                        sh $4
+                        sh $5
+                        ''')
+        print('sbatch '
+                  + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh '+ str(
+            server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
+            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three']))
+        os.system('sbatch '
+                  + config.PATH_CONFIG[
+                      'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh ' + str(
+            server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
+            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three']))
+        print('queued')
+    else: # run raw command (without slurm)
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/")
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/")
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
     return JsonResponse({"success": True})
 
 
@@ -6783,7 +6832,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
 
             designer_protonation_matrix = ""
             protonation_ac_list = ["ASP", "GLU", "HIS", "LYS"]
-            #copy protonation files from CatMex module to Designer
+            #copy protonation files from CatMec module to Designer
             for atoms_name in protonation_ac_list:
                 try:
                     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
