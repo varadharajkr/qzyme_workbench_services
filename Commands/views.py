@@ -1386,7 +1386,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     if slurm_value == "yes": # queue to slurm
         initial_string = 'QZW'
         module_name = 'Hotspot_Mutations_'
-        job_name = initial_string + '_' + str(project_id) + '_' + module_name
+        job_name = initial_string + '_' + str(project_name) + '_' + module_name
         # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
         # generating slurm batch script
@@ -4910,7 +4910,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     print(source_file_path)
 
     print('server_value,slurm_value --------------------------------------------')
-    print(server_value,'\n', slurm_value)
+    print(server_value,'\n', server_value)
     function_returned_value = replace_temp_and_nsteps_in_mdp_file(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + config.PATH_CONFIG['md_simulations_path'], temp_value, nsteps_value)
     if function_returned_value:
         print('replace mdp file function returned true')
@@ -4935,7 +4935,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 print('slurm value selected is yes')
                 initial_string = 'QZW'
                 module_name = 'CatMec'
-                job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+                job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
                 # generating slurm batch script
 #                 with open(dest_file_path+'/simulation.sh', 'w+') as slurm_bash_script:
@@ -4979,15 +4979,19 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
                                                                                            project_id=project_id,
                                                                                            entry_time=entry_time,
-                                                                                           job_id=job_id)
+                                                                                           job_id=job_id,
+                                                                                           job_status="1",
+                                                                                           job_title=job_name)
                     QzwSlurmJobDetails_save_job_id.save()
                 except db.OperationalError as e:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           job_id=job_id)
+                                                                        project_id=project_id,
+                                                                        entry_time=entry_time,
+                                                                        job_id=job_id,
+                                                                        job_status="1",
+                                                                        job_title=job_name)
                     QzwSlurmJobDetails_save_job_id.save()
                     print("saved")
                 except Exception as e:
@@ -5848,7 +5852,7 @@ class Loop_Modelling(APIView):
 
 #END OF ACTUALWORKING AUTODOCK
 
-class autodock(APIView):
+class CatmecandAutodock(APIView):
     def get(self,request):
         pass
 
@@ -5858,7 +5862,9 @@ class autodock(APIView):
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
         command_tool_title = commandDetails_result.command_title
-        command_tool = commandDetails_result.command_tool
+        pre_command_tool = commandDetails_result.command_tool
+        length_of_pre_command_tool = len(pre_command_tool.split('&')) - 1
+        command_tool = pre_command_tool.split('&')[length_of_pre_command_tool - 1]
         print("tool before")
         print(command_tool_title)
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
@@ -5879,16 +5885,16 @@ class autodock(APIView):
 
         #rplace string / paths for normal mode analysis
         primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/Tconcoord_no_threading.py',
+            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/Tconcoord_no_threading.py',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_additional_dirpath%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tcc/',
+            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/tcc/',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_input_filepath%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/input3.cpf',
+            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/input3.cpf',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
+            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title,
                                           primary_command_runnable)
 
         print(primary_command_runnable)

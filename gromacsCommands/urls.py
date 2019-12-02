@@ -37,7 +37,7 @@ urlpatterns = [
     url(r'^Complex_Simulations/', views.Complex_Simulations.as_view()),
     url(r'^MakeSubstitution/', views.MakeSubstitution.as_view()),
     url(r'^Literature_Research/', views.Literature_Research.as_view()),
-    url(r'^autodock/',views.autodock.as_view()),
+    url(r'^Catmecandautodock/',views.Catmecandautodock.as_view()),
     url(r'^CatMec/',views.CatMec.as_view()),
     url(r'^Designer/',views.Designer.as_view()),
     url(r'^Hotspot/',views.Hotspot.as_view()),

@@ -88,13 +88,15 @@ class QzwSlurmJobDetails(models.Model):
     project_id = models.IntegerField()
     entry_time = models.DateTimeField()
     job_id = models.IntegerField()
+    job_status = models.CharField(max_length=45, blank=True, null=True)
+    job_title = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'qzw_slurm_job_details'
 
     def __str__(self):
-        return u'%s %s %s %s' % (self.user_id,self.project_id,self.entry_time,self.job_id)
+        return u'%s %s %s %s %s %s' % (self.user_id,self.project_id,self.entry_time,self.job_id,self.job_status,self.job_title)
 
 class QzwProjectEssentials(models.Model):
     id = models.AutoField(primary_key=True)
