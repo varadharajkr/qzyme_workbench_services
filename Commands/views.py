@@ -5861,7 +5861,10 @@ class CatmecandAutodock(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
-        command_tool_title = commandDetails_result.command_title
+        pre_command_title = commandDetails_result.command_title
+        length_of_pre_command_title = len(pre_command_title.split('and')) - 1
+        command_tool_title_string = pre_command_title.split('and')[length_of_pre_command_title]
+        command_tool_title = pre_command_title.split('and')[length_of_pre_command_title-1]
         pre_command_tool = commandDetails_result.command_tool
         length_of_pre_command_tool = len(pre_command_tool.split('&')) - 1
         command_tool = pre_command_tool.split('&')[length_of_pre_command_tool - 1]
@@ -5885,16 +5888,16 @@ class CatmecandAutodock(APIView):
 
         #rplace string / paths for normal mode analysis
         primary_command_runnable = re.sub("%tconcoord_python_filepath%", config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/Tconcoord_no_threading.py',
+            'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/Tconcoord_no_threading.py',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_additional_dirpath%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/tcc/',
+            'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/tcc/',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%tconcoord_input_filepath%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/input3.cpf',
+            'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/input3.cpf',
                                           primary_command_runnable)
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title,
+            'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title,
                                           primary_command_runnable)
 
         print(primary_command_runnable)
@@ -5907,7 +5910,7 @@ class CatmecandAutodock(APIView):
             else
                 change DIR to Autodock
         '''
-        str_command_tool_title = str(command_tool_title)
+        str_command_tool_title = str(command_tool_title_string)
         print(type(str_command_tool_title))
         command_tool_title_split = str_command_tool_title.split('_')
         print("\nsplit is---------------------------------------------------------------------------------")
@@ -5931,8 +5934,8 @@ class CatmecandAutodock(APIView):
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
             elif(command_tool_title_split[0] == "nma"):
                 print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
-                print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
-                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+command_tool_title_split[2]+'/')
+                print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title +'/tconcoord/'+command_tool_title_split[2]+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' +  command_tool_title + '/tconcoord/'+command_tool_title_split[2]+'/')
 
             elif(str(command_tool_title) == "tconcord_dlg"):
                 print('inside command_tool_title is tconcord_dlg ',command_tool_title)
@@ -5943,15 +5946,15 @@ class CatmecandAutodock(APIView):
                 nma_path = nma_enzyme_file[:-4]
                 print(str(nma_path[:-4]))
                 print('\nnma_path ****************************************')
-                print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
-                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/tconcoord/'+nma_path+'/')
+                print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/tconcoord/'+nma_path+'/')
+                os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/tconcoord/'+nma_path+'/')
             else:
                 print('inside else and lenght of split is more than 1')
                 os.chdir(config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+                             'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
         else:
             print('inside else')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
         print("\nworking directory after changing CHDIR")
         print(os.system("pwd"))
 
@@ -5965,8 +5968,8 @@ class CatmecandAutodock(APIView):
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
-        command_title_folder = commandDetails_result.command_title
-        command_tool_title= commandDetails_result.command_tool
+        # command_title_folder = command_tool_title_string
+        # command_tool_title = commandDetails_result.command_tool
         print("\nprinting status ofprocess")
         print(process_return.returncode)
         print("\nprinting output of process")
@@ -5988,7 +5991,7 @@ class CatmecandAutodock(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock status error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                                   'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/' +command_tool_title_string + '.log',
                                'w+')
                 fileobj.write(out)
                 status_id = config.CONSTS['status_error']
@@ -5998,7 +6001,7 @@ class CatmecandAutodock(APIView):
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                                   'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/' + command_tool_title_string + '.log',
                                'w+')
                 fileobj.write(err)
                 status_id = config.CONSTS['status_error']
