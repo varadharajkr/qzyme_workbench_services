@@ -5866,10 +5866,11 @@ class CatmecandAutodock(APIView):
         command_tool_title_string = pre_command_title.split('and')[length_of_pre_command_title]
         command_tool_title = pre_command_title.split('and')[length_of_pre_command_title-1]
         pre_command_tool = commandDetails_result.command_tool
-        length_of_pre_command_tool = len(pre_command_tool.split('&')) - 1
-        command_tool = pre_command_tool.split('&')[length_of_pre_command_tool - 1]
+        length_of_pre_command_tool = len(pre_command_tool.split('and')) - 1
+        command_tool = pre_command_tool.split('and')[length_of_pre_command_tool - 1]
         print("tool before")
         print(command_tool_title)
+        print(command_tool)
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         key_name = 'enzyme_file'
