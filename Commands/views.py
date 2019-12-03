@@ -5932,7 +5932,7 @@ class CatmecandAutodock(APIView):
                 primary_command_runnable = primary_command_runnable + " " + enzyme_file_name
                 print('primary_command_runnable ',primary_command_runnable)
                 os.chdir(config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+                             'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
             elif(command_tool_title_split[0] == "nma"):
                 print('inside command_tool_title_split[0] (zero) is nma ',command_tool_title_split[0])
                 print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title +'/tconcoord/'+command_tool_title_split[2]+'/')
