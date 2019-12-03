@@ -5938,7 +5938,7 @@ class CatmecandAutodock(APIView):
                 print('printing path ',config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title +'/tconcoord/'+command_tool_title_split[2]+'/')
                 os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' +  command_tool_title + '/tconcoord/'+command_tool_title_split[2]+'/')
 
-            elif(str(command_tool_title) == "tconcord_dlg"):
+            elif "tconcord_dlg" in str(command_tool_title):
                 print('inside command_tool_title is tconcord_dlg ',command_tool_title)
                 enzyme_file_key = 'autodock_nma_final_protein_conformation'
                 ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
