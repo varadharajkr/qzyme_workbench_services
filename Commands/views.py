@@ -5951,10 +5951,13 @@ class CatmecandAutodock(APIView):
                 os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/tconcoord/'+nma_path+'/')
             else:
                 print('inside else and lenght of split is more than 1')
+                print(config.PATH_CONFIG[
+                             'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
         else:
             print('inside else')
+            print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
         print("\nworking directory after changing CHDIR")
         print(os.system("pwd"))
