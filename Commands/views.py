@@ -4692,10 +4692,10 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     print('after change directory')
     print(os.getcwd())
     print("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-    print("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr -maxwarn 2")
+    print("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -r newbox.gro -o vac_em.tpr -maxwarn 2")
     print("gmx mdrun -v -s vac_em.tpr -o vac_em.trr -cpo vac_em.cpt -c vac_em.gro -e vac_em.edr -g vac_em.log -deffnm vac_em -nt " + str(number_of_threads))
     os.system("gmx editconf -f complex_out.gro -o  newbox.gro -bt cubic -d 1.2")
-    os.system("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -o vac_em.tpr -maxwarn 2")
+    os.system("gmx grompp -f vac_em.mdp -po mdout.mdp -c newbox.gro -p topol.top -r newbox.gro -o vac_em.tpr -maxwarn 2")
     os.system("gmx mdrun -v -s vac_em.tpr -o vac_em.trr -cpo vac_em.cpt -c vac_em.gro -e vac_em.edr -g vac_em.log -deffnm vac_em -nt " + str(number_of_threads))
 
     print("gmx solvate -cp vac_em.gro -cs spc216.gro -p topol.top -o solve.gro")
@@ -4721,7 +4721,7 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     os.chdir(source_file_path)
     print('after change directory')
     print(os.getcwd())
-    os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr -maxwarn 2")
+    os.system("gmx grompp -f ions.mdp -po mdout.mdp -c solve.gro -p topol.top -o ions.tpr")
 
     group_value = sol_group_option()
     SOL_replace_backup = "echo %SOL_value% | gmx genion -s ions.tpr -o solve_ions.gro -p topol.top -neutral"
