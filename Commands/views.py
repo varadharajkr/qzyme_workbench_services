@@ -583,6 +583,78 @@ class analyse_mmpbsa(APIView):
 
 
 
+# execute Designer MMPBSA with job Scheduler
+def designer_slurm_queue_analyse_mmpbsa(inp_command_id, md_mutation_folder, project_name, command_tool, project_id,user_id,slurm_job_id):
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis")
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA/")
+    #copy python processing file for mmpbsa
+
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_mmpbsa__slurm_pre_processing.py',config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_mmpbsa__slurm_pre_processing.py")
+    shutil.copyfile(config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_mmpbsa__slurm_pre_processing.py", config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA/designer_mmpbsa__slurm_pre_processing.py")
+    # Designer MMPBSA with SLURM
+    # =======   get assigned server for project ============
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+    initial_string = 'QZW'
+    module_name = 'Designer_mmpbsa_preperation_'
+    job_name = initial_string + '_' + str(
+        project_id) + '_' + project_name + '_' + 'mutation_' + md_mutation_folder + '_' + module_name
+    dest_file_path =config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + "/" + command_tool
+    number_of_threads =1
+    generate_designer_slurm_script(dest_file_path, server_value, job_name, number_of_threads,inp_command_id,md_mutation_folder,project_name,command_tool,project_id,user_id)
+
+    #basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    #windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+
+    print("Converting from windows to unix format")
+    os.system("perl -p -e 's/\r$//' < "+config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/"+"basic_sbatch_script_windows_format.sh > "+config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA/"+"designer_sbatch.sh")
+    print('queuing **********************************************************************************')
+
+    cmd = "sbatch --dependency=afterok:"+slurm_job_id+" " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/MMPBSA" + "/" + "designer_sbatch.sh"
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in except of MMPBSA SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    return job_id
 
 #new code for Designer MMPBSA
 def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
@@ -4156,6 +4228,84 @@ class pathanalysis(APIView):
                     # run Path analysis last executed command(executed in CatMec module)
                     os.system(commandDetails_result.primary_command)
 
+#designer path analysis for SLURM
+def designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id,
+                                             user_id,inp_command_id,contact_score_job_id):
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/')
+
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_pathanalysis__slurm_pre_processing.py.py',
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py")
+    shutil.copyfile(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py",
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/designer_pathanalysis__slurm_pre_processing.py.py")
+    # =======   get assigned server for project ============
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+    initial_string = 'QZW'
+    module_name = 'Designer_path_analysis'
+    job_name = initial_string + '_' + str(
+        project_id) + '_' + project_name + '_' + 'mutation_' + md_mutation_folder + '_' + module_name
+    dest_file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/" + command_tool
+    number_of_threads = 4
+    generate_designer_path_analysis_slurm_script(dest_file_path, server_value, job_name, number_of_threads,
+                                                 inp_command_id,
+                                                 md_mutation_folder, project_name, command_tool, project_id, user_id)
+
+    # basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    # windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+
+    print("Converting from windows to unix format")
+    os.system("perl -p -e 's/\r$//' < " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + "basic_sbatch_script_windows_format.sh > " +
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/" + "path_analysis_sbatch.sh")
+    print('queuing **********************************************************************************')
+
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/")
+    cmd = "sbatch --dependency=afterok:" + contact_score_job_id + " " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/" + "path_analysis_sbatch.sh"
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in except of contact score SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    return job_id
+
+
+
 #designer queue  path analysis
 def designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     primary_run_command = ""
@@ -4364,6 +4514,92 @@ class mmpbsa(APIView):
             update_command_status(inp_command_id,status_id)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
+
+def designer_slurm_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id,mmpbsa_job_id,inp_command_id):
+    #create directory
+    os.system("mkdir " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    # copy python processing file for contact_score
+
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_contactscore__slurm_pre_processing.py',
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_contactscore__slurm_pre_processing.py")
+    shutil.copyfile(config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_contactscore__slurm_pre_processing.py",
+                    config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/designer_contactscore__slurm_pre_processing.py")
+
+    #------- get number of threads input for contact score -----------
+    command_tootl_title = 'Contact_Score'
+    ProjectToolEssentials_res_catmec_contact_score = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
+                                                   key_name='catmec_contact_score').latest('entry_time')
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
+        if inputkey == 'no_of_threads':
+            number_of_threads = inputvalue
+    #------- end of get number of threads input for contact score --------
+    # =======   get assigned server for project ============
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+    initial_string = 'QZW'
+    module_name = 'Designer_contact_score'
+    job_name = initial_string + '_' + str(
+        project_id) + '_' + project_name + '_' + 'mutation_' + md_mutation_folder + '_' + module_name
+    dest_file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + "/" + command_tool
+
+    generate_designer_contact_score_slurm_script(dest_file_path, server_value, job_name, number_of_threads, inp_command_id,
+                                   md_mutation_folder, project_name, command_tool, project_id, user_id)
+
+    # basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    # windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+
+    print("Converting from windows to unix format")
+    os.system("perl -p -e 's/\r$//' < " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + "basic_sbatch_script_windows_format.sh > " +
+              config.PATH_CONFIG[
+                  'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/" + "contact_score_sbatch.sh")
+    print('queuing **********************************************************************************')
+
+    os.chdir(config.PATH_CONFIG[
+                 'local_shared_folder_path'] + project_name + '/' + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/")
+    cmd = "sbatch --dependency=afterok:" + mmpbsa_job_id + " " + config.PATH_CONFIG[
+        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Contact_score/" + "contact_score_sbatch.sh"
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in except of contact score SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    return job_id
 
 def designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
     entry_time = datetime.now()
@@ -4851,6 +5087,100 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
 
 
 @csrf_exempt
+def generate_designer_slurm_script(file_path, server_name, job_name, number_of_threads,inp_command_id,md_mutation_folder,project_name,command_tool,project_id,user_id):
+    print('inside generate_slurm_script function')
+    new_shell_script_lines = ''
+    basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+    print('before opening ',file_path +'/'+ basic_sbatch_script_file_name)
+    with open(file_path +'/'+ basic_sbatch_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ basic_sbatch_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ windows_format_script_file_name):
+        print('removing ',file_path + windows_format_script_file_name)
+        os.remove(file_path + windows_format_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ windows_format_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write("python designer_mmpbsa__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+    print('outside the loop')
+    return True
+
+def generate_designer_contact_score_slurm_script(file_path, server_name, job_name, number_of_threads,inp_command_id,md_mutation_folder,project_name,command_tool,project_id,user_id):
+    print('inside generate_slurm_script function')
+    new_shell_script_lines = ''
+    basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+    print('before opening ',file_path +'/'+ basic_sbatch_script_file_name)
+    with open(file_path +'/'+ basic_sbatch_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ basic_sbatch_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ windows_format_script_file_name):
+        print('removing ',file_path + windows_format_script_file_name)
+        os.remove(file_path + windows_format_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ windows_format_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write("python designer_contactscore__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+    print('outside the loop')
+    return True
+
+
+
+def generate_designer_path_analysis_slurm_script(file_path, server_name, job_name, number_of_threads,inp_command_id,md_mutation_folder,project_name,command_tool,project_id,user_id):
+    print('inside generate_slurm_script function')
+    new_shell_script_lines = ''
+    basic_sbatch_script_file_name = 'basic_sbatch_script.sh'
+    windows_format_script_file_name = 'basic_sbatch_script_windows_format.sh'
+    print('before opening ',file_path +'/'+ basic_sbatch_script_file_name)
+    with open(file_path +'/'+ basic_sbatch_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ basic_sbatch_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ windows_format_script_file_name):
+        print('removing ',file_path + windows_format_script_file_name)
+        os.remove(file_path + windows_format_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ windows_format_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write("python designer_pathanalysis__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+    print('outside the loop')
+    return True
+
+
+
+
+
+@csrf_exempt
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, user_id='', md_simulation_path=''):
     print("inside md_simulation_preparation function")
     print("user id is ",user_id)
@@ -4937,19 +5267,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 module_name = 'CatMec'
                 job_name = initial_string + '_' + str(project_id) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
-                # generating slurm batch script
-#                 with open(dest_file_path+'/simulation.sh', 'w+') as slurm_bash_script:
-#                     slurm_bash_script.write('''\
-# #!/bin/bash
-#
-# module load gromacs/2019.2
-#
-# gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10
-# gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt $3
-# gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10
-# gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt $3
-# gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10
-# gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt $3''')
+
                 print('after generate_slurm_script ************************************************************************')
                 print('before changing directory')
                 print(os.getcwd())
@@ -5071,6 +5389,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
 
 def execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id):
+    job_id =""
     db.close_old_connections()
     print("in execute_md_simulation definition")
     key_name = 'md_simulation_no_of_runs'
@@ -5101,6 +5420,42 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
     source_file_path2 = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/" + command_tool + "/" + str(
         md_mutation_folder)
     md_simulation_minimization(project_name,command_tool,number_of_threads,md_mutation_folder,designer_module=True)
+
+    # =======   get slurm key from  database   ===========
+    slurm_key = "md_simulation_slurm_selection_value"
+    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                 key_name=slurm_key).latest(
+        'entry_time')
+
+    slurm_value = slurm_ProjectToolEssentials_res.values
+
+    #=======   get assigned server for project ============
+    server_key = "md_simulation_server_selection_value"
+    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=server_key).latest(
+        'entry_time')
+
+    server_value = server_ProjectToolEssentials_res.values
+
+    # ======= get temperature and MD simulation runs from DB ========
+    temp_key = "preliminary_temp_value"
+    temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                key_name=temp_key).latest(
+        'entry_time')
+
+    temp_value = float(temp_ProjectToolEssentials_res.values)
+
+    nsteps_key = "md_simulation_nsteps_value"
+    nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                  key_name=nsteps_key).latest(
+        'entry_time')
+
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+
+    # substitutung config values in MD simulations MDP files
+    function_returned_value = replace_temp_and_nsteps_in_mdp_file(
+        config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + config.PATH_CONFIG['md_simulations_path'],
+        temp_value, nsteps_value)
     for i in range(int(md_run_no_of_conformation)):
         file_outpu_md = open("test_output_md_"+'md_run' + str(i + 1)+".txt", "w+")
         print (source_file_path + 'md_run' + str(i + 1))
@@ -5116,55 +5471,106 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             except Exception:
                 print("Unexpected error:", sys.exc_info())
                 pass
-        print("in md_run loooppppp")
-        print(source_file_path + '/md_run' + str(i + 1))
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
+        # if user has selected Slurm job scheduler
+        if slurm_value == "yes":
+            print('slurm value selected is yes')
+            initial_string = 'QZW'
+            module_name = 'Designer'
+            job_name = initial_string + '_' + str(project_id) + '_' +project_name+'_'+'mutation_'+md_mutation_folder+'_'+module_name + '_r' + str(
+                md_run_no_of_conformation)
+            generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+            print(
+                'after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch " + dest_file_path + "/" + "simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print(
+                    "<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+        else:
+            print("in md_run loooppppp")
+            print(source_file_path + '/md_run' + str(i + 1))
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
 
-        print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 33333333333333  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
+            print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 33333333333333  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
 
-        print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
-        print("start mdrun 2222222222222  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt 18")
+            print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt")
+            print("start mdrun 2222222222222  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt 18")
 
-        print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 44444444444  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+            print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 44444444444  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
 
-        print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
-        print("start mdrun 333333333333  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+            print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
+            print("start mdrun 333333333333  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
 
-        print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
-        print("start grompp 5555555555  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+            print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
+            print("start grompp 5555555555  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
 
-        print(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
-        print("start mdrun 4444444444444  ==========================================")
-        print(os.getcwd())
-        os.chdir(source_file_path + '/md_run' + str(i + 1))
-        print(os.getcwd())
-        os.system(
-            "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+            print(
+                "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1")
+            print("start mdrun 4444444444444  ==========================================")
+            print(os.getcwd())
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            os.system(
+                "gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
 
-    return JsonResponse({'success': True})
+    return job_id
 
 
 #Run MD Simulations for Hotspot module
@@ -6959,7 +7365,8 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             '''
 
             md_mutation_folder = line.strip()
-            execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            # get slurm job ID to create dependency for upcoming jobs
+            slurm_job_id = execute_md_simulation(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE MMPBSA
             '''
@@ -6970,7 +7377,21 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              |_| \_\\__,_|_| |_| |_|  |_|_|  |_|_|   |____/____/_/   \_\
             
             '''
-            designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            #check if user has selected slurm as job scheduler
+            # =======   get slurm key from  database   ===========
+            slurm_key = "md_simulation_slurm_selection_value"
+            slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                         key_name=slurm_key).latest(
+                'entry_time')
+
+            slurm_value = slurm_ProjectToolEssentials_res.values
+            if slurm_value == "yes":
+                #get command ID for input parameter
+                inp_command_id = request.POST.get("command_id")
+                mmpbsa_job_id = designer_slurm_queue_analyse_mmpbsa(inp_command_id, md_mutation_folder, project_name, command_tool, project_id,
+                                              user_id,slurm_job_id)
+            else:
+                designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE CONTACT SCORE
             '''
@@ -6980,7 +7401,12 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              | |__| (_) | | | | || (_| | (__| |_   ___) | (_| (_) | | |  __/
               \____\___/|_| |_|\__\__,_|\___|\__| |____/ \___\___/|_|  \___|
             '''
-            designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            if slurm_value == "yes":
+                # get command ID for input parameter
+                inp_command_id = request.POST.get("command_id")
+                contact_score_job_id = designer_slurm_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id,mmpbsa_job_id,inp_command_id)
+            else:
+                designer_queue_contact_score(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
 
             #EXECUTE PATH ANALYSIS
             '''
@@ -6990,7 +7416,13 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
              |  __/ ___ \| | |  _  |  / ___ \| |\  |/ ___ \| |___| |  ___) | | ___) |
              |_| /_/   \_\_| |_| |_| /_/   \_\_| \_/_/   \_\_____|_| |____/___|____/ 
             '''
-            designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
+            if slurm_value == "yes":
+                # get command ID for input parameter
+                inp_command_id = request.POST.get("command_id")
+                designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id,
+                                             user_id,inp_command_id,contact_score_job_id)
+            else:
+                designer_queue_path_analysis(request, md_mutation_folder, project_name, command_tool, project_id, user_id)
             #counter for next mutant folder
             variant_index_count +=1
     return JsonResponse({'success': True})
