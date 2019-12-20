@@ -4686,7 +4686,7 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
         source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
     os.chdir(source_file_path)
     print("start editconf==========================================")
-    print('before change directory')
+    print('before change directory is ')
     print(os.getcwd())
     os.chdir(source_file_path)
     print('after change directory')
