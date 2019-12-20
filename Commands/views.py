@@ -1455,9 +1455,16 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         'entry_time')
 
     slurm_value = slurm_ProjectToolEssentials_res.values
+    # =======================  get user input threads  ============================
+    key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+    ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+        ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                   key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    # ======================= End of get user input threads  ======================
     if slurm_value == "yes": # queue to slurm
         initial_string = 'QZW'
-        module_name = 'Hotspot_Mutations_'
+        module_name = 'Hotspot_Mutations_mmpbsa'
         job_name = initial_string + '_' + str(project_id) + '_' + module_name
         # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
@@ -1470,17 +1477,20 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                         #SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
                         #SBATCH --time=100:00:00     ### WallTime
                         #SBATCH --nodes=1            ### Number of Nodes
-                        #SBATCH --ntasks-per-node=1 ### Number of tasks (MPI processes)
+                        #SBATCH --ntasks-per-node=$6 ### Number of tasks (MPI processes)
                         
+                        rsync -avz $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID
+                        cd /scratch/$SLURM_JOB_ID
                         sh $3
                         sh $4
                         sh $5
+                        rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/
                         ''')
         print('sbatch '
                   + config.PATH_CONFIG[
                       'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh '+ str(
             server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
-            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three']))
+            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three'])+ ' '+str(catmec_mmpbsa_threads_input))
         os.system('sbatch '
                   + config.PATH_CONFIG[
                       'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh ' + str(
@@ -5082,6 +5092,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
         new_bash_script.write("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads)+"\n")
         new_bash_script.write("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10 \n")
         new_bash_script.write("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads) + "\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5112,7 +5123,8 @@ def generate_designer_slurm_script(file_path, server_name, job_name, number_of_t
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("python designer_mmpbsa__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+        new_bash_script.write("python designer_mmpbsa__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5141,7 +5153,8 @@ def generate_designer_contact_score_slurm_script(file_path, server_name, job_nam
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("python designer_contactscore__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+        new_bash_script.write("python designer_contactscore__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5172,7 +5185,8 @@ def generate_designer_path_analysis_slurm_script(file_path, server_name, job_nam
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("python designer_pathanalysis__slurm_pre_processing.py \n"+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id))
+        new_bash_script.write("python designer_pathanalysis__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
