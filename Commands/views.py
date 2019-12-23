@@ -7318,7 +7318,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                           ) as matrix_file_ptr:
                     matrix_file_lines = matrix_file_ptr.readlines()
                     for matrix_file_line in matrix_file_lines:
-                        input_file_ptr.write(matrix_file_line.split()[5] + '\n')
+                        input_file_ptr.write(matrix_file_line.split()[-1] + '\n')
 
             #get python script for make_compex execution
             shutil.copyfile(config.PATH_CONFIG['shared_scripts'] +'CatMec/MD_Simulation/' +"make_complex.py",
@@ -7592,7 +7592,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                           ) as matrix_file_ptr:
                                     matrix_file_lines = matrix_file_ptr.readlines()
                                     for matrix_file_line in matrix_file_lines:
-                                        input_file_ptr.write(matrix_file_line.split()[5] + '\n')
+                                        input_file_ptr.write(matrix_file_line.split()[-1] + '\n')
 
                             # get python script for make_compex execution
                             shutil.copyfile(
