@@ -4787,7 +4787,7 @@ class Contact_Score(APIView):
                         'md_simulations_path'] + md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n " +
                     config.PATH_CONFIG[
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                        'mmpbsa_project_path'] + "index.ndx < gmx_trajconv_input.txt")
+                        'mmpbsa_project_path'] + "trial/index.ndx < gmx_trajconv_input.txt")
 
                 '''os.system(
                     "gmx trjconv -f merged_center.xtc -s " +
