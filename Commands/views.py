@@ -4805,7 +4805,7 @@ class Contact_Score(APIView):
                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool + "/frames_.pdb -split 0 -sep -n " +
                     config.PATH_CONFIG[
                         'local_shared_folder_path'] + project_name + '/CatMec/' + config.PATH_CONFIG[
-                        'mmpbsa_project_path'] + "index.ndx ")
+                        'mmpbsa_project_path'] + "trial/index.ndx ")
             else: # primary_command_runnable.split()[3].strip() == "S":
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool)
