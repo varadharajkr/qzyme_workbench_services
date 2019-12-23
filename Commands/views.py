@@ -7622,7 +7622,8 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             # replace protien file in make_complex_params
                             make_complex_params_replaced = re.sub(r'(\w+)(\.pdb)', variants_dir.strip(),
                                                                   make_complex_params)
-
+                            print("make_complex_params_replaced")
+                            print(make_complex_params_replaced)
                             # copy ligand .GRO files and .ITP files from CatMec module
                             ligands_key_name = 'substrate_input'
                             ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(
