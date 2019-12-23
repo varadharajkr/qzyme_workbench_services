@@ -7679,7 +7679,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                             print("command is ----------------")
                             print(make_complex_params_replaced)
                             os.system("python3 make_complex.py "+make_complex_params_replaced)
-
+                            exit()
                             '''
                               ____                __  __ ____    ____  _                 _       _   _                 
                              |  _ \ _   _ _ __   |  \/  |  _ \  / ___|(_)_ __ ___  _   _| | __ _| |_(_) ___  _ __  ___ 
