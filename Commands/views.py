@@ -1080,6 +1080,43 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
     return JsonResponse({"success": True})
 
+
+@csrf_exempt
+def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_threads):
+    print('inside generate_hotspot_slurm_script function')
+    new_shell_script_lines = ''
+    pre_simulation_script_file_name = 'pre_simulation.sh'
+    simulation_script_file_name = 'simulation_windows_format.sh'
+    print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
+    with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ simulation_script_file_name):
+        print('removing ',file_path + simulation_script_file_name)
+        os.remove(file_path + simulation_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ simulation_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write("rsync - avz $SLURM_SUBMIT_DIR / * / scratch /$SLURM_JOB_ID\n")
+        new_bash_script.write("cd / scratch /$SLURM_JOB_ID\n")
+        new_bash_script.write("sh $3\n")
+        new_bash_script.write("sh $4\n")
+        new_bash_script.write("sh $5\n")
+        new_bash_script.write("rsync - avz / scratch /$SLURM_JOB_ID / * $SLURM_SUBMIT_DIR /")
+    print('outside the loop')
+    return True
+
+
 def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_tool,project_id, user_id):
     #MMPBSA for hotspot module
     entry_time = datetime.now()
@@ -1469,34 +1506,118 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
         # generating slurm batch script
-        with open(config.PATH_CONFIG[
-                 'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh', 'w+') as slurm_bash_script:
-            slurm_bash_script.write('''\
-                        #!/bin/bash
-                        #SBATCH --partition=$1     ### Partition
-                        #SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
-                        #SBATCH --time=100:00:00     ### WallTime
-                        #SBATCH --nodes=1            ### Number of Nodes
-                        #SBATCH --ntasks-per-node=$6 ### Number of tasks (MPI processes)
-                        
-                        rsync -avz $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID
-                        cd /scratch/$SLURM_JOB_ID
-                        sh $3
-                        sh $4
-                        sh $5
-                        rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/
-                        ''')
-        print('sbatch '
-                  + config.PATH_CONFIG[
-                      'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh '+ str(
-            server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
-            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three'])+ ' '+str(catmec_mmpbsa_threads_input))
-        os.system('sbatch '
-                  + config.PATH_CONFIG[
-                      'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh ' + str(
-            server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
-            config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three']))
+        # =======================  get user input threads  ============================
+        key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+        ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+        catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+        # ======================= End of get user input threads  ======================
+
+        # ======================= Start of get directory to queue or work in  ======================
+        md_simulation_file_path = '/CatMec/MD_Simulation/pre_simulation.sh'
+        source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_file_path
+        destination_file_path = config.PATH_CONFIG[
+                                    'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/"
+        try:
+            print("inside try")
+            shutil.copy(str(source_file_path) , str(destination_file_path))
+        except IOError as e:
+            print("Unable to copy file. %s" % e)
+            pass
+        except Exception:
+            print("Unexpected error:", sys.exc_info())
+            pass
+        # ======================= End of get directory to queue or work in  ======================
+
+        generate_hotspot_slurm_script(destination_file_path, server_value, job_name, catmec_mmpbsa_threads_input)
+        # with open(config.PATH_CONFIG[
+        #          'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh', 'w+') as slurm_bash_script:
+        #     slurm_bash_script.write('''\
+        #                 #!/bin/bash
+        #                 #SBATCH --partition=$1     ### Partition
+        #                 #SBATCH --job-name=$2      ### jobname QZW_project-id_module-name_no-of-runs
+        #                 #SBATCH --time=100:00:00     ### WallTime
+        #                 #SBATCH --nodes=1            ### Number of Nodes
+        #                 #SBATCH --ntasks-per-node=$6 ### Number of tasks (MPI processes)
+        #
+        #                 rsync -avz $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID
+        #                 cd /scratch/$SLURM_JOB_ID
+        #                 sh $3
+        #                 sh $4
+        #                 sh $5
+        #                 rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/
+        #                 ''')
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(destination_file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+        os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+        print('queuing **********************************************************************************')
+        cmd = "sbatch " + destination_file_path + "/" + "simulation.sh"
+        print("Submitting Job1 with command: %s" % cmd)
+        status, jobnum = commands.getstatusoutput(cmd)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print(jobnum.split())
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        job_id_key_name = "job_id"
+        entry_time = datetime.now()
+        try:
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name)
+            QzwSlurmJobDetails_save_job_id.save()
+        except db.OperationalError as e:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in except of HOTSPOT SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")
+        except Exception as e:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in except of HOTSPOT SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ", str(e))
+            pass
+            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   values=job_id,
+                                                                                   job_id=job_id)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")'''
         print('queued')
+
+        # print('sbatch '
+        #           + config.PATH_CONFIG[
+        #               'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh '+ str(
+        #     server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
+        #     config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three'])+ ' '+str(catmec_mmpbsa_threads_input))
+        # os.system('sbatch '
+        #           + config.PATH_CONFIG[
+        #               'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh ' + str(
+        #     server_value) + ' ' + str(job_name) + ' ' + str(config.PATH_CONFIG['GMX_run_file_one']) + ' ' + str(
+        #     config.PATH_CONFIG['GMX_run_file_two']) + ' ' + str(config.PATH_CONFIG['GMX_run_file_three']))
+        # print('queued')
     else: # run raw command (without slurm)
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_one'])
         os.chdir(config.PATH_CONFIG[
