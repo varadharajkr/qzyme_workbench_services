@@ -1107,12 +1107,12 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
     with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("rsync - avz $SLURM_SUBMIT_DIR / * / scratch /$SLURM_JOB_ID\n")
-        new_bash_script.write("cd / scratch /$SLURM_JOB_ID\n")
+        new_bash_script.write("rsync -avz $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
+        new_bash_script.write("cd /scratch/$SLURM_JOB_ID\n")
         new_bash_script.write("sh $3\n")
         new_bash_script.write("sh $4\n")
         new_bash_script.write("sh $5\n")
-        new_bash_script.write("rsync - avz / scratch /$SLURM_JOB_ID / * $SLURM_SUBMIT_DIR /")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
