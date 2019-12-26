@@ -1504,7 +1504,6 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         module_name = 'Hotspot_Mutations_mmpbsa'
         job_name = initial_string + '_' + str(project_id) + '_' + module_name
         # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
-
         # generating slurm batch script
         # =======================  get user input threads  ============================
         key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
