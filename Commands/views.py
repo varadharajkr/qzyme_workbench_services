@@ -1082,7 +1082,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
 
 
 @csrf_exempt
-def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_threads):
+def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_threads,GMX_run_file_one,GMX_run_file_two,GMX_run_file_three):
     print('inside generate_hotspot_slurm_script function')
     new_shell_script_lines = ''
     pre_simulation_script_file_name = 'pre_simulation.sh'
@@ -1109,9 +1109,9 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("rsync -avz --no-o --no-g --no-perms $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
         new_bash_script.write("cd /scratch/$SLURM_JOB_ID\n")
-        new_bash_script.write("sh $3\n")
-        new_bash_script.write("sh $4\n")
-        new_bash_script.write("sh $5\n")
+        new_bash_script.write("sh "+GMX_run_file_one+"\n")
+        new_bash_script.write("sh "+GMX_run_file_two+"\n")
+        new_bash_script.write("sh "+GMX_run_file_three+"\n")
         new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
@@ -1528,8 +1528,10 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
             print("Unexpected error:", sys.exc_info())
             pass
         # ======================= End of get directory to queue or work in  ======================
-
-        generate_hotspot_slurm_script(destination_file_path, server_value, job_name, catmec_mmpbsa_threads_input)
+        GMX_run_file_one = config.PATH_CONFIG['GMX_run_file_one']
+        GMX_run_file_two = config.PATH_CONFIG['GMX_run_file_two']
+        GMX_run_file_three = config.PATH_CONFIG['GMX_run_file_three']
+        generate_hotspot_slurm_script(destination_file_path, server_value, job_name, catmec_mmpbsa_threads_input,GMX_run_file_one,GMX_run_file_two,GMX_run_file_three)
         # with open(config.PATH_CONFIG[
         #          'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh', 'w+') as slurm_bash_script:
         #     slurm_bash_script.write('''\
