@@ -1087,9 +1087,9 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
     new_shell_script_lines = ''
     pre_simulation_script_file_name = 'pre_simulation.sh'
     simulation_script_file_name = 'simulation_windows_format.sh'
-    print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
-    with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
-        print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
+    print('before opening ',file_path + pre_simulation_script_file_name)
+    with open(file_path + pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path + pre_simulation_script_file_name)
         content = source_file.readlines()
         for line in content:
             if 'QZSERVER' in line:
@@ -1100,12 +1100,12 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
                 new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
             else:
                 new_shell_script_lines += line
-    if os.path.exists(file_path +'/'+ simulation_script_file_name):
+    if os.path.exists(file_path + simulation_script_file_name):
         print('removing ',file_path + simulation_script_file_name)
         os.remove(file_path + simulation_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
-        print('opened ',file_path +'/'+ simulation_script_file_name)
+    with open(file_path + simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path + simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("rsync -avz --no-o --no-g --no-perms $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
         new_bash_script.write("cd /scratch/$SLURM_JOB_ID\n")
