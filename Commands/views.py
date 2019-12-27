@@ -5559,13 +5559,24 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         md_mutation_folder)
     md_simulation_minimization(project_name,command_tool,number_of_threads,md_mutation_folder,designer_module=True)
 
-    # =======   get slurm key from  database   ===========
-    slurm_key = "md_simulation_slurm_selection_value"
-    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                                 key_name=slurm_key).latest(
-        'entry_time')
+    try:
+        # =======   get slurm key from  database   ===========
+        slurm_key = "md_simulation_slurm_selection_value"
+        slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                     key_name=slurm_key).latest(
+            'entry_time')
 
-    slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.values
+    except db.OperationalError as e:
+        db.close_old_connections()
+        # =======   get slurm key from  database   ===========
+        slurm_key = "md_simulation_slurm_selection_value"
+        slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                     key_name=slurm_key).latest(
+            'entry_time')
+
+        slurm_value = slurm_ProjectToolEssentials_res.values
+
 
     #=======   get assigned server for project ============
     server_key = "md_simulation_server_selection_value"
