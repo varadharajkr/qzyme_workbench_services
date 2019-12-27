@@ -5629,6 +5629,13 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             module_name = 'Designer'
             job_name = initial_string + '_' + str(project_id) + '_' +project_name+'_'+'mutation_'+md_mutation_folder+'_'+module_name + '_r' + str(
                 md_run_no_of_conformation)
+            # =============== copy shell script template files to MD simulation directory ===========
+            shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool+"/"+"pre_simulation.sh",
+                            dest_file_path+"/"+"pre_simulation.sh")
+            shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + str(
+                project_name) + "/" + command_tool + "/" + "basic_sbatch_script.sh",
+                            dest_file_path + "/" + "basic_sbatch_script.sh")
+            # ================ End of copy shell script templates ===================================
             generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
             print(
                 'after generate_slurm_script ************************************************************************')
