@@ -1557,7 +1557,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
         os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
         print('queuing **********************************************************************************')
-        cmd = "sbatch " + destination_file_path + "/" + "simulation.sh"
+        cmd = "sbatch " + destination_file_path + "simulation.sh"
         print("Submitting Job1 with command: %s" % cmd)
         status, jobnum = commands.getstatusoutput(cmd)
         print("job id is ", jobnum)
