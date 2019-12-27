@@ -5240,7 +5240,7 @@ def generate_designer_slurm_script(file_path, server_name, job_name, number_of_t
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
         print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
@@ -5269,8 +5269,8 @@ def generate_designer_contact_score_slurm_script(file_path, server_name, job_nam
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
-        print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        print('removing ',file_path +'/'+ windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
@@ -5301,8 +5301,8 @@ def generate_designer_path_analysis_slurm_script(file_path, server_name, job_nam
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
-        print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        print('removing ',file_path +'/'+ windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
