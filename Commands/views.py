@@ -4366,13 +4366,13 @@ def designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name
     os.system("mkdir " + config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/')
 
-    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_pathanalysis__slurm_pre_processing.py.py',
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_pathanalysis__slurm_pre_processing.py',
                     config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py")
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py")
     shutil.copyfile(config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py",
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py",
                     config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/designer_pathanalysis__slurm_pre_processing.py.py")
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/designer_pathanalysis__slurm_pre_processing.py")
     # =======   get assigned server for project ============
     server_key = "md_simulation_server_selection_value"
     server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
