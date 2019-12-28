@@ -5399,8 +5399,11 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
             if slurm_value == "yes":
                 print('slurm value selected is yes')
                 initial_string = 'QZW'
-                module_name = 'CatMec'
-                job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+                # module_name = 'CatMec'
+                module_name = 'MD_SIMULATION'
+                # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+                job_name = str(project_name) + '_' + module_name
+                job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
                 print('after generate_slurm_script ************************************************************************')
@@ -5434,7 +5437,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                                                                                            entry_time=entry_time,
                                                                                            job_id=job_id,
                                                                                            job_status="1",
-                                                                                           job_title=job_name)
+                                                                                           job_title=job_name,
+                                                                                           job_details=job_detail_string)
                     QzwSlurmJobDetails_save_job_id.save()
                 except db.OperationalError as e:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -5444,7 +5448,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                                                                         entry_time=entry_time,
                                                                         job_id=job_id,
                                                                         job_status="1",
-                                                                        job_title=job_name)
+                                                                        job_title=job_name,
+                                                                        job_details=job_detail_string)
                     QzwSlurmJobDetails_save_job_id.save()
                     print("saved")
                 except Exception as e:
