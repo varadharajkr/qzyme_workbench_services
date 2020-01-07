@@ -1082,14 +1082,14 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
 
 
 @csrf_exempt
-def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_threads):
+def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_threads,GMX_run_file_one,GMX_run_file_two,GMX_run_file_three):
     print('inside generate_hotspot_slurm_script function')
     new_shell_script_lines = ''
     pre_simulation_script_file_name = 'pre_simulation.sh'
     simulation_script_file_name = 'simulation_windows_format.sh'
-    print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
-    with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
-        print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
+    print('before opening ',file_path + pre_simulation_script_file_name)
+    with open(file_path + pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path + pre_simulation_script_file_name)
         content = source_file.readlines()
         for line in content:
             if 'QZSERVER' in line:
@@ -1100,19 +1100,19 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
                 new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
             else:
                 new_shell_script_lines += line
-    if os.path.exists(file_path +'/'+ simulation_script_file_name):
+    if os.path.exists(file_path + simulation_script_file_name):
         print('removing ',file_path + simulation_script_file_name)
         os.remove(file_path + simulation_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
-        print('opened ',file_path +'/'+ simulation_script_file_name)
+    with open(file_path + simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path + simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("rsync - avz $SLURM_SUBMIT_DIR / * / scratch /$SLURM_JOB_ID\n")
-        new_bash_script.write("cd / scratch /$SLURM_JOB_ID\n")
-        new_bash_script.write("sh $3\n")
-        new_bash_script.write("sh $4\n")
-        new_bash_script.write("sh $5\n")
-        new_bash_script.write("rsync - avz / scratch /$SLURM_JOB_ID / * $SLURM_SUBMIT_DIR /")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
+        new_bash_script.write("cd /scratch/$SLURM_JOB_ID\n")
+        new_bash_script.write("sh "+GMX_run_file_one+"\n")
+        new_bash_script.write("sh "+GMX_run_file_two+"\n")
+        new_bash_script.write("sh "+GMX_run_file_three+"\n")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -1504,7 +1504,6 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         module_name = 'Hotspot_Mutations_mmpbsa'
         job_name = initial_string + '_' + str(project_id) + '_' + module_name
         # generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
-
         # generating slurm batch script
         # =======================  get user input threads  ============================
         key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
@@ -1529,8 +1528,10 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
             print("Unexpected error:", sys.exc_info())
             pass
         # ======================= End of get directory to queue or work in  ======================
-
-        generate_hotspot_slurm_script(destination_file_path, server_value, job_name, catmec_mmpbsa_threads_input)
+        GMX_run_file_one = config.PATH_CONFIG['GMX_run_file_one']
+        GMX_run_file_two = config.PATH_CONFIG['GMX_run_file_two']
+        GMX_run_file_three = config.PATH_CONFIG['GMX_run_file_three']
+        generate_hotspot_slurm_script(destination_file_path, server_value, job_name, catmec_mmpbsa_threads_input,GMX_run_file_one,GMX_run_file_two,GMX_run_file_three)
         # with open(config.PATH_CONFIG[
         #          'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + mutation_dir_mmpbsa + "/MMPBSA/" + 'queue_mmpbsa.sh', 'w+') as slurm_bash_script:
         #     slurm_bash_script.write('''\
@@ -1558,7 +1559,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
         os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
         print('queuing **********************************************************************************')
-        cmd = "sbatch " + destination_file_path + "/" + "simulation.sh"
+        cmd = "sbatch " + destination_file_path + "simulation.sh"
         print("Submitting Job1 with command: %s" % cmd)
         status, jobnum = commands.getstatusoutput(cmd)
         print("job id is ", jobnum)
@@ -4365,13 +4366,13 @@ def designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name
     os.system("mkdir " + config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + md_mutation_folder + '/Analysis/Path_Analysis/')
 
-    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_pathanalysis__slurm_pre_processing.py.py',
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + 'Designer/designer_pathanalysis__slurm_pre_processing.py',
                     config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py")
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py")
     shutil.copyfile(config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py.py",
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/designer_pathanalysis__slurm_pre_processing.py",
                     config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/designer_pathanalysis__slurm_pre_processing.py.py")
+                        'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/Analysis/Path_Analysis/designer_pathanalysis__slurm_pre_processing.py")
     # =======   get assigned server for project ============
     server_key = "md_simulation_server_selection_value"
     server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
@@ -5213,7 +5214,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
         new_bash_script.write("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads)+"\n")
         new_bash_script.write("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10 \n")
         new_bash_script.write("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads) + "\n")
-        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5239,13 +5240,13 @@ def generate_designer_slurm_script(file_path, server_name, job_name, number_of_t
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
         print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_mmpbsa__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5268,14 +5269,14 @@ def generate_designer_contact_score_slurm_script(file_path, server_name, job_nam
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
-        print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        print('removing ',file_path +'/'+ windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_contactscore__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5300,14 +5301,14 @@ def generate_designer_path_analysis_slurm_script(file_path, server_name, job_nam
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ windows_format_script_file_name):
-        print('removing ',file_path + windows_format_script_file_name)
-        os.remove(file_path + windows_format_script_file_name)
+        print('removing ',file_path +'/'+ windows_format_script_file_name)
+        os.remove(file_path +'/'+ windows_format_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ windows_format_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_pathanalysis__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5565,13 +5566,24 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         md_mutation_folder)
     md_simulation_minimization(project_name,command_tool,number_of_threads,md_mutation_folder,designer_module=True)
 
-    # =======   get slurm key from  database   ===========
-    slurm_key = "md_simulation_slurm_selection_value"
-    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                                 key_name=slurm_key).latest(
-        'entry_time')
+    try:
+        # =======   get slurm key from  database   ===========
+        slurm_key = "md_simulation_slurm_selection_value"
+        slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                     key_name=slurm_key).latest(
+            'entry_time')
 
-    slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.values
+    except db.OperationalError as e:
+        db.close_old_connections()
+        # =======   get slurm key from  database   ===========
+        slurm_key = "md_simulation_slurm_selection_value"
+        slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                     key_name=slurm_key).latest(
+            'entry_time')
+
+        slurm_value = slurm_ProjectToolEssentials_res.values
+
 
     #=======   get assigned server for project ============
     server_key = "md_simulation_server_selection_value"
@@ -5622,6 +5634,13 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
             module_name = 'Designer'
             job_name = initial_string + '_' + str(project_id) + '_' +project_name+'_'+'mutation_'+md_mutation_folder+'_'+module_name + '_r' + str(
                 md_run_no_of_conformation)
+            # =============== copy shell script template files to MD simulation directory ===========
+            shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + "/"+command_tool+"/"+"pre_simulation.sh",
+                            dest_file_path+"/"+"pre_simulation.sh")
+            shutil.copyfile(config.PATH_CONFIG['shared_folder_path'] + str(
+                project_name) + "/" + command_tool + "/" + "basic_sbatch_script.sh",
+                            dest_file_path + "/" + "basic_sbatch_script.sh")
+            # ================ End of copy shell script templates ===================================
             generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
             print(
                 'after generate_slurm_script ************************************************************************')
