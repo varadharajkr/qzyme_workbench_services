@@ -6880,7 +6880,7 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
-            print('command_tool_title ----------------------')
+            print('command_tool_title ----------------------\n')
             print(command_tool_title)
             user_id = commandDetails_result.user_id
             inp_command_id = request.POST.get("command_id")
