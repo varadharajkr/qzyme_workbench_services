@@ -6895,11 +6895,12 @@ class CatMec(APIView):
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
             # print ligand_name
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
+            md_simulation_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
+            os.chdir(md_simulation_path)
             print (os.getcwd())
 
             if commandDetails_result.command_title == "md_run":
-                md_simulation_path = '/CatMec/MD_Simulation/'
+                md_simulation_path = md_simulation_path
                 print('md simulation path in md_run is')
                 print(md_simulation_path)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
