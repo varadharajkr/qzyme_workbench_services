@@ -208,7 +208,7 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_tpr_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_tpr_file).latest('entry_time')
-        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
         # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
         key_name_ndx_file = 'mmpbsa_index_file'
@@ -216,7 +216,7 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_ndx_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ndx_file).latest('entry_time')
-        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.key_values.replace('\\', '/')
 
         key_name_CatMec_input = 'substrate_input'
         command_tootl_title = "CatMec"
@@ -224,14 +224,14 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_CatMec_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                        key_name=key_name_CatMec_input).latest('entry_time')
-        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
         # if User has only one ligand as input
         multiple_ligand_input = False
         if len(CatMec_input_dict) > 1:
             multiple_ligand_input = True
 
-        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
-        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.key_values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.key_values)
 
         '''
                                                                   .                o8o                         .        
@@ -278,7 +278,7 @@ class analyse_mmpbsa(APIView):
             ProjectToolEssentials_res_ligand_input = \
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             #extract ligand number
             if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
                 ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
@@ -319,7 +319,7 @@ class analyse_mmpbsa(APIView):
             ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
                                                                                       project_id=project_id,
                                                                                       key_name=key_name_protien_ligand_complex_index,
-                                                                                      values=protien_ligand_complex_index,
+                                                                                      key_values=protien_ligand_complex_index,
                                                                                       entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             ligand_name_index = protien_ligand_complex_index + 1
@@ -368,7 +368,7 @@ class analyse_mmpbsa(APIView):
                 tool_title=commandDetails_result.command_tool,
                 project_id=project_id,
                 key_name=key_name_protien_ligand_complex_index,
-                values=protien_ligand_complex_index,
+                key_values=protien_ligand_complex_index,
                 entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
@@ -481,7 +481,7 @@ class analyse_mmpbsa(APIView):
                     ProjectToolEssentials_res_ligand_input = \
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_ligand_input).latest('entry_time')
-                    ligand_name = ProjectToolEssentials_res_ligand_input.values
+                    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
                 else:
                     #for single ligand
                     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -603,7 +603,7 @@ def designer_slurm_queue_analyse_mmpbsa(inp_command_id, md_mutation_folder, proj
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_mmpbsa_preperation_'
     job_name = initial_string + '_' + str(
@@ -725,7 +725,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     ProjectToolEssentials_save_designer_mmpbsa_tpr_file = ProjectToolEssentials(tool_title=command_tool,
                                                                                 project_id=project_id,
                                                                                 key_name=key_name_tpr_file,
-                                                                                values=tpr_file_list[0],
+                                                                                key_values=tpr_file_list[0],
                                                                                 entry_time=entry_time)
     result_ProjectToolEssentials_save_mmpbsa_tpr_file = ProjectToolEssentials_save_designer_mmpbsa_tpr_file.save()
 
@@ -735,7 +735,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     ProjectToolEssentials_res_CatMec_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name=key_name_CatMec_input).latest('entry_time')
-    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
     # if User has only one ligand as input
     multiple_ligand_input = False
     if len(CatMec_input_dict) > 1:
@@ -789,7 +789,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
         # extract ligand number
         if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
             ligand_name_input = str(indexfile_input_dict["[ " + ligand_name + " ]"])
@@ -831,7 +831,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
             tool_title=commandDetails_result.command_tool,
             project_id=project_id,
             key_name=key_name_protien_ligand_complex_index,
-            values=protien_ligand_complex_index,
+            key_values=protien_ligand_complex_index,
             entry_time=entry_time)
         result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
         ligand_name_index = protien_ligand_complex_index + 1
@@ -976,7 +976,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             else:
                 # for single ligand
                 for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -1125,7 +1125,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.key_values
 
     #create MMPBSA dir only
     os.system("mkdir " + config.PATH_CONFIG[
@@ -1178,7 +1178,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     ProjectToolEssentials_res_CatMec_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name=key_name_CatMec_input).latest('entry_time')
-    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
     # if User has only one ligand as input
     multiple_ligand_input = False
     if len(CatMec_input_dict) > 1:
@@ -1206,7 +1206,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
         # extract ligand number
         if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
             ligand_name_input = str(indexfile_input_dict["[ " + ligand_name + " ]"])
@@ -1397,7 +1397,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             else:
                 # for single ligand
                 for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -1484,20 +1484,20 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     # -- get the slurm boolean value from DB
     slurm_key = "md_simulation_slurm_selection_value"
     slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                  key_name=slurm_key).latest(
         'entry_time')
 
-    slurm_value = slurm_ProjectToolEssentials_res.values
+    slurm_value = slurm_ProjectToolEssentials_res.key_values
     # =======================  get user input threads  ============================
     key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
     if slurm_value == "yes": # queue to slurm
         initial_string = 'QZW'
@@ -1510,7 +1510,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-        catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+        catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
         # ======================= End of get user input threads  ======================
 
         # ======================= Start of get directory to queue or work in  ======================
@@ -1815,7 +1815,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -2470,7 +2470,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
 
@@ -2479,7 +2479,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -2516,14 +2516,14 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     except db.OperationalError as e:
         print("in pre_process_designer_queue_mmpbsa_imput except first DB operation")
         db.close_old_connections()
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
 
     #======================= End of get user input ligand  ======================
 
@@ -3164,7 +3164,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
     # =======================  get user input threads  ============================
@@ -3172,7 +3172,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -3207,7 +3207,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -3859,7 +3859,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
     # =======================  get user input threads  ============================
@@ -3867,7 +3867,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -3945,7 +3945,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -4379,7 +4379,7 @@ def designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_path_analysis'
     job_name = initial_string + '_' + str(
@@ -4475,7 +4475,7 @@ def designer_queue_path_analysis(request, md_mutation_folder, project_name, comm
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name='catmec_path_analysis_input_atom_starting_point').latest('entry_time')
     #catmec_pathanalysis_atom_input = ProjectToolEssentials_res_catmec_pathanalysis.values
-    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.values)
+    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.key_values)
     chain_id_input = ""
     recidue_number_input = ""
     probe_radius_input = ""
@@ -4666,7 +4666,7 @@ def designer_slurm_queue_contact_score(request, md_mutation_folder, project_name
     ProjectToolEssentials_res_catmec_contact_score = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name='catmec_contact_score').latest('entry_time')
-    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.key_values)
     for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
         if inputkey == 'no_of_threads':
             number_of_threads = inputvalue
@@ -4677,7 +4677,7 @@ def designer_slurm_queue_contact_score(request, md_mutation_folder, project_name
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_contact_score'
     job_name = initial_string + '_' + str(
@@ -4759,7 +4759,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_protien_ligand_complex_index_number).latest(
             'entry_time')
-    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
     # ------   get TPR file   ------
     # get .tpr file from MD Simulations mutations folder(key = designer_mmpbsa_tpr_file)
@@ -4768,7 +4768,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
     ProjectToolEssentials_res_tpr_file_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_tpr_file).latest('entry_time')
-    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
     os.system(
         "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
@@ -4800,7 +4800,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
                                                    key_name='catmec_contact_score').latest('entry_time')
     designer_contact_score_cmd_calculate = ""
     designer_contact_score_cmd_combine = ""
-    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.key_values)
     for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
         if inputkey == 'command':
             designer_contact_score_cmd_calculate = inputvalue
@@ -4884,7 +4884,7 @@ class Contact_Score(APIView):
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_protien_ligand_complex_index_number).latest(
                         'entry_time')
-                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
                 # ------   get TPR file   ------
                 # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
@@ -4893,7 +4893,7 @@ class Contact_Score(APIView):
                 ProjectToolEssentials_res_tpr_file_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_tpr_file).latest('entry_time')
-                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
                 md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
 
                 # create trajconv input file
@@ -4981,7 +4981,7 @@ class Contact_Score(APIView):
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_protien_ligand_complex_index_number).latest(
                             'entry_time')
-                    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
                     # ------   get TPR file   ------
                     # get .tpr file from MD Simulations mutations folder(key = designer_mmpbsa_tpr_file)
@@ -4990,7 +4990,7 @@ class Contact_Score(APIView):
                     ProjectToolEssentials_res_tpr_file_input = \
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_tpr_file).latest('entry_time')
-                    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
                     os.system(
                         "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
@@ -5330,34 +5330,34 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.key_values)
     no_of_thread_key = "number_of_threads"
     ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
 
     temp_key = "preliminary_temp_value"
     temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=temp_key).latest(
         'entry_time')
 
-    temp_value = float(temp_ProjectToolEssentials_res.values)
+    temp_value = float(temp_ProjectToolEssentials_res.key_values)
 
     nsteps_key = "md_simulation_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=nsteps_key).latest(
         'entry_time')
 
-    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
 
     slurm_key = "md_simulation_slurm_selection_value"
     slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=slurm_key).latest(
         'entry_time')
 
-    slurm_value = slurm_ProjectToolEssentials_res.values
+    slurm_value = slurm_ProjectToolEssentials_res.key_values
 
 
     server_key = "md_simulation_server_selection_value"
@@ -5365,7 +5365,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                                                                            key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
 
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -5543,7 +5543,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.key_values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
@@ -5551,7 +5551,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt','vac_em']
@@ -5573,7 +5573,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                      key_name=slurm_key).latest(
             'entry_time')
 
-        slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.key_values
     except db.OperationalError as e:
         db.close_old_connections()
         # =======   get slurm key from  database   ===========
@@ -5582,7 +5582,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                      key_name=slurm_key).latest(
             'entry_time')
 
-        slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.key_values
 
 
     #=======   get assigned server for project ============
@@ -5591,7 +5591,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
 
     # ======= get temperature and MD simulation runs from DB ========
     temp_key = "preliminary_temp_value"
@@ -5599,14 +5599,14 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                 key_name=temp_key).latest(
         'entry_time')
 
-    temp_value = float(temp_ProjectToolEssentials_res.values)
+    temp_value = float(temp_ProjectToolEssentials_res.key_values)
 
     nsteps_key = "md_simulation_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                   key_name=nsteps_key).latest(
         'entry_time')
 
-    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
 
     # substitutung config values in MD simulations MDP files
     function_returned_value = replace_temp_and_nsteps_in_mdp_file(
@@ -5746,7 +5746,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
     #     ProjectToolEssentials.objects.all().filter(project_id=project_id,
     #                                                key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.key_values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
@@ -5761,7 +5761,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
@@ -6441,7 +6441,7 @@ class CatmecandAutodock(APIView):
         key_name = 'enzyme_file'
         ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=key_name).latest("entry_time")
-        enzyme_file_name = ProjectToolEssentials_res.values
+        enzyme_file_name = ProjectToolEssentials_res.key_values
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
@@ -6508,7 +6508,7 @@ class CatmecandAutodock(APIView):
                 enzyme_file_key = 'autodock_nma_final_protein_conformation'
                 ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
                     project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
-                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
+                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.key_values
                 nma_path = nma_enzyme_file[:-4]
                 print(str(nma_path[:-4]))
                 print('\nnma_path ****************************************')
@@ -6977,7 +6977,7 @@ class CatMec(APIView):
             key_name = 'enzyme_file'
             ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                    key_name=key_name).latest("entry_time")
-            enzyme_file_name = ProjectToolEssentials_res.values
+            enzyme_file_name = ProjectToolEssentials_res.key_values
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
@@ -7266,7 +7266,7 @@ class Hotspot(APIView):
             project_id=project_id,
             key_name=ligands_key_name).latest(
             'entry_time')
-        ligand_names = ProjectToolEssentials_ligand_name_res.values
+        ligand_names = ProjectToolEssentials_ligand_name_res.key_values
         ligand_file_data = ast.literal_eval(ligand_names)
         ligand_names_list = []
         for key, value in ligand_file_data.items():
@@ -7376,7 +7376,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    designer_mutations_file = ProjectToolEssentials_mutations_file.values
+    designer_mutations_file = ProjectToolEssentials_mutations_file.key_values
 
     # open mutated text file and loop thru to prepare files for make_complex.py
     with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -7479,7 +7479,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=make_complex_params_keyname).latest(
                         'entry_time')
-                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
             except db.OperationalError as e:
                 print("in make_complex_parameters query except first DB operation")
                 db.close_old_connections()
@@ -7487,7 +7487,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=make_complex_params_keyname).latest(
                         'entry_time')
-                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
 
 
             variant_protien_file = 'variant_'+str(variant_index_count)+'.pdb'
@@ -7499,7 +7499,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                                key_name=ligands_key_name).latest(
                 'entry_time')
-            ligand_names = ProjectToolEssentials_ligand_name_res.values
+            ligand_names = ProjectToolEssentials_ligand_name_res.key_values
             ligand_file_data = ast.literal_eval(ligand_names)
             for key, value in ligand_file_data.items():
                 #value.split('_')[0]
@@ -7557,7 +7557,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                                                                                          key_name=slurm_key).latest(
                 'entry_time')
 
-            slurm_value = slurm_ProjectToolEssentials_res.values
+            slurm_value = slurm_ProjectToolEssentials_res.key_values
             if slurm_value == "yes":
                 #get command ID for input parameter
                 inp_command_id = request.POST.get("command_id")
@@ -7609,7 +7609,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.key_values
     print("hotspot mutation file --------")
     print("\n")
     print(hotspot_mutations_file)
@@ -7753,7 +7753,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=make_complex_params_keyname).latest(
                                         'entry_time')
-                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
                             except db.OperationalError as e:
                                 db.close_old_connections()
                                 make_complex_params_keyname = "make_complex_parameters"
@@ -7761,7 +7761,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=make_complex_params_keyname).latest(
                                         'entry_time')
-                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
 
 
                             variant_protien_file = 'variant_' + str(variant_index_count) + '.pdb'
@@ -7776,7 +7776,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 project_id=project_id,
                                 key_name=ligands_key_name).latest(
                                 'entry_time')
-                            ligand_names = ProjectToolEssentials_ligand_name_res.values
+                            ligand_names = ProjectToolEssentials_ligand_name_res.key_values
                             ligand_file_data = ast.literal_eval(ligand_names)
                             ligand_names_list = []
                             for key, value in ligand_file_data.items():
@@ -7897,7 +7897,7 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_tpr_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_tpr_file).latest('entry_time')
-        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
         # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
         key_name_ndx_file = 'designer_mmpbsa_index_file'
@@ -7905,7 +7905,7 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_ndx_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ndx_file).latest('entry_time')
-        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.key_values.replace('\\', '/')
 
         key_name_CatMec_input = 'substrate_input'
         command_tootl_title = "CatMec"
@@ -7913,14 +7913,14 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_CatMec_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                        key_name=key_name_CatMec_input).latest('entry_time')
-        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
         # if User has only one ligand as input
         multiple_ligand_input = False
         if len(CatMec_input_dict) > 1:
             multiple_ligand_input = True
 
-        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
-        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.key_values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.key_values)
 
         '''
                                                                   .                o8o                         .        
@@ -7966,7 +7966,7 @@ class Designer_Mmpbsa_analyse(APIView):
             ProjectToolEssentials_res_ligand_input = \
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             #extract ligand number
             if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
                 ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
@@ -8007,7 +8007,7 @@ class Designer_Mmpbsa_analyse(APIView):
             ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
                                                                                       project_id=project_id,
                                                                                       key_name=key_name_protien_ligand_complex_index,
-                                                                                      values=protien_ligand_complex_index,
+                                                                                      key_values=protien_ligand_complex_index,
                                                                                       entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             ligand_name_index = protien_ligand_complex_index + 1
@@ -8144,7 +8144,7 @@ class Designer_Mmpbsa_analyse(APIView):
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
                 if file_name[:-4] == ligand_name:
                     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
                                     config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
