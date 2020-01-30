@@ -5403,7 +5403,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 # module_name = 'CatMec'
                 module_name = 'MD_SIMULATION'
                 # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                job_name = str(project_name) + '_' + module_name
+                job_name = str(initial_string) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
                 job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
                 generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
