@@ -46,6 +46,10 @@ import logging # for default django logging
 # Create your views ere.
 
 django_logger = logging.getLogger(__name__)
+
+# module accessing
+exec(open('/usr/share/Modules/init/python.py').read())
+
 # to run command in shell
 def execute_command(command,inp_command_id):
     print('inside execute_command')
@@ -6796,7 +6800,6 @@ class CatMec(APIView):
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
             print('exec(open(/usr/share/Modules/init/python.py).read())')
-            exec(open('/usr/share/Modules/init/python.py').read())
             print('module(unload mgltools)')
             module('unload mgltools')
             print('command_tool_title is ',command_tool_title)
