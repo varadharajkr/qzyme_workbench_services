@@ -48,7 +48,7 @@ import logging # for default django logging
 django_logger = logging.getLogger(__name__)
 
 # module accessing
-# exec(open('/usr/share/Modules/init/python.py').read())
+exec(open('/usr/share/Modules/init/python.py').read())
 
 # to run command in shell
 def execute_command(command,inp_command_id):
