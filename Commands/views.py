@@ -6800,8 +6800,8 @@ class CatMec(APIView):
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
             print('exec(open(/usr/share/Modules/init/python.py).read())')
-            print('module(unload mgltools)')
-            module('unload mgltools')
+            # print('module(unload mgltools)')
+            # module('unload mgltools')
             print('command_tool_title is ',command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
@@ -6869,8 +6869,8 @@ class CatMec(APIView):
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
 
-                print('module(load mgltools)')
-                module('load mgltools')
+                # print('module(load mgltools)')
+                # module('load mgltools')
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print("inside error")
@@ -6888,8 +6888,8 @@ class CatMec(APIView):
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
-                print('module(load mgltools)')
-                module('load mgltools')
+                # print('module(load mgltools)')
+                # module('load mgltools')
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
             print('command_tool_title ----------------------\n')
