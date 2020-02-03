@@ -6802,7 +6802,8 @@ class CatMec(APIView):
             print('exec(open(/usr/share/Modules/init/python.py).read())')
             try:
                 print('module(unload mgltools)')
-                module('unload mgltools')
+                # module('unload mgltools')
+                os.system('module unload mgltools')
             except Exception as e:
                 print("inside exception of unload mgltools in LP ",str(e))
             print('command_tool_title is ',command_tool_title)
@@ -6874,7 +6875,8 @@ class CatMec(APIView):
 
                 try:
                     print('module(load mgltools)')
-                    module('load mgltools')
+                    # module('load mgltools')
+                    os.system('module load mgltools')
                 except Exception as e:
                     print("inside exception of load mgltools in LP ", str(e))
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
@@ -6896,7 +6898,8 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id)
                 try:
                     print('module(load mgltools)')
-                    module('load mgltools')
+                    # module('load mgltools')
+                    os.system('module load mgltools')
                 except Exception as e:
                     print("inside exception of load mgltools in LP ", str(e))
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
