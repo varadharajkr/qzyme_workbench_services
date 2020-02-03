@@ -48,7 +48,7 @@ import logging # for default django logging
 django_logger = logging.getLogger(__name__)
 
 # module accessing
-exec(open('/usr/share/Modules/init/python.py').read())
+# exec(open('/usr/share/Modules/init/python.py').read())
 
 # to run command in shell
 def execute_command(command,inp_command_id):
@@ -6804,6 +6804,7 @@ class CatMec(APIView):
                 print('module(unload mgltools)')
                 # module('unload mgltools')
                 os.system('module unload mgltools')
+                os.system('module list')
             except Exception as e:
                 print("inside exception of unload mgltools in LP ",str(e))
             print('command_tool_title is ',command_tool_title)
@@ -6877,6 +6878,7 @@ class CatMec(APIView):
                     print('module(load mgltools)')
                     # module('load mgltools')
                     os.system('module load mgltools')
+                    os.system('module list')
                 except Exception as e:
                     print("inside exception of load mgltools in LP ", str(e))
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
@@ -6900,6 +6902,7 @@ class CatMec(APIView):
                     print('module(load mgltools)')
                     # module('load mgltools')
                     os.system('module load mgltools')
+                    os.system('module list')
                 except Exception as e:
                     print("inside exception of load mgltools in LP ", str(e))
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
