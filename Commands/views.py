@@ -5413,14 +5413,14 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     print(os.getcwd())
     os.system("echo q | gmx make_ndx -f solve_ions.gro")
 
-    print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+    print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr -maxwarn 10")
     print("start grompp 222222222222 ==========================================")
     print('before change directory')
     print(os.getcwd())
     os.chdir(source_file_path)
     print('after change directory')
     print(os.getcwd())
-    os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+    os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr -maxwarn 10")
 
     print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt "+str(number_of_threads))
     print("start mdrun  ==========================================")
