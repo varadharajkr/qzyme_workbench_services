@@ -354,10 +354,10 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
             print("saved")'''
         print('queued')
 
-        return JsonResponse({'success': True})
+        return True
     else:
         print('replace inp file function returned False')
-        return JsonResponse({'success': False})
+        return False
 
 
 # TASS
@@ -378,66 +378,66 @@ class TASS(APIView):
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
         if commandDetails_result.command_title == "nvt_equilibration":
             returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.user_id)
-        else:
-            print('primary_command_runnable')
-            print(primary_command_runnable)
 
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        print('primary_command_runnable')
+        print(primary_command_runnable)
 
-            dirName = os.getcwd()
-            print("dirname")
-            print(os.getcwd())
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
 
-            print("runnable command is")
-            print(primary_command_runnable)
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
-            print("working directory after changing CHDIR")
-            print(os.system("pwd"))
-            #execute command
-            process_return = execute_command(primary_command_runnable, inp_command_id)
-            out, err = process_return.communicate()
-            process_return.wait()
-            # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
+        dirName = os.getcwd()
+        print("dirname")
+        print(os.getcwd())
 
-            command_title_folder = commandDetails_result.command_title
-            command_tool_title = commandDetails_result.command_tool
-            print("printing status ofprocess")
-            print(process_return.returncode)
-            print("printing output of process")
-            print(out)
+        print("runnable command is")
+        print(primary_command_runnable)
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        print("working directory after changing CHDIR")
+        print(os.system("pwd"))
+        #execute command
+        process_return = execute_command(primary_command_runnable, inp_command_id)
+        out, err = process_return.communicate()
+        process_return.wait()
+        # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
-            if process_return.returncode == 0:
-                print("success executing command")
-                fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
-                fileobj.write(out)
-                try:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< success try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id)
-                except db.OperationalError as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< success except block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id)
-                return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        command_title_folder = commandDetails_result.command_title
+        command_tool_title = commandDetails_result.command_tool
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
 
-            if process_return.returncode != 0:
-                print("error executing command!!")
-                fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
-                fileobj.write(err)
-                try:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< error try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id)
-                except db.OperationalError as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< error except block TASS  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id)
+        if process_return.returncode == 0:
+            print("success executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
-                return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+        if process_return.returncode != 0:
+            print("error executing command!!")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< error try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block TASS  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
 #analyse_mmpsa
