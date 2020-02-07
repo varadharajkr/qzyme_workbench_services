@@ -174,219 +174,180 @@ class gromacs(APIView):
 
 
 @csrf_exempt
-def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool,command_title, user_id='', md_simulation_path=''):
+def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads):
+    print('inside generate_TASS_slurm_script function')
+    new_shell_script_lines = ''
+    print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
+    with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ simulation_script_file_name):
+        print('removing ',file_path + simulation_script_file_name)
+        os.remove(file_path + '/' + simulation_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ simulation_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write("sander -O -i Heat.in -o Heat.out -p amber.top -c 01_Min.ncrst -r Heat.ncrst -x Heat.nc -inf Heat.mdinfo\n")
+        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+    print('outside the loop')
+    return True
+
+
+@csrf_exempt
+def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value, nsteps_value):
+    print('inside replace_temp_and_nsteps_in_mdp_file function')
+    try:
+        original_inp_lines = ''
+        with open(file_path+pre_inp_file, 'r') as pre_processed_mdb:
+            content = pre_processed_mdb.readlines()
+            for line in content:
+                if 'QZTEMP' in line:
+                    original_inp_lines += line.replace('QZTEMP', str(temp_value))
+                elif 'QZNSTEPS' in line:
+                    original_inp_lines += line.replace('QZNSTEPS', str(nsteps_value))
+                else:
+                    original_inp_lines += line
+
+        if os.path.exists(file_path+inp_file):
+            os.remove(file_path+inp_file)
+        with open(file_path+inp_file, 'w+') as inp_source_file:
+            inp_source_file.write(original_inp_lines)
+
+    except Exception as e:
+        print('exception in replacing mdp file is ',str(e))
+        return False
+
+
+@csrf_exempt
+def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, user_id=''):
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id)
     print("inside TASS_nvt_equilibiration_preparation function")
-    key_name = 'TASS_no_of_runs'
     print('TASS_simulation_path is')
-    print(md_simulation_path)
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
-    ProjectToolEssentials_res = \
-        ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                   key_name=key_name).latest('entry_time')
+    print(file_path)
 
-    TASS_no_of_conformation = int(ProjectToolEssentials_res.key_values)
-    no_of_thread_key = "number_of_threads"
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
     ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
     number_of_threads = int(ProjectToolEssentials_res.key_values)
 
-    temp_key = "preliminary_temp_value"
+    temp_key = "TASS_nvt_equilibration_temp_value"
     temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=temp_key).latest(
         'entry_time')
 
     temp_value = float(temp_ProjectToolEssentials_res.key_values)
 
-    nsteps_key = "md_simulation_nsteps_value"
+    nsteps_key = "TASS_nvt_equilibration_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=nsteps_key).latest(
         'entry_time')
 
     nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
 
-    slurm_key = "md_simulation_slurm_selection_value"
-    slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=slurm_key).latest(
-        'entry_time')
-
-    slurm_value = slurm_ProjectToolEssentials_res.key_values
-
-
-    server_key = "md_simulation_server_selection_value"
-    server_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=server_key).latest(
-        'entry_time')
-
-    server_value = server_ProjectToolEssentials_res.key_values
-
     print("number of threads is ",number_of_threads)
-    print ('TASS_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
-    print(TASS_no_of_conformation)
+
 
     source_file_path = file_path
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
 
-    print('server_value,slurm_value --------------------------------------------')
-    print(server_value,'\n', server_value)
-    function_returned_value = replace_temp_and_nsteps_in_mdp_file(config.PATH_CONFIG['shared_folder_path'] + str(project_name) + '/' + config.PATH_CONFIG['md_simulations_path'], temp_value, nsteps_value)
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'HEAT.in', temp_value, nsteps_value)
+
     if function_returned_value:
         print('replace mdp file function returned true')
-        md_simulation_minimization(project_name,command_tool,number_of_threads,md_simulation_path,designer_module=False)
-        for i in range(int(TASS_no_of_conformation)):
-            if not (os.path.exists(source_file_path + 'md_run' + str(i + 1))):
-                print (source_file_path + 'md_run' + str(i + 1))
-                os.mkdir(source_file_path + 'md_run' + str(i + 1))
-            dest_file_path = source_file_path + 'md_run' + str(i + 1)
-            # copying MD Simulation files in to md_run(1/2/3...) folder
-            for file_name in os.listdir(source_file_path):
-                try:
-                    print("inside try")
-                    shutil.copy(str(source_file_path) + file_name, dest_file_path)
-                except IOError as e:
-                    print("Unable to copy file. %s" % e)
-                    pass
-                except Exception:
-                    print("Unexpected error:", sys.exc_info())
-                    pass
-            if slurm_value == "yes":
-                print('slurm value selected is yes')
-                initial_string = 'QZW'
-                # module_name = 'CatMec'
-                module_name = 'MD_SIMULATION'
-                # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                job_name = str(initial_string) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
-                generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+        print('slurm value selected is yes')
+        initial_string = 'QZW'
+        # module_name = 'CatMec'
+        module_name = 'TASS'
+        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+        job_name = str(initial_string) + '_' + module_name
+        job_detail_string = module_name + + '_NVT_EQUILIBRATION'
+        server_value = 'allcpu'
+        pre_simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
+        simulation_script = 'TASS_NVT_equilibration.sh'
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   number_of_threads)
 
-                print('after generate_slurm_script ************************************************************************')
-                print('before changing directory')
-                print(os.getcwd())
-                print('after changing directory')
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print(os.getcwd())
-                print("Converting from windows to unix format")
-                print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                print('queuing **********************************************************************************')
-                cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
-                print("Submitting Job1 with command: %s" % cmd)
-                status, jobnum = commands.getstatusoutput(cmd)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print(jobnum.split())
-                lenght_of_split = len(jobnum.split())
-                index_value = lenght_of_split - 1
-                print(jobnum.split()[index_value])
-                job_id = jobnum.split()[index_value]
-                # save job id
-                job_id_key_name = "job_id"
-                entry_time = datetime.now()
-                try:
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           job_id=job_id,
-                                                                                           job_status="1",
-                                                                                           job_title=job_name,
-                                                                                           job_details=job_detail_string)
-                    QzwSlurmJobDetails_save_job_id.save()
-                except db.OperationalError as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                        project_id=project_id,
-                                                                        entry_time=entry_time,
-                                                                        job_id=job_id,
-                                                                        job_status="1",
-                                                                        job_title=job_name,
-                                                                        job_details=job_detail_string)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")
-                except Exception as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    print("exception is ",str(e))
-                    pass
-                    '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           values=job_id,
-                                                                                           job_id=job_id)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")'''
-                print('queued')
-            elif slurm_value == "No":
-                print('slurm value selected is no')
-                print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-                print("start grompp 33333333333333  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
-
-
-                print("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt  -nt "+str(number_of_threads))
-                print("start mdrun 2222222222222  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx mdrun -v -s nvt.tpr -o nvt.trr -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log -deffnm nvt -nt "+str(number_of_threads))
-
-
-                print("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
-                print("start grompp 44444444444  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx grompp -f npt.mdp -po mdout.mdp -c nvt.gro -r nvt.gro -p topol.top -o npt.tpr -n index.ndx -maxwarn 10")
-
-
-                print("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
-                print("start mdrun 333333333333  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads))
-
-
-                print("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
-                print("start grompp 5555555555  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10")
-
-
-                print("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
-                print("start mdrun 4444444444444  ==========================================")
-                print('before change directory')
-                print(os.getcwd())
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print('after change directory')
-                print(os.getcwd())
-                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(source_file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < TASS_NVT_equilibration_windows_format.sh > TASS_NVT_equilibration.sh")
+        os.system("perl -p -e 's/\r$//' < TASS_NVT_equilibration_windows_format.sh > TASS_NVT_equilibration.sh")
+        print('queuing **********************************************************************************')
+        cmd = "sbatch "+ source_file_path + "/" + "TASS_NVT_equilibration.sh"
+        print("Submitting Job1 with command: %s" % cmd)
+        status, jobnum = commands.getstatusoutput(cmd)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print(jobnum.split())
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        job_id_key_name = "job_id"
+        entry_time = datetime.now()
+        try:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS EQUILIBRATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   job_id=job_id,
+                                                                                   job_status="1",
+                                                                                   job_title=job_name,
+                                                                                   job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+        except db.OperationalError as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name,
+                                                                job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")
+        except Exception as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ",str(e))
+            pass
+            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   values=job_id,
+                                                                                   job_id=job_id)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")'''
+        print('queued')
 
         return JsonResponse({'success': True})
     else:
-        print('replace mdp file function returned False')
+        print('replace inp file function returned False')
         return JsonResponse({'success': False})
 
 
