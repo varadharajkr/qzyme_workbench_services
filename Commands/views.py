@@ -5500,7 +5500,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ simulation_script_file_name):
         print('removing ',file_path + simulation_script_file_name)
-        os.remove(file_path + simulation_script_file_name)
+        os.remove(file_path + '/' + simulation_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ simulation_script_file_name)
