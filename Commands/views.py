@@ -278,7 +278,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         module_name = 'TASS'
         # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
         job_name = str(initial_string) + '_' + module_name
-        job_detail_string = module_name + + '_NVT_EQUILIBRATION'
+        job_detail_string = module_name + '_NVT_EQUILIBRATION'
         server_value = 'allcpu'
         pre_simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
         simulation_script = 'TASS_NVT_equilibration.sh'
