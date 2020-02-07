@@ -176,6 +176,10 @@ class gromacs(APIView):
 @csrf_exempt
 def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads):
     print('inside generate_TASS_slurm_script function')
+    print('file_path ',)
+    print('server_name ',server_name)
+    print('job_name ',job_name)
+    print('number_of_threads ',number_of_threads)
     new_shell_script_lines = ''
     print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
     with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
@@ -205,7 +209,11 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
 
 @csrf_exempt
 def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value, nsteps_value):
-    print('inside replace_temp_and_nsteps_in_mdp_file function')
+    print('inside replace_temp_and_nsteps_in_inp_file function')
+    print(file_path+pre_inp_file)
+    print(file_path+inp_file)
+    print('temp_value ',temp_value)
+    print('nsteps_value ',nsteps_value)
     try:
         original_inp_lines = ''
         with open(file_path+pre_inp_file, 'r') as pre_processed_mdb:
@@ -221,11 +229,13 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
         if os.path.exists(file_path+inp_file):
             os.remove(file_path+inp_file)
         with open(file_path+inp_file, 'w+') as inp_source_file:
+            print('file opened ',file_path+inp_file)
             inp_source_file.write(original_inp_lines)
+            print('file closed ', file_path + inp_file)
         return True
 
     except Exception as e:
-        print('exception in replacing mdp file is ',str(e))
+        print('exception in replacing inp file is ',str(e))
         return False
 
 
@@ -265,13 +275,13 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
 
 
     source_file_path = file_path
-    print('source file path in md simulation preparation --------------')
+    print('source file path in TASS Equilibration preparation --------------')
     print(source_file_path)
 
     function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'HEAT.in', temp_value, nsteps_value)
 
     if function_returned_value:
-        print('replace mdp file function returned true')
+        print('replace inp file function returned true')
         print('slurm value selected is yes')
         initial_string = 'QZW'
         # module_name = 'CatMec'
@@ -280,8 +290,8 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         job_name = str(initial_string) + '_' + module_name
         job_detail_string = module_name + '_NVT_EQUILIBRATION'
         server_value = 'allcpu'
-        pre_simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
-        simulation_script = 'TASS_NVT_equilibration.sh'
+        pre_simulation_script = 'pre_TASS_NVT_equilibration.sh'
+        simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
                                    number_of_threads)
 
