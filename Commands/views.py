@@ -367,7 +367,7 @@ class TASS(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         if commandDetails_result.command_title == "nvt_equilibration":
-            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.user_id)
         print('primary_command_runnable')
         print(primary_command_runnable)
 
