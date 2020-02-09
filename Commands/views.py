@@ -495,7 +495,7 @@ class TASS(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
-        primary_command_runnable = re.sub('amber_nvt_simulation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
         if commandDetails_result.command_title == "nvt_equilibration":
             returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
         elif commandDetails_result.command_title == "nvt_simulation":
