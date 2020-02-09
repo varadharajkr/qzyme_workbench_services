@@ -201,7 +201,10 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
     with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("sander -O -i Heat.in -o Heat.out -p amber.top -c 01_Min.ncrst -r Heat.ncrst -x Heat.nc -inf Heat.mdinfo\n")
+        if command_title == 'nvt_equilibration':
+            new_bash_script.write("sander -O -i Heat.in -o Heat.out -p amber.top -c 01_Min.ncrst -r Heat.ncrst -x Heat.nc -inf Heat.mdinfo\n")
+        elif command_title == 'nvt_simulation':
+            new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p pmaa.top -c Heat.ncrst -r min_qmmm.rst\n")
         new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
