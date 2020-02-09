@@ -174,7 +174,7 @@ class gromacs(APIView):
 
 
 @csrf_exempt
-def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads):
+def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads, command_title):
     print('inside generate_TASS_slurm_script function')
     print('file_path ',)
     print('server_name ',server_name)
@@ -208,7 +208,7 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
 
 
 @csrf_exempt
-def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value, nsteps_value):
+def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value='', nsteps_value='', atom_range=''):
     print('inside replace_temp_and_nsteps_in_inp_file function')
     print(file_path+pre_inp_file)
     print(file_path+inp_file)
@@ -220,7 +220,7 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
             content = pre_processed_mdb.readlines()
             for line in content:
                 if 'QZTEMP' in line or 'QZNSTEPS' in line:
-                    original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value))
+                    original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
                 else:
                     original_inp_lines += line
 
@@ -238,7 +238,7 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
 
 
 @csrf_exempt
-def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, user_id=''):
+def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, command_title, user_id=''):
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
@@ -291,7 +291,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         pre_simulation_script = 'pre_TASS_NVT_equilibration.sh'
         simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
-                                   number_of_threads)
+                                   number_of_threads, command_title)
 
         print('after generate_slurm_script ************************************************************************')
         print('before changing directory')
@@ -357,7 +357,123 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         return True
     else:
         print('replace inp file function returned False')
-        return False
+        return False\
+
+
+@csrf_exempt
+def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+    print("inside TASS_nvt_simulation_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print("inside TASS_nvt_simulation_preparation function")
+    print('TASS_simulation_path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
+    print(file_path)
+
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=no_of_thread_key).latest(
+        'entry_time')
+
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
+
+    atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
+    atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=atom_range_key).latest(
+        'entry_time')
+
+    atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+
+    print("number of threads is ",number_of_threads)
+
+
+    source_file_path = file_path
+    print('source file path in TASS NVT Simulation preparation --------------')
+    print(source_file_path)
+
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
+
+    if function_returned_value:
+        print('replace inp file function returned true')
+        print('slurm value selected is yes')
+        initial_string = 'QZW'
+        # module_name = 'CatMec'
+        module_name = 'TASS'
+        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+        job_name = str(initial_string) + '_' + module_name
+        job_detail_string = module_name + '_NVT_SIMULATION'
+        server_value = 'allcpu'
+        pre_simulation_script = 'pre_TASS_NVT_simulation.sh'
+        simulation_script = 'TASS_NVT_simulation_windows_format.sh'
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   number_of_threads, command_title)
+
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(source_file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
+        os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
+        print('queuing **********************************************************************************')
+        cmd = "sbatch "+ source_file_path + "/" + "TASS_NVT_equilibration.sh"
+        print("Submitting Job1 with command: %s" % cmd)
+        status, jobnum = commands.getstatusoutput(cmd)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print(jobnum.split())
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        job_id_key_name = "job_id"
+        entry_time = datetime.now()
+        try:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   job_id=job_id,
+                                                                                   job_status="1",
+                                                                                   job_title=job_name,
+                                                                                   job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+        except db.OperationalError as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name,
+                                                                job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")
+        except Exception as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ",str(e))
+            pass
+            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   values=job_id,
+                                                                                   job_id=job_id)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")'''
+        print('queued')
+
+        return True
+    else:
+        print('replace inp file function returned False')
+        return False\
 
 
 # TASS
@@ -376,8 +492,11 @@ class TASS(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('amber_nvt_simulation.sh', '', primary_command_runnable)
         if commandDetails_result.command_title == "nvt_equilibration":
-            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.user_id)
+            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+        elif commandDetails_result.command_title == "nvt_simulation":
+            returned_preparation_value = TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
 
         print('primary_command_runnable')
         print(primary_command_runnable)
@@ -428,7 +547,7 @@ class TASS(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             try:
-                print("<<<<<<<<<<<<<<<<<<<<<<< error try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
                 update_command_status(inp_command_id, status_id)
             except db.OperationalError as e:
