@@ -423,7 +423,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
         print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         print('queuing **********************************************************************************')
-        cmd = "sbatch "+ source_file_path + "/" + "TASS_NVT_equilibration.sh"
+        cmd = "sbatch "+ source_file_path + "TASS_NVT_equilibration.sh"
         print("Submitting Job1 with command: %s" % cmd)
         status, jobnum = commands.getstatusoutput(cmd)
         print("job id is ", jobnum)
