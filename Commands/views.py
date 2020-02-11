@@ -204,7 +204,7 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
         if command_title == 'nvt_equilibration':
             new_bash_script.write("sander -O -i Heat.in -o Heat.out -p amber.top -c 01_Min.ncrst -r Heat.ncrst -x Heat.nc -inf Heat.mdinfo\n")
         elif command_title == 'nvt_simulation':
-            new_bash_script.write("mpirun -np "+str(number_of_threads)+" sander.MPI -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
+            new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
         elif command_title == 'TASS_qmm_mm':
             new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
         new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
@@ -425,7 +425,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
         print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         print('queuing **********************************************************************************')
-        cmd = "sbatch "+ source_file_path + "TASS_NVT_equilibration.sh"
+        cmd = "sbatch "+ source_file_path + "TASS_NVT_simulation..sh"
         print("Submitting Job1 with command: %s" % cmd)
         status, jobnum = commands.getstatusoutput(cmd)
         print("job id is ", jobnum)
