@@ -425,7 +425,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
         print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
         print('queuing **********************************************************************************')
-        cmd = "sbatch "+ source_file_path + "TASS_NVT_simulation..sh"
+        cmd = "sbatch "+ source_file_path + "TASS_NVT_simulation.sh"
         print("Submitting Job1 with command: %s" % cmd)
         status, jobnum = commands.getstatusoutput(cmd)
         print("job id is ", jobnum)
@@ -451,6 +451,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
                                                                                    job_title=job_name,
                                                                                    job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
+            print('saved and queued')
         except db.OperationalError as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
@@ -474,7 +475,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
                                                                                    job_id=job_id)
             QzwSlurmJobDetails_save_job_id.save()
             print("saved")'''
-        print('queued')
+            print('not queued')
 
         return True
     else:
@@ -568,7 +569,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
                                                                                    job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
         except db.OperationalError as e:
-            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
             QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
                                                                 project_id=project_id,
@@ -580,7 +581,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
             QzwSlurmJobDetails_save_job_id.save()
             print("saved")
         except Exception as e:
-            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             print("exception is ",str(e))
             pass
             '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
