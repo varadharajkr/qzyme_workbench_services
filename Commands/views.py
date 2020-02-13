@@ -550,28 +550,34 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         data = json.loads(collective_range_value)
         for id in data:
             if id['filter'] == "distance":
+                print("inside if distance")
                 filter_count += 1
                 atom_one = str(id['atom_type_one'])
                 atom_two = str(id['atom_type_two'])
-                original_inp_lines += 'd'+str(filter_count)+' DISTANCE ATOMS='+atom_one+', '+atom_two+'\n'
+                original_inp_lines += str('d'+str(filter_count)+' DISTANCE ATOMS='+str(atom_one)+', '+str(atom_two)+'\n')
+                print('original_inp_lines in distance ',str(original_inp_lines))
             elif id['filter'] == "angle":
+                print("inside if angle")
                 filter_count += 1
                 atom_one = id['atom_type_one']
                 atom_two = id['atom_type_two']
                 atom_three = id['atom_type_three']
-                original_inp_lines += 'd'+str(filter_count)+' ANGLE ATOMS='+atom_one+', '+atom_two+', '+atom_three+'\n'
+                original_inp_lines += str('d'+str(filter_count)+' ANGLE ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_three)+'\n')
+                print('original_inp_lines in angle ',str(original_inp_lines))
             elif id['filter'] == "torsion":
+                print("inside if torsion")
                 filter_count += 1
                 atom_one = id['atom_type_one']
                 atom_two = id['atom_type_two']
                 atom_three = id['atom_type_three']
                 atom_four = id['atom_type_four']
-                original_inp_lines += 'd'+str(filter_count)+' TORSION ATOMS='+atom_one+', '+atom_two+', '+atom_four+'\n'
+                original_inp_lines += str('d'+str(filter_count)+' TORSION ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_four)+'\n')
+                print('original_inp_lines in torsion ', str(original_inp_lines))
         for i in range(filter_count):
             if i + 1 == filter_count:
-                ARG_str += 'd' + str(i + 1)
+                ARG_str += str('d' + str(i + 1))
             elif i + 1 != filter_count:
-                ARG_str += 'd' + str(i + 1) + ','
+                ARG_str += str('d' + str(i + 1) + ',')
         print('ARG_str is ',ARG_str)
         original_inp_lines += str('metad: METAD ARG=d2  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
         original_inp_lines += str('restraint-d1: RESTRAINT ARG=d1 KAPPA=500  AT=0.3245\n')
@@ -580,9 +586,12 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         original_inp_lines += str('\n')
         original_inp_lines += str('# monitor the two variables and the metadynamics bias potential\n')
         original_inp_lines += str('PRINT STRIDE=10 ARG='+str(ARG_str)+'  FILE=COLVAR\n')
+        print('original_inp_lines finally is \n',original_inp_lines)
         if os.path.exists(file_path + 'plumed.dat'):
+            print('removing plumed.dat file')
             os.remove(file_path + 'plumed.dat')
         with open(file_path + 'plumed.dat', 'w+') as plumed_file:
+            print('openeing plumed.dat and writing')
             plumed_file.write(str(original_inp_lines))
         plumed_replacement_completion = True
 
