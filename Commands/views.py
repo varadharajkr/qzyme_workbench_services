@@ -551,22 +551,22 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         for id in data:
             if id['filter'] == "distance":
                 filter_count += 1
-                atom_one = id['atom_type_one']
-                atom_two = id['atom_type_two']
-                original_inp_lines += 'd'+filter_count+' DISTANCE ATOMS='+atom_one+', '+atom_two+'\n'
+                atom_one = str(id['atom_type_one'])
+                atom_two = str(id['atom_type_two'])
+                original_inp_lines += 'd'+str(filter_count)+' DISTANCE ATOMS='+atom_one+', '+atom_two+'\n'
             elif id['filter'] == "angle":
                 filter_count += 1
                 atom_one = id['atom_type_one']
                 atom_two = id['atom_type_two']
                 atom_three = id['atom_type_three']
-                original_inp_lines += 'd'+filter_count+' ANGLE ATOMS='+atom_one+', '+atom_two+', '+atom_three+'\n'
+                original_inp_lines += 'd'+str(filter_count)+' ANGLE ATOMS='+atom_one+', '+atom_two+', '+atom_three+'\n'
             elif id['filter'] == "torsion":
                 filter_count += 1
                 atom_one = id['atom_type_one']
                 atom_two = id['atom_type_two']
                 atom_three = id['atom_type_three']
                 atom_four = id['atom_type_four']
-                original_inp_lines += 'd'+filter_count+' TORSION ATOMS='+atom_one+', '+atom_two+', '+atom_four+'\n'
+                original_inp_lines += 'd'+str(filter_count)+' TORSION ATOMS='+atom_one+', '+atom_two+', '+atom_four+'\n'
         for i in range(filter_count):
             if i + 1 == filter_count:
                 ARG_str += 'd' + str(i + 1)
