@@ -516,6 +516,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
     filter_count = 0
+    umb_med_count = 0
     ARG_str = ''
     plumed_replacement_completion = False
     try:
@@ -573,18 +574,22 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
                 atom_four = id['atom_type_four']
                 original_inp_lines += str('d'+str(filter_count)+' TORSION ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_four)+'\n')
                 print('original_inp_lines in torsion ', str(original_inp_lines))
+        for id in data:
+            umb_med_count += 1
+            if id['umb_med'] == 'meta_dynamics':
+                original_inp_lines += str('metad: METAD ARG=d'+str(umb_med_count)+'  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
+            elif id['umb_med'] == 'umbrella_sampling':
+                original_inp_lines += str('restraint-d'+str(umb_med_count)+': RESTRAINT ARG=d'+str(umb_med_count)+' KAPPA=500  AT=0.3245\n')
+        original_inp_lines += str('\n')
+        original_inp_lines += str('#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n')
+        original_inp_lines += str('\n')
+        original_inp_lines += str('# monitor the two variables and the metadynamics bias potential\n')
         for i in range(filter_count):
             if i + 1 == filter_count:
                 ARG_str += str('d' + str(i + 1))
             elif i + 1 != filter_count:
                 ARG_str += str('d' + str(i + 1) + ',')
         print('ARG_str is ',ARG_str)
-        original_inp_lines += str('metad: METAD ARG=d2  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
-        original_inp_lines += str('restraint-d1: RESTRAINT ARG=d1 KAPPA=500  AT=0.3245\n')
-        original_inp_lines += str('\n')
-        original_inp_lines += str('#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n')
-        original_inp_lines += str('\n')
-        original_inp_lines += str('# monitor the two variables and the metadynamics bias potential\n')
         original_inp_lines += str('PRINT STRIDE=10 ARG='+str(ARG_str)+'  FILE=COLVAR\n')
         print('original_inp_lines finally is \n',original_inp_lines)
         if os.path.exists(file_path + 'plumed.dat'):
