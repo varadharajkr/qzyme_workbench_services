@@ -206,7 +206,7 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
         elif command_title == 'nvt_simulation':
             new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
         elif command_title == 'TASS_qmm_mm':
-            new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
+            new_bash_script.write("sander -O -i md_qmm.in -o md_qmmm.out -p amber.top -c min_qmmm.rst -r md_qmmm.rst -x md_qmmm.mdcrd\n")
         new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
@@ -501,12 +501,13 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
 
     number_of_threads = int(ProjectToolEssentials_res.key_values)
 
-    atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
-    atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=atom_range_key).latest(
+    collective_range_key = "TASS_collective_filter_json"
+    collective_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=collective_range_key).latest(
         'entry_time')
 
-    atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+    pre_collective_range_value = str(collective_range_ProjectToolEssentials_res.key_values)
+    collective_range_value = '\"'+ pre_collective_range_value +'\"'
 
     print("number of threads is ",number_of_threads)
 
@@ -514,89 +515,164 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
+    filter_count = 0
+    ARG_str = ''
+    plumed_replacement_completion = False
+    try:
+        atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
+        atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                          key_name=atom_range_key).latest(
+            'entry_time')
 
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
+        atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+    try:
+        temp_key = "TASS_nvt_equilibration_temp_value"
+        temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=temp_key).latest(
+            'entry_time')
 
-    if function_returned_value:
-        print('replace inp file function returned true')
-        print('slurm value selected is yes')
-        initial_string = 'QZW'
-        # module_name = 'CatMec'
-        module_name = 'TASS'
-        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-        job_name = str(initial_string) + '_' + module_name
-        job_detail_string = module_name + '_NVT_SIMULATION'
-        server_value = 'allcpu'
-        pre_simulation_script = 'pre_TASS_NVT_simulation.sh'
-        simulation_script = 'TASS_NVT_simulation_windows_format.sh'
-        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
-                                   number_of_threads, command_title)
+        temp_value = float(temp_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+    try:
+        nstep_val_key = 'TASS_simulation_nsteps_value'
+        nstep_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=nstep_val_key).latest(
+            'entry_time')
 
-        print('after generate_slurm_script ************************************************************************')
-        print('before changing directory')
-        print(os.getcwd())
-        print('after changing directory')
-        os.chdir(source_file_path)
-        print(os.getcwd())
-        print("Converting from windows to unix format")
-        print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
-        os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
-        print('queuing **********************************************************************************')
-        cmd = "sbatch "+ source_file_path + "/" + "TASS_NVT_equilibration.sh"
-        print("Submitting Job1 with command: %s" % cmd)
-        status, jobnum = commands.getstatusoutput(cmd)
-        print("job id is ", jobnum)
-        print("status is ", status)
-        print("job id is ", jobnum)
-        print("status is ", status)
-        print(jobnum.split())
-        lenght_of_split = len(jobnum.split())
-        index_value = lenght_of_split - 1
-        print(jobnum.split()[index_value])
-        job_id = jobnum.split()[index_value]
-        # save job id
-        job_id_key_name = "job_id"
-        entry_time = datetime.now()
-        try:
-            print(
-                "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                   project_id=project_id,
-                                                                                   entry_time=entry_time,
-                                                                                   job_id=job_id,
-                                                                                   job_status="1",
-                                                                                   job_title=job_name,
-                                                                                   job_details=job_detail_string)
-            QzwSlurmJobDetails_save_job_id.save()
-        except db.OperationalError as e:
-            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            db.close_old_connections()
-            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                project_id=project_id,
-                                                                entry_time=entry_time,
-                                                                job_id=job_id,
-                                                                job_status="1",
-                                                                job_title=job_name,
-                                                                job_details=job_detail_string)
-            QzwSlurmJobDetails_save_job_id.save()
-            print("saved")
-        except Exception as e:
-            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            print("exception is ",str(e))
-            pass
-            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                   project_id=project_id,
-                                                                                   entry_time=entry_time,
-                                                                                   values=job_id,
-                                                                                   job_id=job_id)
-            QzwSlurmJobDetails_save_job_id.save()
-            print("saved")'''
-        print('queued')
+        nstep_value = float(nstep_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+    try:
+        original_inp_lines = ''
+        data = json.loads(collective_range_value)
+        for id in data:
+            if id['filter'] == "distance":
+                filter_count += 1
+                atom_one = id['atom_type_one']
+                atom_two = id['atom_type_two']
+                original_inp_lines += 'd'+filter_count+' DISTANCE ATOMS='+atom_one+', '+atom_two+'\n'
+            elif id['filter'] == "angle":
+                filter_count += 1
+                atom_one = id['atom_type_one']
+                atom_two = id['atom_type_two']
+                atom_three = id['atom_type_three']
+                original_inp_lines += 'd'+filter_count+' ANGLE ATOMS='+atom_one+', '+atom_two+', '+atom_three+'\n'
+            elif id['filter'] == "torsion":
+                filter_count += 1
+                atom_one = id['atom_type_one']
+                atom_two = id['atom_type_two']
+                atom_three = id['atom_type_three']
+                atom_four = id['atom_type_four']
+                original_inp_lines += 'd'+filter_count+' TORSION ATOMS='+atom_one+', '+atom_two+', '+atom_four+'\n'
+        for i in range(filter_count):
+            if i + 1 == filter_count:
+                ARG_str += 'd' + str(i + 1)
+            elif i + 1 != filter_count:
+                ARG_str += 'd' + str(i + 1) + ','
+        original_inp_lines += 'metad: METAD ARG=d2  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n'
+        original_inp_lines += 'restraint-d1: RESTRAINT ARG=d1 KAPPA=500  AT=0.3245\n'
+        original_inp_lines += '\n'
+        original_inp_lines += '#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n'
+        original_inp_lines += '\n'
+        original_inp_lines += '# monitor the two variables and the metadynamics bias potential\n'
+        original_inp_lines += 'PRINT STRIDE=10 ARG='+ARG_str+'  FILE=COLVAR\n'
+        if os.path.exists(file_path + 'plumed.dat'):
+            os.remove(file_path + 'plumed.dat')
+        with open(file_path + 'plumed.dat', 'w+') as plumed_file:
+            plumed_file.write(original_inp_lines)
+        plumed_replacement_completion = True
 
-        return True
+    except Exception as e:
+        print('exception in replacing inp file is ', str(e))
+        plumed_replacement_completion = False
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_md_qmm.in', 'md_qmm.in', temp_value, nstep_value, atom_range_value)
+    if plumed_replacement_completion:
+        if function_returned_value:
+            print('replace inp file function returned true')
+            print('slurm value selected is yes')
+            initial_string = 'QZW'
+            # module_name = 'CatMec'
+            module_name = 'TASS'
+            # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_name = str(initial_string) + '_' + module_name
+            job_detail_string = module_name + '_TASS_SIMULATION'
+            server_value = 'allcpu'
+            pre_simulation_script = 'pre_TASS_simulation.sh'
+            simulation_script = 'TASS_simulation_windows_format.sh'
+            generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                       number_of_threads, command_title)
+
+            print('after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(source_file_path)
+            print(os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < TASS_simulation_windows_format.sh > TASS_simulation.sh")
+            os.system("perl -p -e 's/\r$//' < TASS_simulation_windows_format.sh > TASS_simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch "+ source_file_path + "/" + "TASS_simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                print(
+                    "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       job_id=job_id,
+                                                                                       job_status="1",
+                                                                                       job_title=job_name,
+                                                                                       job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+            except Exception as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("exception is ",str(e))
+                pass
+                '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       values=job_id,
+                                                                                       job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")'''
+            print('queued')
+
+            return True
+        else:
+            print('replace inp file function returned False')
+            return False
     else:
-        print('replace inp file function returned False')
-        return False\
+        print('replacement in plumed.dat was not successful')
+        return False
 
 
 # TASS
