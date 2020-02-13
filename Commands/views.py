@@ -572,17 +572,18 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
                 ARG_str += 'd' + str(i + 1)
             elif i + 1 != filter_count:
                 ARG_str += 'd' + str(i + 1) + ','
-        original_inp_lines += 'metad: METAD ARG=d2  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n'
-        original_inp_lines += 'restraint-d1: RESTRAINT ARG=d1 KAPPA=500  AT=0.3245\n'
-        original_inp_lines += '\n'
-        original_inp_lines += '#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n'
-        original_inp_lines += '\n'
-        original_inp_lines += '# monitor the two variables and the metadynamics bias potential\n'
-        original_inp_lines += 'PRINT STRIDE=10 ARG='+ARG_str+'  FILE=COLVAR\n'
+        print('ARG_str is ',ARG_str)
+        original_inp_lines += str('metad: METAD ARG=d2  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
+        original_inp_lines += str('restraint-d1: RESTRAINT ARG=d1 KAPPA=500  AT=0.3245\n')
+        original_inp_lines += str('\n')
+        original_inp_lines += str('#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n')
+        original_inp_lines += str('\n')
+        original_inp_lines += str('# monitor the two variables and the metadynamics bias potential\n')
+        original_inp_lines += str('PRINT STRIDE=10 ARG='+str(ARG_str)+'  FILE=COLVAR\n')
         if os.path.exists(file_path + 'plumed.dat'):
             os.remove(file_path + 'plumed.dat')
         with open(file_path + 'plumed.dat', 'w+') as plumed_file:
-            plumed_file.write(original_inp_lines)
+            plumed_file.write(str(original_inp_lines))
         plumed_replacement_completion = True
 
     except Exception as e:
