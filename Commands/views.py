@@ -507,7 +507,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         'entry_time')
 
     pre_collective_range_value = str(collective_range_ProjectToolEssentials_res.key_values)
-    collective_range_value = '\"'+ pre_collective_range_value +'\"'
+    collective_range_value = str('\"'+ pre_collective_range_value +'\"')
 
     print("number of threads is ",number_of_threads)
 
@@ -548,11 +548,10 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         print(str(e))
     # try:
     original_inp_lines = ''
-    # data = json.loads(collective_range_value)
-    data = json.loads(pre_collective_range_value)
-    print('pre_collective_range_value*****************************\n',pre_collective_range_value)
-    print('collective_range_value*****************************\n',collective_range_value)
-    print('data **********************************************\n',data)
+    data = json.loads(collective_range_value)
+    print('pre_collective_range_value*****************************\n',pre_collective_range_value,'\n',type(pre_collective_range_value),'\n')
+    print('collective_range_value*****************************\n',collective_range_value,'\n',type(collective_range_value),'\n')
+    print('data **********************************************\n',data,'\n',type(data),'\n')
     for id in data:
         if id['filter'] == "distance":
             print("inside if distance")
