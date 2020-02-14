@@ -507,7 +507,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         'entry_time')
 
     pre_collective_range_value = collective_range_ProjectToolEssentials_res.key_values
-    collective_range_value = '\"'+ pre_collective_range_value +'\"'
+    collective_range_value = list('\"'+ pre_collective_range_value +'\"')
 
     print("number of threads is ",number_of_threads)
 
