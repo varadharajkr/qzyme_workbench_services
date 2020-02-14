@@ -507,7 +507,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         'entry_time')
 
     pre_collective_range_value = collective_range_ProjectToolEssentials_res.key_values
-    collective_range_value = list('\"'+ pre_collective_range_value +'\"')
+    collective_range_value = str('\"'+ pre_collective_range_value +'\"')
 
     print("number of threads is ",number_of_threads)
 
@@ -552,38 +552,44 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
           type(pre_collective_range_value), '\n')
     print('collective_range_value*****************************\n', collective_range_value, '\n',
           type(collective_range_value), '\n')
-    
+    data = json.loads(collective_range_value)
+    data = json.loads(collective_range_value)
+    print('data **********************************************\n', data, '\n', type(data), '\n')
+
     for id in collective_range_value:
-        if id['filter'] == "distance":
-            print("inside if distance")
-            filter_count += 1
-            atom_one = str(id['atom_type_one'])
-            atom_two = str(id['atom_type_two'])
-            original_inp_lines += str('d'+str(filter_count)+' DISTANCE ATOMS='+str(atom_one)+', '+str(atom_two)+'\n')
-            print('original_inp_lines in distance ',str(original_inp_lines))
-        elif id['filter'] == "angle":
-            print("inside if angle")
-            filter_count += 1
-            atom_one = id['atom_type_one']
-            atom_two = id['atom_type_two']
-            atom_three = id['atom_type_three']
-            original_inp_lines += str('d'+str(filter_count)+' ANGLE ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_three)+'\n')
-            print('original_inp_lines in angle ',str(original_inp_lines))
-        elif id['filter'] == "torsion":
-            print("inside if torsion")
-            filter_count += 1
-            atom_one = id['atom_type_one']
-            atom_two = id['atom_type_two']
-            atom_three = id['atom_type_three']
-            atom_four = id['atom_type_four']
-            original_inp_lines += str('d'+str(filter_count)+' TORSION ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_four)+'\n')
-            print('original_inp_lines in torsion ', str(original_inp_lines))
+        for key, value in id.iteritems():
+            if key == 'filter' and value == "distance":
+                print("inside if distance")
+                filter_count += 1
+                atom_one = str(id['atom_type_one'])
+                atom_two = str(id['atom_type_two'])
+                original_inp_lines += str('d'+str(filter_count)+' DISTANCE ATOMS='+str(atom_one)+', '+str(atom_two)+'\n')
+                print('original_inp_lines in distance ',str(original_inp_lines))
+            elif key == 'filter' and value == "angle":
+                print("inside if angle")
+                filter_count += 1
+                atom_one = id['atom_type_one']
+                atom_two = id['atom_type_two']
+                atom_three = id['atom_type_three']
+                original_inp_lines += str('d'+str(filter_count)+' ANGLE ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_three)+'\n')
+                print('original_inp_lines in angle ',str(original_inp_lines))
+            elif key == 'filter' and value == "torsion":
+                print("inside if torsion")
+                filter_count += 1
+                atom_one = id['atom_type_one']
+                atom_two = id['atom_type_two']
+                atom_three = id['atom_type_three']
+                atom_four = id['atom_type_four']
+                original_inp_lines += str('d'+str(filter_count)+' TORSION ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_four)+'\n')
+                print('original_inp_lines in torsion ', str(original_inp_lines))
     for id in data:
         umb_med_count += 1
-        if id['umb_med'] == 'meta_dynamics':
-            original_inp_lines += str('metad: METAD ARG=d'+str(umb_med_count)+'  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
-        elif id['umb_med'] == 'umbrella_sampling':
-            original_inp_lines += str('restraint-d'+str(umb_med_count)+': RESTRAINT ARG=d'+str(umb_med_count)+' KAPPA=500  AT=0.3245\n')
+        for key, value in id.iteritems():
+            if key == 'umb_med' and value == "meta_dynamics":
+                original_inp_lines += str(
+                    'metad: METAD ARG=d' + str(umb_med_count) + '  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
+            elif key == 'umb_med' and value == "umbrella_sampling":
+                original_inp_lines += str('restraint-d'+str(umb_med_count)+': RESTRAINT ARG=d'+str(umb_med_count)+' KAPPA=500  AT=0.3245\n')
     original_inp_lines += str('\n')
     original_inp_lines += str('#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n')
     original_inp_lines += str('\n')
