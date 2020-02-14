@@ -548,11 +548,12 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         print(str(e))
     # try:
     original_inp_lines = ''
-    data = json.loads(collective_range_value)
-    print('pre_collective_range_value*****************************\n',pre_collective_range_value,'\n',type(pre_collective_range_value),'\n')
-    print('collective_range_value*****************************\n',collective_range_value,'\n',type(collective_range_value),'\n')
-    print('data **********************************************\n',data,'\n',type(data),'\n')
-    for id in data:
+    print('pre_collective_range_value*****************************\n', pre_collective_range_value, '\n',
+          type(pre_collective_range_value), '\n')
+    print('collective_range_value*****************************\n', collective_range_value, '\n',
+          type(collective_range_value), '\n')
+    
+    for id in collective_range_value:
         if id['filter'] == "distance":
             print("inside if distance")
             filter_count += 1
