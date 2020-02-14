@@ -507,7 +507,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         'entry_time')
 
     pre_collective_range_value = collective_range_ProjectToolEssentials_res.key_values
-    collective_range_value = str('\"'+ pre_collective_range_value +'\"')
+    collective_range_value = str(pre_collective_range_value)
 
     print("number of threads is ",number_of_threads)
 
@@ -515,9 +515,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
-    filter_count = 0
-    umb_med_count = 0
-    ARG_str = ''
+
     plumed_replacement_completion = False
     try:
         atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
@@ -546,74 +544,19 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         nstep_value = float(nstep_ProjectToolEssentials_res.key_values)
     except Exception as e:
         print(str(e))
-    # try:
-    original_inp_lines = ''
-    print('pre_collective_range_value*****************************\n', pre_collective_range_value, '\n',
-          type(pre_collective_range_value), '\n')
-    print('collective_range_value*****************************\n', collective_range_value, '\n',
-          type(collective_range_value), '\n')
-    data = json.loads(collective_range_value)
-    data = json.loads(collective_range_value)
-    print('data **********************************************\n', data, '\n', type(data), '\n')
 
-    for id in collective_range_value:
-        for key, value in id.iteritems():
-            if key == 'filter' and value == "distance":
-                print("inside if distance")
-                filter_count += 1
-                atom_one = str(id['atom_type_one'])
-                atom_two = str(id['atom_type_two'])
-                original_inp_lines += str('d'+str(filter_count)+' DISTANCE ATOMS='+str(atom_one)+', '+str(atom_two)+'\n')
-                print('original_inp_lines in distance ',str(original_inp_lines))
-            elif key == 'filter' and value == "angle":
-                print("inside if angle")
-                filter_count += 1
-                atom_one = id['atom_type_one']
-                atom_two = id['atom_type_two']
-                atom_three = id['atom_type_three']
-                original_inp_lines += str('d'+str(filter_count)+' ANGLE ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_three)+'\n')
-                print('original_inp_lines in angle ',str(original_inp_lines))
-            elif key == 'filter' and value == "torsion":
-                print("inside if torsion")
-                filter_count += 1
-                atom_one = id['atom_type_one']
-                atom_two = id['atom_type_two']
-                atom_three = id['atom_type_three']
-                atom_four = id['atom_type_four']
-                original_inp_lines += str('d'+str(filter_count)+' TORSION ATOMS='+str(atom_one)+', '+str(atom_two)+', '+str(atom_four)+'\n')
-                print('original_inp_lines in torsion ', str(original_inp_lines))
-    for id in data:
-        umb_med_count += 1
-        for key, value in id.iteritems():
-            if key == 'umb_med' and value == "meta_dynamics":
-                original_inp_lines += str(
-                    'metad: METAD ARG=d' + str(umb_med_count) + '  PACE=100 HEIGHT=5.0 SIGMA=0.1 FILE=HILLS\n')
-            elif key == 'umb_med' and value == "umbrella_sampling":
-                original_inp_lines += str('restraint-d'+str(umb_med_count)+': RESTRAINT ARG=d'+str(umb_med_count)+' KAPPA=500  AT=0.3245\n')
-    original_inp_lines += str('\n')
-    original_inp_lines += str('#uwall: UPPER_WALLS ARG=d1 AT=0.4 KAPPA=800.0 EXP=2 EPS=1 OFFSET=0\n')
-    original_inp_lines += str('\n')
-    original_inp_lines += str('# monitor the two variables and the metadynamics bias potential\n')
-    for i in range(filter_count):
-        if i + 1 == filter_count:
-            ARG_str += str('d' + str(i + 1))
-        elif i + 1 != filter_count:
-            ARG_str += str('d' + str(i + 1) + ',')
-    print('ARG_str is ',ARG_str)
-    original_inp_lines += str('PRINT STRIDE=10 ARG='+str(ARG_str)+'  FILE=COLVAR\n')
-    print('original_inp_lines finally is \n',original_inp_lines)
-    if os.path.exists(file_path + 'plumed.dat'):
-        print('removing plumed.dat file')
-        os.remove(file_path + 'plumed.dat')
-    with open(file_path + 'plumed.dat', 'w+') as plumed_file:
-        print('openeing plumed.dat and writing')
-        plumed_file.write(str(original_inp_lines))
+    os.chdir(file_path)
+
+    if os.path.exists(file_path+'plumed.dat'):
+        os.remove(file_path+'plumed.dat')
+        
+    os.system('python generate_plumed_file.py "' + collective_range_value + '"' + ' ' + file_path)
+
+    if os.path.exists(file_path+'plumed.dat'):
         plumed_replacement_completion = True
 
-    # except Exception as e:
-    #     print('exception in replacing inp file is ', str(e))
-    #     plumed_replacement_completion = False
     function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_md_qmm.in', 'md_qmm.in', temp_value, nstep_value, atom_range_value)
+
     if plumed_replacement_completion:
         if function_returned_value:
             print('replace inp file function returned true')
