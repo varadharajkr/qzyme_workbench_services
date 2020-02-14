@@ -206,7 +206,7 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
         elif command_title == 'nvt_simulation':
             new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
         elif command_title == 'TASS_qmm_mm':
-            new_bash_script.write("sander -O -i md_qmm.in -o md_qmmm.out -p amber.top -c min_qmmm.rst -r md_qmmm.rst -x md_qmmm.mdcrd\n")
+            new_bash_script.write("sander -O -i md_qmm.in -o md_qmmm.out -p amber.top -c Heat.ncrst -r md_qmmm.rst -x md_qmmm.mdcrd\n")
         new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
@@ -226,7 +226,7 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
             content = pre_processed_mdb.readlines()
             for line in content:
                 if 'QZTEMP' in line or 'QZNSTEPS' in line or 'QZATMORANGE' in line:
-                    original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
+                    original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
                 else:
                     original_inp_lines += line
 
@@ -549,7 +549,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
 
     if os.path.exists(file_path+'plumed.dat'):
         os.remove(file_path+'plumed.dat')
-        
+
     os.system('python generate_plumed_file.py "' + collective_range_value + '"' + ' ' + file_path)
 
     if os.path.exists(file_path+'plumed.dat'):
