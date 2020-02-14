@@ -548,7 +548,9 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         print(str(e))
     # try:
     original_inp_lines = ''
-    data = json.loads(collective_range_value)
+    # data = json.loads(collective_range_value)
+    data = json.loads(pre_collective_range_value)
+    print('pre_collective_range_value*****************************\n',pre_collective_range_value)
     print('collective_range_value*****************************\n',collective_range_value)
     print('data **********************************************\n',data)
     for id in data:
