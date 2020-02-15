@@ -282,7 +282,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
     print('source file path in TASS Equilibration preparation --------------')
     print(source_file_path)
 
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'HEAT.in', temp_value, nsteps_value)
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'Heat.in', temp_value, nsteps_value)
 
     if function_returned_value:
         print('replace inp file function returned true')
