@@ -293,7 +293,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
         job_name = str(initial_string) + '_' + module_name
         job_detail_string = module_name + '_NVT_EQUILIBRATION'
-        server_value = 'allcpu'
+        server_value = 'qzyme4'
         pre_simulation_script = 'pre_TASS_NVT_equilibration.sh'
         simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
@@ -409,7 +409,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
         # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
         job_name = str(initial_string) + '_' + module_name
         job_detail_string = module_name + '_NVT_SIMULATION'
-        server_value = 'allcpu'
+        server_value = 'qzyme4'
         pre_simulation_script = 'pre_TASS_NVT_simulation.sh'
         simulation_script = 'TASS_NVT_simulation_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
@@ -659,6 +659,7 @@ class TASS(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
         if commandDetails_result.command_title == "nvt_equilibration":
