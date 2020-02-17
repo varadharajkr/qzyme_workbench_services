@@ -226,7 +226,10 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
             content = pre_processed_mdb.readlines()
             for line in content:
                 if 'QZTEMP' in line or 'QZNSTEPS' in line or 'QZATMORANGE' in line:
-                    original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
+                    if nsteps_value == '':
+                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
+                    else:
+                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
                 else:
                     original_inp_lines += line
 
