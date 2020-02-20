@@ -512,6 +512,14 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     pre_collective_range_value = collective_range_ProjectToolEssentials_res.key_values
     collective_range_value = str(pre_collective_range_value)
 
+    extra_option_key = "TASS_extra_functionality_json"
+    extra_option_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=extra_option_key).latest(
+        'entry_time')
+
+    pre_extra_option_value = extra_option_ProjectToolEssentials_res.key_values
+    extra_option_value = str(pre_extra_option_value)
+
     print("number of threads is ",number_of_threads)
 
 
@@ -553,7 +561,8 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     if os.path.exists(file_path+'plumed.dat'):
         os.remove(file_path+'plumed.dat')
 
-    os.system('python generate_plumed_file.py "' + collective_range_value + '"' + ' ' + file_path)
+    print('python generate_plumed_file.py "' + collective_range_value + '"' + ' "' + extra_option_value + '" ' + file_path)
+    os.system('python generate_plumed_file.py "' + collective_range_value + '"' + ' "' + extra_option_value + '" ' + file_path)
 
     if os.path.exists(file_path+'plumed.dat'):
         plumed_replacement_completion = True
@@ -7164,7 +7173,7 @@ class CatmecandAutodock(APIView):
         #     print "in pdbtopdbqt"
         # if commandDetails_result.command_title == "GpftoGlg":
         #     print "in GpftoGlg"
-        #     process_grid_file(commandDetails_result,QzwProjectDetails_res,request)
+        #     process__file(commandDetails_result,QzwProjectDetails_res,request)
         # if commandDetails_result.command_title == "DpftoDlg":
         #     print "in dpftodlg"
         #     process_dock_file(commandDetails_result,QzwProjectDetails_res,request)
