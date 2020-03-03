@@ -7091,7 +7091,7 @@ class CatmecandAutodock(APIView):
         else:
             print('inside else')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
+            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + 'CatMec' + '/' + command_tool_title + '/')
         print("\nworking directory after changing CHDIR")
         print(os.system("pwd"))
 
