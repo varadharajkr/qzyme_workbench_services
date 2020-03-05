@@ -5919,12 +5919,12 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         'entry_time')
 
     nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
-
+    """
     slurm_key = "md_simulation_slurm_selection_value"
     slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=slurm_key).latest(
         'entry_time')
-
+    
     slurm_value = slurm_ProjectToolEssentials_res.key_values
 
 
@@ -5934,6 +5934,8 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         'entry_time')
 
     server_value = server_ProjectToolEssentials_res.key_values
+    """
+    server_value = "anygpu"
 
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -5965,75 +5967,75 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 except Exception:
                     print("Unexpected error:", sys.exc_info())
                     pass
-            if slurm_value == "yes":
-                print('slurm value selected is yes')
-                initial_string = 'QZW'
-                # module_name = 'CatMec'
-                module_name = 'MD_SIMULATION'
-                # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                job_name = str(initial_string) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
-                generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+            # if slurm_value == "yes":
+            print('slurm value selected is yes')
+            initial_string = 'QZW'
+            # module_name = 'CatMec'
+            module_name = 'MD_SIMULATION'
+            # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_name = str(initial_string) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
+            generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
-                print('after generate_slurm_script ************************************************************************')
-                print('before changing directory')
-                print(os.getcwd())
-                print('after changing directory')
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print(os.getcwd())
-                print("Converting from windows to unix format")
-                print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                print('queuing **********************************************************************************')
-                cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
-                print("Submitting Job1 with command: %s" % cmd)
-                status, jobnum = commands.getstatusoutput(cmd)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print(jobnum.split())
-                lenght_of_split = len(jobnum.split())
-                index_value = lenght_of_split - 1
-                print(jobnum.split()[index_value])
-                job_id = jobnum.split()[index_value]
-                # save job id
-                job_id_key_name = "job_id"
-                entry_time = datetime.now()
-                try:
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           job_id=job_id,
-                                                                                           job_status="1",
-                                                                                           job_title=job_name,
-                                                                                           job_details=job_detail_string)
-                    QzwSlurmJobDetails_save_job_id.save()
-                except db.OperationalError as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                        project_id=project_id,
-                                                                        entry_time=entry_time,
-                                                                        job_id=job_id,
-                                                                        job_status="1",
-                                                                        job_title=job_name,
-                                                                        job_details=job_detail_string)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")
-                except Exception as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    print("exception is ",str(e))
-                    pass
-                    '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           values=job_id,
-                                                                                           job_id=job_id)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")'''
-                print('queued')
-            elif slurm_value == "No":
+            print('after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       job_id=job_id,
+                                                                                       job_status="1",
+                                                                                       job_title=job_name,
+                                                                                       job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+            except Exception as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("exception is ",str(e))
+                pass
+                '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       values=job_id,
+                                                                                       job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")'''
+            print('queued')
+            """elif slurm_value == "No":
                 print('slurm value selected is no')
                 print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
                 print("start grompp 33333333333333  ==========================================")
@@ -6092,7 +6094,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 os.chdir(source_file_path + '/md_run' + str(i + 1))
                 print('after change directory')
                 print(os.getcwd())
-                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))"""
 
         return JsonResponse({'success': True})
     else:
