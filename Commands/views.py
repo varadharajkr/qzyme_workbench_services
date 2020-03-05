@@ -5935,7 +5935,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
 
     server_value = server_ProjectToolEssentials_res.key_values
     """
-    server_value = "anygpu"
+    server_value = "allgpu"
 
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
