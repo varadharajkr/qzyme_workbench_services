@@ -7130,7 +7130,7 @@ class CatmecandAutodock(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock status error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/' +command_tool_title_string + '.log',
+                                   'local_shared_folder_path'] + project_name + '/' + 'CatMec' + '/' + command_tool_title + '/' +command_tool_title_string + '.log',
                                'w+')
                 fileobj.write(out)
                 status_id = config.CONSTS['status_error']
@@ -7140,7 +7140,7 @@ class CatmecandAutodock(APIView):
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/' + command_tool_title_string + '.log',
+                                   'local_shared_folder_path'] + project_name + '/' + 'CatMec' + '/' + command_tool_title + '/' + command_tool_title_string + '.log',
                                'w+')
                 fileobj.write(err)
                 status_id = config.CONSTS['status_error']
