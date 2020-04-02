@@ -46,6 +46,8 @@ import logging # for default django logging
 # Create your views ere.
 
 django_logger = logging.getLogger(__name__)
+
+
 # to run command in shell
 def execute_command(command,inp_command_id):
     print('inside execute_command')
@@ -115,6 +117,7 @@ def grom(request):
     commandDetails_result = commandDetails.objects.all().filter(command_id=inp_command_id)
     print(commandDetails_result)
 
+
 class gromacs(APIView):
     def get(self,request):
         pass
@@ -170,6 +173,574 @@ class gromacs(APIView):
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+@csrf_exempt
+def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads, command_title):
+    print('inside generate_TASS_slurm_script function')
+    print('file_path ',)
+    print('server_name ',server_name)
+    print('job_name ',job_name)
+    print('number_of_threads ',number_of_threads)
+    new_shell_script_lines = ''
+    print('before opening ',file_path +'/'+ pre_simulation_script_file_name)
+    with open(file_path +'/'+ pre_simulation_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ pre_simulation_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ simulation_script_file_name):
+        print('removing ',file_path + simulation_script_file_name)
+        os.remove(file_path + '/' + simulation_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ simulation_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        if command_title == 'nvt_equilibration':
+            new_bash_script.write("sander -O -i Heat.in -o Heat.out -p amber.top -c 01_Min.ncrst -r Heat.ncrst -x Heat.nc -inf Heat.mdinfo\n")
+        elif command_title == 'nvt_simulation':
+            new_bash_script.write("sander -O -i test.in -o min_qmmm.out -p amber.top -c Heat.ncrst -r min_qmmm.rst\n")
+        elif command_title == 'TASS_qmm_mm':
+            new_bash_script.write("sander -O -i md_qmm.in -o md_qmmm.out -p amber.top -c Heat.ncrst -r md_qmmm.rst -x md_qmmm.mdcrd\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+    print('outside the loop')
+    return True
+
+
+@csrf_exempt
+def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value='', nsteps_value='', atom_range=''):
+    print('inside replace_temp_and_nsteps_in_inp_file function')
+    print(file_path+pre_inp_file)
+    print(file_path+inp_file)
+    print('temp_value ',temp_value)
+    print('nsteps_value ',nsteps_value)
+    print('atom_range ',atom_range)
+    try:
+        original_inp_lines = ''
+        with open(file_path+pre_inp_file, 'r') as pre_processed_mdb:
+            content = pre_processed_mdb.readlines()
+            for line in content:
+                if 'QZTEMP' in line or 'QZNSTEPS' in line or 'QZATMORANGE' in line:
+                    if nsteps_value == '':
+                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
+                    else:
+                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
+                else:
+                    original_inp_lines += line
+
+        if os.path.exists(file_path+inp_file):
+            os.remove(file_path+inp_file)
+        with open(file_path+inp_file, 'w+') as inp_source_file:
+            print('file opened ',file_path+inp_file)
+            inp_source_file.write(original_inp_lines)
+            print('file closed ', file_path + inp_file)
+        return True
+
+    except Exception as e:
+        print('exception in replacing inp file is ',str(e))
+        return False
+
+
+@csrf_exempt
+def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, command_title, user_id=''):
+    print("inside TASS_nvt_equilibiration_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print("inside TASS_nvt_equilibiration_preparation function")
+    print('TASS_simulation_path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
+    print(file_path)
+
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=no_of_thread_key).latest(
+        'entry_time')
+
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
+
+    temp_key = "TASS_nvt_equilibration_temp_value"
+    temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=temp_key).latest(
+        'entry_time')
+
+    temp_value = float(temp_ProjectToolEssentials_res.key_values)
+
+    nsteps_key = "TASS_nvt_equilibration_nsteps_value"
+    nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=nsteps_key).latest(
+        'entry_time')
+
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
+
+    print("number of threads is ",number_of_threads)
+
+
+    source_file_path = file_path
+    print('source file path in TASS Equilibration preparation --------------')
+    print(source_file_path)
+
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'Heat.in', temp_value, nsteps_value)
+
+    if function_returned_value:
+        print('replace inp file function returned true')
+        print('slurm value selected is yes')
+        initial_string = 'QZW'
+        # module_name = 'CatMec'
+        module_name = 'TASS'
+        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+        job_name = str(initial_string) + '_' + module_name
+        job_detail_string = module_name + '_NVT_EQUILIBRATION'
+        server_value = 'qzyme4'
+        pre_simulation_script = 'pre_TASS_NVT_equilibration.sh'
+        simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   number_of_threads, command_title)
+
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(source_file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < TASS_NVT_equilibration_windows_format.sh > TASS_NVT_equilibration.sh")
+        os.system("perl -p -e 's/\r$//' < TASS_NVT_equilibration_windows_format.sh > TASS_NVT_equilibration.sh")
+        print('queuing **********************************************************************************')
+        cmd = "sbatch "+ source_file_path + "/" + "TASS_NVT_equilibration.sh"
+        print("Submitting Job1 with command: %s" % cmd)
+        status, jobnum = commands.getstatusoutput(cmd)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print(jobnum.split())
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        job_id_key_name = "job_id"
+        entry_time = datetime.now()
+        try:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS EQUILIBRATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   job_id=job_id,
+                                                                                   job_status="1",
+                                                                                   job_title=job_name,
+                                                                                   job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+        except db.OperationalError as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name,
+                                                                job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")
+        except Exception as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ",str(e))
+            pass
+            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   values=job_id,
+                                                                                   job_id=job_id)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")'''
+        print('queued')
+
+        return True
+    else:
+        print('replace inp file function returned False')
+        return False\
+
+
+@csrf_exempt
+def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+    print("inside TASS_nvt_simulation_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print("inside TASS_nvt_simulation_preparation function")
+    print('TASS_simulation_path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
+    print(file_path)
+
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=no_of_thread_key).latest(
+        'entry_time')
+
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
+
+    atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
+    atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=atom_range_key).latest(
+        'entry_time')
+
+    atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+
+    print("number of threads is ",number_of_threads)
+
+
+    source_file_path = file_path
+    print('source file path in TASS NVT Simulation preparation --------------')
+    print(source_file_path)
+
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
+
+    if function_returned_value:
+        print('replace inp file function returned true')
+        print('slurm value selected is yes')
+        initial_string = 'QZW'
+        # module_name = 'CatMec'
+        module_name = 'TASS'
+        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+        job_name = str(initial_string) + '_' + module_name
+        job_detail_string = module_name + '_NVT_SIMULATION'
+        server_value = 'qzyme4'
+        pre_simulation_script = 'pre_TASS_NVT_simulation.sh'
+        simulation_script = 'TASS_NVT_simulation_windows_format.sh'
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   number_of_threads, command_title)
+
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(source_file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
+        os.system("perl -p -e 's/\r$//' < TASS_NVT_simulation_windows_format.sh > TASS_NVT_simulation.sh")
+        print('queuing **********************************************************************************')
+        cmd = "sbatch "+ source_file_path + "TASS_NVT_simulation.sh"
+        print("Submitting Job1 with command: %s" % cmd)
+        status, jobnum = commands.getstatusoutput(cmd)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print("job id is ", jobnum)
+        print("status is ", status)
+        print(jobnum.split())
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        job_id_key_name = "job_id"
+        entry_time = datetime.now()
+        try:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   job_id=job_id,
+                                                                                   job_status="1",
+                                                                                   job_title=job_name,
+                                                                                   job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+            print('saved and queued')
+        except db.OperationalError as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_name,
+                                                                job_details=job_detail_string)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")
+        except Exception as e:
+            print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ",str(e))
+            pass
+            '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                   project_id=project_id,
+                                                                                   entry_time=entry_time,
+                                                                                   values=job_id,
+                                                                                   job_id=job_id)
+            QzwSlurmJobDetails_save_job_id.save()
+            print("saved")'''
+            print('not queued')
+
+        return True
+    else:
+        print('replace inp file function returned False')
+        return False\
+
+
+@csrf_exempt
+def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+    print("inside TASS_qmm_mm_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print("inside TASS_qmm_mm_preparation function")
+    print('TASS_simulation_path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
+    print(file_path)
+
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=no_of_thread_key).latest(
+        'entry_time')
+
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
+
+    collective_range_key = "TASS_collective_filter_json"
+    collective_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=collective_range_key).latest(
+        'entry_time')
+
+    pre_collective_range_value = collective_range_ProjectToolEssentials_res.key_values
+    collective_range_value = str(pre_collective_range_value)
+
+    extra_option_key = "TASS_extra_functionality_json"
+    extra_option_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=extra_option_key).latest(
+        'entry_time')
+
+    pre_extra_option_value = extra_option_ProjectToolEssentials_res.key_values
+    extra_option_value = str(pre_extra_option_value)
+
+    print("number of threads is ",number_of_threads)
+
+
+    source_file_path = file_path
+    print('source file path in TASS NVT Simulation preparation --------------')
+    print(source_file_path)
+
+    plumed_replacement_completion = False
+    try:
+        atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
+        atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                          key_name=atom_range_key).latest(
+            'entry_time')
+
+        atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+    try:
+        temp_key = "TASS_nvt_equilibration_temp_value"
+        temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=temp_key).latest(
+            'entry_time')
+
+        temp_value = float(temp_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+    try:
+        nstep_val_key = 'TASS_simulation_nsteps_value'
+        nstep_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=nstep_val_key).latest(
+            'entry_time')
+
+        nstep_value = float(nstep_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+
+    os.chdir(file_path)
+
+    if os.path.exists(file_path+'plumed.dat'):
+        os.remove(file_path+'plumed.dat')
+
+    print('python generate_plumed_file.py "' + collective_range_value + '"' + ' "' + extra_option_value + '" ' + file_path)
+    os.system('python generate_plumed_file.py "' + collective_range_value + '"' + ' "' + extra_option_value + '" ' + file_path)
+
+    if os.path.exists(file_path+'plumed.dat'):
+        plumed_replacement_completion = True
+
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_md_qmm.in', 'md_qmm.in', temp_value, nstep_value, atom_range_value)
+
+    if plumed_replacement_completion:
+        if function_returned_value:
+            print('replace inp file function returned true')
+            print('slurm value selected is yes')
+            initial_string = 'QZW'
+            # module_name = 'CatMec'
+            module_name = 'TASS'
+            # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_name = str(initial_string) + '_' + module_name
+            job_detail_string = module_name + '_TASS_SIMULATION'
+            server_value = 'qzyme4'
+            pre_simulation_script = 'pre_TASS_simulation.sh'
+            simulation_script = 'TASS_simulation_windows_format.sh'
+            generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                       number_of_threads, command_title)
+
+            print('after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(source_file_path)
+            print(os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < TASS_simulation_windows_format.sh > TASS_simulation.sh")
+            os.system("perl -p -e 's/\r$//' < TASS_simulation_windows_format.sh > TASS_simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch "+ source_file_path + "/" + "TASS_simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                print(
+                    "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       job_id=job_id,
+                                                                                       job_status="1",
+                                                                                       job_title=job_name,
+                                                                                       job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+            except Exception as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("exception is ",str(e))
+                pass
+                '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       values=job_id,
+                                                                                       job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")'''
+            print('queued')
+
+            return True
+        else:
+            print('replace inp file function returned False')
+            return False
+    else:
+        print('replacement in plumed.dat was not successful')
+        return False
+
+
+# TASS
+class TASS(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+
+        primary_command_runnable = commandDetails_result.primary_command
+        primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
+        if commandDetails_result.command_title == "nvt_equilibration":
+            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+        elif commandDetails_result.command_title == "nvt_simulation":
+            returned_preparation_value = TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+        elif commandDetails_result.command_title == "TASS_qmm_mm":
+            returned_preparation_value = TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+
+        print('primary_command_runnable')
+        print(primary_command_runnable)
+
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+
+        print("dirname")
+        print(os.getcwd())
+
+        print("runnable command is")
+        print(primary_command_runnable)
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        print("working directory after changing CHDIR")
+        print(os.system("pwd"))
+
+        #execute command
+        process_return = execute_command(primary_command_runnable, inp_command_id)
+        out, err = process_return.communicate()
+        process_return.wait()
+        # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
+
+        command_title_folder = commandDetails_result.command_title
+        command_tool_title = commandDetails_result.command_tool
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
+
+        if process_return.returncode == 0:
+            print("success executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+
+        if process_return.returncode != 0:
+            print("error executing command!!")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block TASS  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id)
+
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+
 
 #analyse_mmpsa
 class analyse_mmpbsa(APIView):
@@ -208,7 +779,7 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_tpr_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_tpr_file).latest('entry_time')
-        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
         # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
         key_name_ndx_file = 'mmpbsa_index_file'
@@ -216,7 +787,7 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_ndx_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ndx_file).latest('entry_time')
-        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.key_values.replace('\\', '/')
 
         key_name_CatMec_input = 'substrate_input'
         command_tootl_title = "CatMec"
@@ -224,14 +795,14 @@ class analyse_mmpbsa(APIView):
         ProjectToolEssentials_res_CatMec_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                        key_name=key_name_CatMec_input).latest('entry_time')
-        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
         # if User has only one ligand as input
         multiple_ligand_input = False
         if len(CatMec_input_dict) > 1:
             multiple_ligand_input = True
 
-        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
-        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.key_values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.key_values)
 
         '''
                                                                   .                o8o                         .        
@@ -278,7 +849,7 @@ class analyse_mmpbsa(APIView):
             ProjectToolEssentials_res_ligand_input = \
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             #extract ligand number
             if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
                 ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
@@ -319,7 +890,7 @@ class analyse_mmpbsa(APIView):
             ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
                                                                                       project_id=project_id,
                                                                                       key_name=key_name_protien_ligand_complex_index,
-                                                                                      values=protien_ligand_complex_index,
+                                                                                      key_values=protien_ligand_complex_index,
                                                                                       entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             ligand_name_index = protien_ligand_complex_index + 1
@@ -368,7 +939,7 @@ class analyse_mmpbsa(APIView):
                 tool_title=commandDetails_result.command_tool,
                 project_id=project_id,
                 key_name=key_name_protien_ligand_complex_index,
-                values=protien_ligand_complex_index,
+                key_values=protien_ligand_complex_index,
                 entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             file_gmx_make_ndx_input = open(config.PATH_CONFIG[
@@ -481,7 +1052,7 @@ class analyse_mmpbsa(APIView):
                     ProjectToolEssentials_res_ligand_input = \
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_ligand_input).latest('entry_time')
-                    ligand_name = ProjectToolEssentials_res_ligand_input.values
+                    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
                 else:
                     #for single ligand
                     for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -603,7 +1174,7 @@ def designer_slurm_queue_analyse_mmpbsa(inp_command_id, md_mutation_folder, proj
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_mmpbsa_preperation_'
     job_name = initial_string + '_' + str(
@@ -725,7 +1296,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     ProjectToolEssentials_save_designer_mmpbsa_tpr_file = ProjectToolEssentials(tool_title=command_tool,
                                                                                 project_id=project_id,
                                                                                 key_name=key_name_tpr_file,
-                                                                                values=tpr_file_list[0],
+                                                                                key_values=tpr_file_list[0],
                                                                                 entry_time=entry_time)
     result_ProjectToolEssentials_save_mmpbsa_tpr_file = ProjectToolEssentials_save_designer_mmpbsa_tpr_file.save()
 
@@ -735,7 +1306,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
     ProjectToolEssentials_res_CatMec_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name=key_name_CatMec_input).latest('entry_time')
-    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
     # if User has only one ligand as input
     multiple_ligand_input = False
     if len(CatMec_input_dict) > 1:
@@ -789,7 +1360,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
         # extract ligand number
         if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
             ligand_name_input = str(indexfile_input_dict["[ " + ligand_name + " ]"])
@@ -831,7 +1402,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
             tool_title=commandDetails_result.command_tool,
             project_id=project_id,
             key_name=key_name_protien_ligand_complex_index,
-            values=protien_ligand_complex_index,
+            key_values=protien_ligand_complex_index,
             entry_time=entry_time)
         result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
         ligand_name_index = protien_ligand_complex_index + 1
@@ -976,7 +1547,7 @@ def designer_queue_analyse_mmpbsa(request, md_mutation_folder, project_name, com
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             else:
                 # for single ligand
                 for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -1107,12 +1678,12 @@ def generate_hotspot_slurm_script(file_path, server_name, job_name, number_of_th
     with open(file_path + simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path + simulation_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
+        new_bash_script.write("rsync $SLURM_SUBMIT_DIR/* /scratch/$SLURM_JOB_ID\n")
         new_bash_script.write("cd /scratch/$SLURM_JOB_ID\n")
         new_bash_script.write("sh "+GMX_run_file_one+"\n")
         new_bash_script.write("sh "+GMX_run_file_two+"\n")
         new_bash_script.write("sh "+GMX_run_file_three+"\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -1125,7 +1696,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.key_values
 
     #create MMPBSA dir only
     os.system("mkdir " + config.PATH_CONFIG[
@@ -1178,7 +1749,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
     ProjectToolEssentials_res_CatMec_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name=key_name_CatMec_input).latest('entry_time')
-    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+    CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
     # if User has only one ligand as input
     multiple_ligand_input = False
     if len(CatMec_input_dict) > 1:
@@ -1206,7 +1777,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
         # extract ligand number
         if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
             ligand_name_input = str(indexfile_input_dict["[ " + ligand_name + " ]"])
@@ -1397,7 +1968,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             else:
                 # for single ligand
                 for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
@@ -1484,20 +2055,20 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     # -- get the slurm boolean value from DB
     slurm_key = "md_simulation_slurm_selection_value"
     slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                  key_name=slurm_key).latest(
         'entry_time')
 
-    slurm_value = slurm_ProjectToolEssentials_res.values
+    slurm_value = slurm_ProjectToolEssentials_res.key_values
     # =======================  get user input threads  ============================
     key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
     if slurm_value == "yes": # queue to slurm
         initial_string = 'QZW'
@@ -1510,7 +2081,7 @@ def hotspot_analyse_mmpbsa(request,mutation_dir_mmpbsa, project_name, command_to
         ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-        catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+        catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
         # ======================= End of get user input threads  ======================
 
         # ======================= Start of get directory to queue or work in  ======================
@@ -1815,7 +2386,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -2470,7 +3041,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
 
@@ -2479,7 +3050,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -2516,14 +3087,14 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     except db.OperationalError as e:
         print("in pre_process_designer_queue_mmpbsa_imput except first DB operation")
         db.close_old_connections()
         ProjectToolEssentials_res_ligand_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ligand_input).latest('entry_time')
-        ligand_name = ProjectToolEssentials_res_ligand_input.values
+        ligand_name = ProjectToolEssentials_res_ligand_input.key_values
 
     #======================= End of get user input ligand  ======================
 
@@ -3166,7 +3737,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
     # =======================  get user input threads  ============================
@@ -3174,7 +3745,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -3209,7 +3780,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -3861,7 +4432,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_temperature_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_temperature).latest('entry_time')
-    temperature_input = ProjectToolEssentials_res_temperature_input.values
+    temperature_input = ProjectToolEssentials_res_temperature_input.key_values
     # ======================= End of get user input temperature  ======================
 
     # =======================  get user input threads  ============================
@@ -3869,7 +4440,7 @@ def pre_process_hotspot_mmpbsa_imput(project_id, project_name, md_simulations_tp
     ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_mmpbsa_threads_input).latest('entry_time')
-    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.values
+    catmec_mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
     # ======================= End of get user input threads  ======================
 
     new_input_lines = ""
@@ -3947,7 +4518,7 @@ def pre_process_designer_mmpbsa_imput(project_id, project_name, tpr_file_split, 
     ProjectToolEssentials_res_ligand_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_ligand_input).latest('entry_time')
-    ligand_name = ProjectToolEssentials_res_ligand_input.values
+    ligand_name = ProjectToolEssentials_res_ligand_input.key_values
     #======================= End of get user input ligand  ======================
 
 
@@ -4381,7 +4952,7 @@ def designer_slurm_queue_path_analysis(request, md_mutation_folder, project_name
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_path_analysis'
     job_name = initial_string + '_' + str(
@@ -4477,7 +5048,7 @@ def designer_queue_path_analysis(request, md_mutation_folder, project_name, comm
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name='catmec_path_analysis_input_atom_starting_point').latest('entry_time')
     #catmec_pathanalysis_atom_input = ProjectToolEssentials_res_catmec_pathanalysis.values
-    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.values)
+    catmec_pathanalysis_atom_input = ast.literal_eval(ProjectToolEssentials_res_catmec_pathanalysis.key_values)
     chain_id_input = ""
     recidue_number_input = ""
     probe_radius_input = ""
@@ -4668,7 +5239,7 @@ def designer_slurm_queue_contact_score(request, md_mutation_folder, project_name
     ProjectToolEssentials_res_catmec_contact_score = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                    key_name='catmec_contact_score').latest('entry_time')
-    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.key_values)
     for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
         if inputkey == 'no_of_threads':
             number_of_threads = inputvalue
@@ -4679,7 +5250,7 @@ def designer_slurm_queue_contact_score(request, md_mutation_folder, project_name
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
     initial_string = 'QZW'
     module_name = 'Designer_contact_score'
     job_name = initial_string + '_' + str(
@@ -4761,7 +5332,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_protien_ligand_complex_index_number).latest(
             'entry_time')
-    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
     # ------   get TPR file   ------
     # get .tpr file from MD Simulations mutations folder(key = designer_mmpbsa_tpr_file)
@@ -4770,7 +5341,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
     ProjectToolEssentials_res_tpr_file_input = \
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name_tpr_file).latest('entry_time')
-    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
     os.system(
         "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
@@ -4804,7 +5375,7 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
                                                    key_name='catmec_contact_score').latest('entry_time')
     designer_contact_score_cmd_calculate = ""
     designer_contact_score_cmd_combine = ""
-    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.values)
+    catmec_contact_score_dict = ast.literal_eval(ProjectToolEssentials_res_catmec_contact_score.key_values)
     for inputkey, inputvalue in catmec_contact_score_dict.iteritems():
         if inputkey == 'command':
             designer_contact_score_cmd_calculate = inputvalue
@@ -4888,7 +5459,7 @@ class Contact_Score(APIView):
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_protien_ligand_complex_index_number).latest(
                         'entry_time')
-                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
                 # ------   get TPR file   ------
                 # get .tpr file from MD Simulations(key = mmpbsa_tpr_file)
@@ -4897,7 +5468,7 @@ class Contact_Score(APIView):
                 ProjectToolEssentials_res_tpr_file_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_tpr_file).latest('entry_time')
-                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
                 md_simulations_tpr_file_split = md_simulations_tpr_file.split("/")
 
                 # create trajconv input file
@@ -4985,7 +5556,7 @@ class Contact_Score(APIView):
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_protien_ligand_complex_index_number).latest(
                             'entry_time')
-                    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.values
+                    index_file_complex_input_number = ProjectToolEssentials_protien_ligand_complex_index_number.key_values
 
                     # ------   get TPR file   ------
                     # get .tpr file from MD Simulations mutations folder(key = designer_mmpbsa_tpr_file)
@@ -4994,7 +5565,7 @@ class Contact_Score(APIView):
                     ProjectToolEssentials_res_tpr_file_input = \
                         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                    key_name=key_name_tpr_file).latest('entry_time')
-                    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+                    md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
                     os.system(
                         "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
@@ -5120,14 +5691,14 @@ def md_simulation_minimization(project_name,command_tool,number_of_threads,md_si
     print(os.getcwd())
     os.system("echo q | gmx make_ndx -f solve_ions.gro")
 
-    print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+    print("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr -maxwarn 10")
     print("start grompp 222222222222 ==========================================")
     print('before change directory')
     print(os.getcwd())
     os.chdir(source_file_path)
     print('after change directory')
     print(os.getcwd())
-    os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr")
+    os.system("gmx grompp -f em.mdp -po mdout.mdp -c solve_ions.gro -p topol.top -o em.tpr -maxwarn 10")
 
     print("gmx mdrun -v -s em.tpr -o em.trr -cpo em.cpt -c em.gro -e em.edr -g em.log -deffnm em  -nt "+str(number_of_threads))
     print("start mdrun  ==========================================")
@@ -5207,7 +5778,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ simulation_script_file_name):
         print('removing ',file_path + simulation_script_file_name)
-        os.remove(file_path + simulation_script_file_name)
+        os.remove(file_path + '/' + simulation_script_file_name)
     # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
     with open(file_path +'/'+ simulation_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ simulation_script_file_name)
@@ -5218,7 +5789,7 @@ def generate_slurm_script(file_path, server_name, job_name, number_of_threads):
         new_bash_script.write("gmx mdrun -v -s npt.tpr -o npt.trr -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log -deffnm npt -nt "+str(number_of_threads)+"\n")
         new_bash_script.write("gmx grompp -f md.mdp -po mdout.mdp -c npt.gro -p topol.top -o md_0_1.tpr -n index.ndx -maxwarn 10 \n")
         new_bash_script.write("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads) + "\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5250,7 +5821,7 @@ def generate_designer_slurm_script(file_path, server_name, job_name, number_of_t
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_mmpbsa__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5280,7 +5851,7 @@ def generate_designer_contact_score_slurm_script(file_path, server_name, job_nam
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_contactscore__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
 
@@ -5312,12 +5883,9 @@ def generate_designer_path_analysis_slurm_script(file_path, server_name, job_nam
         print('opened ',file_path +'/'+ windows_format_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
         new_bash_script.write("python designer_pathanalysis__slurm_pre_processing.py "+str(inp_command_id)+" "+str(md_mutation_folder)+" "+str(project_name)+" "+str(command_tool)+" "+str(project_id)+" "+str(user_id)+"\n")
-        new_bash_script.write("rsync -avz --no-o --no-g --no-perms /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
-
-
-
 
 
 @csrf_exempt
@@ -5334,34 +5902,34 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.key_values)
     no_of_thread_key = "number_of_threads"
     ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
 
     temp_key = "preliminary_temp_value"
     temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=temp_key).latest(
         'entry_time')
 
-    temp_value = float(temp_ProjectToolEssentials_res.values)
+    temp_value = float(temp_ProjectToolEssentials_res.key_values)
 
     nsteps_key = "md_simulation_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=nsteps_key).latest(
         'entry_time')
 
-    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
-
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
+    """
     slurm_key = "md_simulation_slurm_selection_value"
     slurm_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                            key_name=slurm_key).latest(
         'entry_time')
-
-    slurm_value = slurm_ProjectToolEssentials_res.values
+    
+    slurm_value = slurm_ProjectToolEssentials_res.key_values
 
 
     server_key = "md_simulation_server_selection_value"
@@ -5369,13 +5937,15 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                                                                            key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
+    """
+    server_value = "allgpu"
 
     print("number of threads is ",number_of_threads)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
 
-    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + md_simulation_path
+    source_file_path = config.PATH_CONFIG['shared_folder_path'] + str(project_name) + str(md_simulation_path)
     print('source file path in md simulation preparation --------------')
     print(source_file_path)
 
@@ -5401,70 +5971,75 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 except Exception:
                     print("Unexpected error:", sys.exc_info())
                     pass
-            if slurm_value == "yes":
-                print('slurm value selected is yes')
-                initial_string = 'QZW'
-                module_name = 'CatMec'
-                job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-                generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
+            # if slurm_value == "yes":
+            print('slurm value selected is yes')
+            initial_string = 'QZW'
+            # module_name = 'CatMec'
+            module_name = 'MD_SIMULATION'
+            # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_name = str(initial_string) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+            job_detail_string = module_name + '_r' + str(md_run_no_of_conformation)
+            generate_slurm_script(dest_file_path, server_value, job_name, number_of_threads)
 
-                print('after generate_slurm_script ************************************************************************')
-                print('before changing directory')
-                print(os.getcwd())
-                print('after changing directory')
-                os.chdir(source_file_path + '/md_run' + str(i + 1))
-                print(os.getcwd())
-                print("Converting from windows to unix format")
-                print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
-                print('queuing **********************************************************************************')
-                cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
-                print("Submitting Job1 with command: %s" % cmd)
-                status, jobnum = commands.getstatusoutput(cmd)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print("job id is ", jobnum)
-                print("status is ", status)
-                print(jobnum.split())
-                lenght_of_split = len(jobnum.split())
-                index_value = lenght_of_split - 1
-                print(jobnum.split()[index_value])
-                job_id = jobnum.split()[index_value]
-                # save job id
-                job_id_key_name = "job_id"
-                entry_time = datetime.now()
-                try:
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           job_id=job_id,
-                                                                                           job_status="1",
-                                                                                           job_title=job_name)
-                    QzwSlurmJobDetails_save_job_id.save()
-                except db.OperationalError as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                        project_id=project_id,
-                                                                        entry_time=entry_time,
-                                                                        job_id=job_id,
-                                                                        job_status="1",
-                                                                        job_title=job_name)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")
-                except Exception as e:
-                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    print("exception is ",str(e))
-                    pass
-                    '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                                           project_id=project_id,
-                                                                                           entry_time=entry_time,
-                                                                                           values=job_id,
-                                                                                           job_id=job_id)
-                    QzwSlurmJobDetails_save_job_id.save()
-                    print("saved")'''
-                print('queued')
-            elif slurm_value == "No":
+            print('after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(source_file_path + '/md_run' + str(i + 1))
+            print(os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            os.system("perl -p -e 's/\r$//' < simulation_windows_format.sh > simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch "+ dest_file_path + "/" + "simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       job_id=job_id,
+                                                                                       job_status="1",
+                                                                                       job_title=job_name,
+                                                                                       job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+            except Exception as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("exception is ",str(e))
+                pass
+                '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                       project_id=project_id,
+                                                                                       entry_time=entry_time,
+                                                                                       values=job_id,
+                                                                                       job_id=job_id)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")'''
+            print('queued')
+            """elif slurm_value == "No":
                 print('slurm value selected is no')
                 print("gmx grompp -f nvt.mdp -po mdout.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -n index.ndx -maxwarn 10")
                 print("start grompp 33333333333333  ==========================================")
@@ -5523,7 +6098,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
                 os.chdir(source_file_path + '/md_run' + str(i + 1))
                 print('after change directory')
                 print(os.getcwd())
-                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))
+                os.system("gmx mdrun -v -s md_0_1.tpr -o md_0_1.trr -cpo md_0_1.cpt -x md_0_1.xtc -c md_0_1.gro -e md_0_1.edr -g md_0_1.log -deffnm md_0_1 -nt "+str(number_of_threads))"""
 
         return JsonResponse({'success': True})
     else:
@@ -5542,7 +6117,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
         ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                    key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = int(ProjectToolEssentials_res.key_values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
@@ -5550,7 +6125,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt','vac_em']
@@ -5572,7 +6147,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                      key_name=slurm_key).latest(
             'entry_time')
 
-        slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.key_values
     except db.OperationalError as e:
         db.close_old_connections()
         # =======   get slurm key from  database   ===========
@@ -5581,7 +6156,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                      key_name=slurm_key).latest(
             'entry_time')
 
-        slurm_value = slurm_ProjectToolEssentials_res.values
+        slurm_value = slurm_ProjectToolEssentials_res.key_values
 
 
     #=======   get assigned server for project ============
@@ -5590,7 +6165,7 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                   key_name=server_key).latest(
         'entry_time')
 
-    server_value = server_ProjectToolEssentials_res.values
+    server_value = server_ProjectToolEssentials_res.key_values
 
     # ======= get temperature and MD simulation runs from DB ========
     temp_key = "preliminary_temp_value"
@@ -5598,14 +6173,14 @@ def execute_md_simulation(request, md_mutation_folder, project_name, command_too
                                                                                 key_name=temp_key).latest(
         'entry_time')
 
-    temp_value = float(temp_ProjectToolEssentials_res.values)
+    temp_value = float(temp_ProjectToolEssentials_res.key_values)
 
     nsteps_key = "md_simulation_nsteps_value"
     nsteps_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                   key_name=nsteps_key).latest(
         'entry_time')
 
-    nsteps_value = int(nsteps_ProjectToolEssentials_res.values)
+    nsteps_value = int(nsteps_ProjectToolEssentials_res.key_values)
 
     # substitutung config values in MD simulations MDP files
     function_returned_value = replace_temp_and_nsteps_in_mdp_file(
@@ -5745,7 +6320,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
     #     ProjectToolEssentials.objects.all().filter(project_id=project_id,
     #                                                key_name=key_name).latest('entry_time')
 
-    md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.values)
+    md_run_no_of_conformation = 1 # int(ProjectToolEssentials_res.key_values)
     print ('md_run_no_of_conformation@@@@@@@@@@@@@@@@@@@@@@@@')
     print(md_run_no_of_conformation)
     no_of_thread_key = "number_of_threads"
@@ -5760,7 +6335,7 @@ def execute_hotspot_md_simulation(request, md_mutation_folder, project_name, com
                                                                            key_name=no_of_thread_key).latest(
         'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.values)
+    number_of_threads = int(ProjectToolEssentials_res.key_values)
     print("number of threads is ",number_of_threads)
     # copy MDP files to working directory
     MDP_filelist = ['em', 'ions', 'md', 'npt', 'nvt']
@@ -6440,7 +7015,7 @@ class CatmecandAutodock(APIView):
         key_name = 'enzyme_file'
         ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=key_name).latest("entry_time")
-        enzyme_file_name = ProjectToolEssentials_res.values
+        enzyme_file_name = ProjectToolEssentials_res.key_values
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
         update_command_status(inp_command_id, status_id)
@@ -6507,7 +7082,7 @@ class CatmecandAutodock(APIView):
                 enzyme_file_key = 'autodock_nma_final_protein_conformation'
                 ProjectToolEssentials_autodock_enzyme_file_name = ProjectToolEssentials.objects.all().filter(
                     project_id=project_id, key_name=enzyme_file_key).latest('entry_time')
-                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.values
+                nma_enzyme_file = ProjectToolEssentials_autodock_enzyme_file_name.key_values
                 nma_path = nma_enzyme_file[:-4]
                 print(str(nma_path[:-4]))
                 print('\nnma_path ****************************************')
@@ -6518,11 +7093,11 @@ class CatmecandAutodock(APIView):
                 print(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
                 os.chdir(config.PATH_CONFIG[
-                             'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
+                             'local_shared_folder_path'] + project_name + '/' + 'CatMec'  +'/' + command_tool_title + '/')
         else:
             print('inside else')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
+            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + 'CatMec' + '/' + command_tool_title + '/')
         print("\nworking directory after changing CHDIR")
         print(os.system("pwd"))
 
@@ -6604,7 +7179,7 @@ class CatmecandAutodock(APIView):
         #     print "in pdbtopdbqt"
         # if commandDetails_result.command_title == "GpftoGlg":
         #     print "in GpftoGlg"
-        #     process_grid_file(commandDetails_result,QzwProjectDetails_res,request)
+        #     process__file(commandDetails_result,QzwProjectDetails_res,request)
         # if commandDetails_result.command_title == "DpftoDlg":
         #     print "in dpftodlg"
         #     process_dock_file(commandDetails_result,QzwProjectDetails_res,request)
@@ -6794,7 +7369,15 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
-            print(command_tool_title)
+            '''print('exec(open(/usr/share/Modules/init/python.py).read())')
+            try:
+                # module accessing
+                exec(open('/usr/share/Modules/init/python.py').read())
+                print('module(unload mgltools)')
+                module('unload mgltools')
+            except Exception as e:
+                print("inside exception of unload mgltools in LP ",str(e))'''
+            print('command_tool_title is ',command_tool_title)
             inp_command_id = request.POST.get("command_id")
             commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
             project_id = commandDetails_result.project_id
@@ -6860,6 +7443,14 @@ class CatMec(APIView):
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
                     update_command_status(inp_command_id, status_id)
+                '''
+                try:
+                    # module accessing
+                    exec (open('/usr/share/Modules/init/python.py').read())
+                    print('module(load mgltools)')
+                    module('load mgltools')
+                except Exception as e:
+                    print("inside exception of load mgltools in LP ", str(e))'''
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print("inside error")
@@ -6877,9 +7468,17 @@ class CatMec(APIView):
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id)
+                '''
+                try:
+                    # module accessing
+                    exec (open('/usr/share/Modules/init/python.py').read())
+                    print('module(load mgltools)')
+                    module('load mgltools')
+                except Exception as e:
+                    print("inside exception of load mgltools in LP ", str(e))'''
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "get_make_complex_parameter_details" or command_tool_title == "make_complex_params" or command_tool_title == "md_run":
-            print('command_tool_title ----------------------')
+            print('command_tool_title ----------------------\n')
             print(command_tool_title)
             user_id = commandDetails_result.user_id
             inp_command_id = request.POST.get("command_id")
@@ -6894,13 +7493,14 @@ class CatMec(APIView):
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
             # print ligand_name
-            os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/')
+            simulation_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + '/CatMec/MD_Simulation/'
+            os.chdir(simulation_path)
             print (os.getcwd())
 
             if commandDetails_result.command_title == "md_run":
                 md_simulation_path = '/CatMec/MD_Simulation/'
                 print('md simulation path in md_run is')
-                print(md_simulation_path)
+                print(simulation_path)
                 md_simulation_preparation(inp_command_id,project_id, project_name, commandDetails_result.command_tool,
                                           commandDetails_result.command_title,user_id,md_simulation_path)
                 try:
@@ -6975,7 +7575,7 @@ class CatMec(APIView):
             key_name = 'enzyme_file'
             ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                    key_name=key_name).latest("entry_time")
-            enzyme_file_name = ProjectToolEssentials_res.values
+            enzyme_file_name = ProjectToolEssentials_res.key_values
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             update_command_status(inp_command_id, status_id)
@@ -7264,7 +7864,7 @@ class Hotspot(APIView):
             project_id=project_id,
             key_name=ligands_key_name).latest(
             'entry_time')
-        ligand_names = ProjectToolEssentials_ligand_name_res.values
+        ligand_names = ProjectToolEssentials_ligand_name_res.key_values
         ligand_file_data = ast.literal_eval(ligand_names)
         ligand_names_list = []
         for key, value in ligand_file_data.items():
@@ -7374,7 +7974,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    designer_mutations_file = ProjectToolEssentials_mutations_file.values
+    designer_mutations_file = ProjectToolEssentials_mutations_file.key_values
 
     # open mutated text file and loop thru to prepare files for make_complex.py
     with open(config.PATH_CONFIG['local_shared_folder_path_project'] + 'Project/'
@@ -7477,7 +8077,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=make_complex_params_keyname).latest(
                         'entry_time')
-                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
             except db.OperationalError as e:
                 print("in make_complex_parameters query except first DB operation")
                 db.close_old_connections()
@@ -7485,7 +8085,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=make_complex_params_keyname).latest(
                         'entry_time')
-                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
 
 
             variant_protien_file = 'variant_'+str(variant_index_count)+'.pdb'
@@ -7497,7 +8097,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
             ProjectToolEssentials_ligand_name_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                                key_name=ligands_key_name).latest(
                 'entry_time')
-            ligand_names = ProjectToolEssentials_ligand_name_res.values
+            ligand_names = ProjectToolEssentials_ligand_name_res.key_values
             ligand_file_data = ast.literal_eval(ligand_names)
             for key, value in ligand_file_data.items():
                 #value.split('_')[0]
@@ -7555,7 +8155,7 @@ def queue_make_complex_params(request,project_id, user_id,  command_tool_title, 
                                                                                          key_name=slurm_key).latest(
                 'entry_time')
 
-            slurm_value = slurm_ProjectToolEssentials_res.values
+            slurm_value = slurm_ProjectToolEssentials_res.key_values
             if slurm_value == "yes":
                 #get command ID for input parameter
                 inp_command_id = request.POST.get("command_id")
@@ -7607,7 +8207,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
     ProjectToolEssentials_mutations_file = ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                       key_name=key_mutations_filename).latest(
         'entry_time')
-    hotspot_mutations_file = ProjectToolEssentials_mutations_file.values
+    hotspot_mutations_file = ProjectToolEssentials_mutations_file.key_values
     print("hotspot mutation file --------")
     print("\n")
     print(hotspot_mutations_file)
@@ -7751,7 +8351,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=make_complex_params_keyname).latest(
                                         'entry_time')
-                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
                             except db.OperationalError as e:
                                 db.close_old_connections()
                                 make_complex_params_keyname = "make_complex_parameters"
@@ -7759,7 +8359,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                                key_name=make_complex_params_keyname).latest(
                                         'entry_time')
-                                make_complex_params = ProjectToolEssentials_make_complex_params.values
+                                make_complex_params = ProjectToolEssentials_make_complex_params.key_values
 
 
                             variant_protien_file = 'variant_' + str(variant_index_count) + '.pdb'
@@ -7774,7 +8374,7 @@ def hotspot_queue_make_complex_params(request, project_id, user_id, command_tool
                                 project_id=project_id,
                                 key_name=ligands_key_name).latest(
                                 'entry_time')
-                            ligand_names = ProjectToolEssentials_ligand_name_res.values
+                            ligand_names = ProjectToolEssentials_ligand_name_res.key_values
                             ligand_file_data = ast.literal_eval(ligand_names)
                             ligand_names_list = []
                             for key, value in ligand_file_data.items():
@@ -7895,7 +8495,7 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_tpr_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_tpr_file).latest('entry_time')
-        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.values.replace('\\', '/')
+        md_simulations_tpr_file = ProjectToolEssentials_res_tpr_file_input.key_values.replace('\\', '/')
 
         # get .ndx file from MD Simulations(key = mmpbsa_tpr_file)
         key_name_ndx_file = 'designer_mmpbsa_index_file'
@@ -7903,7 +8503,7 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_ndx_file_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                        key_name=key_name_ndx_file).latest('entry_time')
-        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.values.replace('\\', '/')
+        md_simulations_ndx_file = ProjectToolEssentials_res_ndx_file_input.key_values.replace('\\', '/')
 
         key_name_CatMec_input = 'substrate_input'
         command_tootl_title = "CatMec"
@@ -7911,14 +8511,14 @@ class Designer_Mmpbsa_analyse(APIView):
         ProjectToolEssentials_res_CatMec_input = \
             ProjectToolEssentials.objects.all().filter(project_id=project_id, tool_title=command_tootl_title,
                                                        key_name=key_name_CatMec_input).latest('entry_time')
-        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.values)
+        CatMec_input_dict = ast.literal_eval(ProjectToolEssentials_res_CatMec_input.key_values)
         # if User has only one ligand as input
         multiple_ligand_input = False
         if len(CatMec_input_dict) > 1:
             multiple_ligand_input = True
 
-        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.values)
-        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.values)
+        indexfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_indexfile_input.key_values)
+        xtcfile_input_dict = ast.literal_eval(ProjectToolEssentials_res_xtcfile_input.key_values)
 
         '''
                                                                   .                o8o                         .        
@@ -7964,7 +8564,7 @@ class Designer_Mmpbsa_analyse(APIView):
             ProjectToolEssentials_res_ligand_input = \
                 ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                            key_name=key_name_ligand_input).latest('entry_time')
-            ligand_name = ProjectToolEssentials_res_ligand_input.values
+            ligand_name = ProjectToolEssentials_res_ligand_input.key_values
             #extract ligand number
             if "[ " + ligand_name + " ]" in indexfile_input_dict.keys():
                 ligand_name_input = str(indexfile_input_dict["[ "+ligand_name+" ]"])
@@ -8005,7 +8605,7 @@ class Designer_Mmpbsa_analyse(APIView):
             ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials(tool_title=commandDetails_result.command_tool,
                                                                                       project_id=project_id,
                                                                                       key_name=key_name_protien_ligand_complex_index,
-                                                                                      values=protien_ligand_complex_index,
+                                                                                      key_values=protien_ligand_complex_index,
                                                                                       entry_time=entry_time)
             result_ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer = ProjectToolEssentials_save_mmpbsa_protien_ligand_index_numer.save()
             ligand_name_index = protien_ligand_complex_index + 1
@@ -8142,7 +8742,7 @@ class Designer_Mmpbsa_analyse(APIView):
                 ProjectToolEssentials_res_ligand_input = \
                     ProjectToolEssentials.objects.all().filter(project_id=project_id,
                                                                key_name=key_name_ligand_input).latest('entry_time')
-                ligand_name = ProjectToolEssentials_res_ligand_input.values
+                ligand_name = ProjectToolEssentials_res_ligand_input.key_values
                 if file_name[:-4] == ligand_name:
                     shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/Designer/' + \
                                     config.PATH_CONFIG['designer_mmpbsa_path'] + file_name,
