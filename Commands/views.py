@@ -2921,6 +2921,8 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
                     new_itp_file.write(initial_text_content)
     else:
         # =====================  for single ligand   ==============================
+        for ligand_inputkey, ligand_inputvalue in CatMec_input_dict.iteritems():
+            CatMec_input_dict_ligand_name = ligand_inputvalue.split("_")[0]
         initial_text_content = ""
         topology_file_atoms_content = ""
         topology_file_bonds_content = ""
@@ -3152,7 +3154,7 @@ def pre_process_designer_queue_mmpbsa_imput(project_id, project_name, tpr_file_s
         atoms_final_count = atoms_lastcount
         with open(config.PATH_CONFIG[
                       'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" +
-                  config.PATH_CONFIG['mmpbsa_project_path'] + "new_" + ligand_inputvalue.split("_")[0] + ".itp",
+                  config.PATH_CONFIG['mmpbsa_project_path'] + "new_" + CatMec_input_dict_ligand_name + ".itp",
                   "w") as new_itp_file:
             new_itp_file.write(initial_text_content)
 
@@ -4774,7 +4776,9 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
         "echo " + index_file_complex_input_number + " | gmx trjconv -f " + config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG[
             'mmpbsa_project_path'] + "merged.xtc -s " + config.PATH_CONFIG[
-            'local_shared_folder_path'] + project_name  + "/"+command_tool+"/"+md_mutation_folder+"/"+ md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n")
+            'local_shared_folder_path'] + project_name  + "/"+command_tool+"/"+md_mutation_folder+"/"+ md_simulations_tpr_file + " -o merged_center.xtc -center -pbc whole -ur compact -n "+config.PATH_CONFIG[
+            'local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+config.PATH_CONFIG[
+            'mmpbsa_project_path'] +"trial/index.ndx    ")
 
     os.system(
         "echo " + index_file_complex_input_number + " | gmx trjconv -f merged_center.xtc -s " +
@@ -4788,9 +4792,9 @@ def designer_queue_contact_score(request, md_mutation_folder, project_name, comm
 
     #copy python scripts (shared_scripts)
     shutil.copyfile(config.PATH_CONFIG[
-            'local_shared_folder_path'] +"Contact_Score/readpdb2.py",config.PATH_CONFIG[
+            'shared_scripts'] +"Contact_Score/readpdb2.py",config.PATH_CONFIG[
             'local_shared_folder_path'] + project_name + "/"+command_tool+"/"+md_mutation_folder+"/"+'Analysis/Contact_score/readpdb2.py')
-    shutil.copyfile(config.PATH_CONFIG['local_shared_folder_path'] + "Contact_Score/whole_protein_contact.py", config.PATH_CONFIG[
+    shutil.copyfile(config.PATH_CONFIG['shared_scripts'] + "Contact_Score/whole_protein_contact.py", config.PATH_CONFIG[
         'local_shared_folder_path'] + project_name + "/" + command_tool + "/" + md_mutation_folder + "/" + 'Analysis/Contact_score/whole_protein_contact.py')
 
     #  ==========  get new contact score parameters from DB   =========================

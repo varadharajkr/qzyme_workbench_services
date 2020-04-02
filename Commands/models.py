@@ -72,7 +72,7 @@ class ProjectToolEssentials(models.Model):
     tool_title = models.TextField(blank=True, null=True)
     project_id = models.IntegerField(blank=True, null=True)
     key_name = models.TextField(blank=True, null=True)
-    values = models.TextField(blank=True, null=True)
+    key_values = models.TextField(blank=True, null=True)
     entry_time = models.DateTimeField()
 
     class Meta:
@@ -80,7 +80,7 @@ class ProjectToolEssentials(models.Model):
         db_table = 'project_tool_essentials'
 
     def __str__(self):
-        return u'%s %s %s %s %s' % (self.tool_title,self.project_id,self.key_name,self.values,self.entry_time)
+        return u'%s %s %s %s %s' % (self.tool_title,self.project_id,self.key_name,self.key_values,self.entry_time)
 
 
 class QzwSlurmJobDetails(models.Model):
