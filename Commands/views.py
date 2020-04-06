@@ -753,6 +753,7 @@ class analyse_mmpbsa(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -1129,7 +1130,7 @@ class analyse_mmpbsa(APIView):
         # ----------------   END of re-creating topology file   -------------------------
 
 
-        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+        '''os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                                     config.PATH_CONFIG['mmpbsa_project_path'])
 
         os.system("sh "+config.PATH_CONFIG['GMX_run_file_one'])
@@ -1138,8 +1139,65 @@ class analyse_mmpbsa(APIView):
         os.system("sh " + config.PATH_CONFIG['GMX_run_file_two'])
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
                  config.PATH_CONFIG['mmpbsa_project_path'])
-        os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])
-
+        os.system("sh " + config.PATH_CONFIG['GMX_run_file_three'])'''
+        shared_dir_path = config.PATH_CONFIG['local_shared_folder_path']
+        mmpbsa_project_path = config.PATH_CONFIG['mmpbsa_project_path']
+        server_name = 'allcpu'
+        job_title = "QZW_"+project_id+"_MMPBSA"
+        # =======================  get user input threads  ============================
+        try:
+            key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+            ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+            mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
+        except db.OperationalError as e:
+            db.close_old_connections()
+            key_name_mmpbsa_threads_input = "catmec_mmpbsa_threads_input"
+            ProjectToolEssentials_res_key_name_mmpbsa_threads_input = \
+                ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                           key_name=key_name_mmpbsa_threads_input).latest('entry_time')
+            mmpbsa_threads_input = ProjectToolEssentials_res_key_name_mmpbsa_threads_input.key_values
+        # ======================= End of get user input threads  ======================
+        prepare_mmpbsa_slurm_script(shared_dir_path,mmpbsa_project_path,project_name,server_name,job_title,mmpbsa_threads_input)
+        os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                 config.PATH_CONFIG['mmpbsa_project_path'])
+        slurm_batch_script_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/CatMec/' + \
+                 config.PATH_CONFIG['mmpbsa_project_path']
+        cmd = "sbatch " + slurm_batch_script_path + "/" + "mmpbsa_batch.sh"
+        status, jobnum = commands.getstatusoutput(cmd)
+        lenght_of_split = len(jobnum.split())
+        index_value = lenght_of_split - 1
+        print(jobnum.split()[index_value])
+        job_id = jobnum.split()[index_value]
+        # save job id
+        entry_time = datetime.now()
+        try:
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_title,
+                                                                job_details="CatMec analysis")
+            QzwSlurmJobDetails_save_job_id.save()
+        except db.OperationalError as e:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in except of CatMec MMPBSA SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            db.close_old_connections()
+            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                project_id=project_id,
+                                                                entry_time=entry_time,
+                                                                job_id=job_id,
+                                                                job_status="1",
+                                                                job_title=job_title,
+                                                                job_details="CatMec analysis")
+            QzwSlurmJobDetails_save_job_id.save()
+        except Exception as e:
+            print(
+                "<<<<<<<<<<<<<<<<<<<<<<< in except of CatMec MMPBSA SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print("exception is ", str(e))
+            pass
         #update command status to database
         try:
             print("<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -5887,6 +5945,34 @@ def generate_designer_path_analysis_slurm_script(file_path, server_name, job_nam
     print('outside the loop')
     return True
 
+def prepare_mmpbsa_slurm_script(shared_dir_path,mmpbsa_project_path,project_name,server_name,job_title,mmpbsa_threads_input):
+    # preparing windows format batch script for MMPBSA / Binding affinity calculation
+    new_shell_script_lines = ''
+    template_script = 'pre_simulation.sh'
+    mmpbsa_shell_script = 'mmpbsa_windows_format.sh'
+    with open(shared_dir_path + project_name + '/CatMec/MD_Simulation/'+ template_script, 'r') as source_file:
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER', str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME', str(job_title)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS', str(mmpbsa_threads_input)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(shared_dir_path + project_name + '/CatMec/' +mmpbsa_project_path + mmpbsa_shell_script):
+        os.remove(shared_dir_path + project_name + '/CatMec/' +mmpbsa_project_path + mmpbsa_shell_script)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(shared_dir_path + project_name + '/CatMec/' +mmpbsa_project_path + mmpbsa_shell_script, 'w+')as new_bash_script:
+        new_bash_script.write(new_shell_script_lines + "\n")
+        new_bash_script.write("sh "+config.PATH_CONFIG['GMX_run_file_one']+" \n")
+        new_bash_script.write("sh "+config.PATH_CONFIG['GMX_run_file_two']+" \n")
+        new_bash_script.write("sh "+config.PATH_CONFIG['GMX_run_file_three']+" \n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+        os.system(
+            "perl -p -e 's/\r$//' < " + shared_dir_path + project_name + "/CatMec/" + mmpbsa_project_path + mmpbsa_shell_script + " > " + shared_dir_path + project_name + "/CatMec/" + mmpbsa_project_path + "mmpbsa_batch.sh")
+    return True
 
 @csrf_exempt
 def md_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title, user_id='', md_simulation_path=''):
