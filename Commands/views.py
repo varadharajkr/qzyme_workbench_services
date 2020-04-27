@@ -380,28 +380,57 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
     print(file_path)
 
-    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
-    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=no_of_thread_key).latest(
-        'entry_time')
+    try:
+        temp_key = "TASS_nvt_simulation_temp_value"
+        temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=temp_key).latest(
+            'entry_time')
 
-    number_of_threads = int(ProjectToolEssentials_res.key_values)
+        temp_value = float(temp_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+        temp_value = ''
+    try:
+        no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+        ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=no_of_thread_key).latest(
+            'entry_time')
 
-    atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
-    atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
-                                                                           key_name=atom_range_key).latest(
-        'entry_time')
+        number_of_threads = int(ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print("exceptio is ",str(e))
+        number_of_threads = ''
+    try:
+        atom_range_key = "TASS_nvt_simulation_qmm_atom_range"
+        atom_range_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                               key_name=atom_range_key).latest(
+            'entry_time')
 
-    atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+        atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print("exception is ",str(e))
+        atom_range_value = ''
 
     print("number of threads is ",number_of_threads)
 
+    try:
+        nstep_val_key = 'TASS_nvt_simulation_nsteps_value'
+        nstep_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=nstep_val_key).latest(
+            'entry_time')
+
+        nstep_value = float(nstep_ProjectToolEssentials_res.key_values)
+    except Exception as e:
+        print(str(e))
+        nstep_value = ''
 
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
 
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
+    #function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', temp_value, nstep_value, atom_range_value)
+
 
     if function_returned_value:
         print('replace inp file function returned true')
@@ -537,6 +566,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         atom_range_value = str(atom_range_ProjectToolEssentials_res.key_values)
     except Exception as e:
         print(str(e))
+        atom_range_value = ''
     try:
         temp_key = "TASS_nvt_equilibration_temp_value"
         temp_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
@@ -546,6 +576,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         temp_value = float(temp_ProjectToolEssentials_res.key_values)
     except Exception as e:
         print(str(e))
+        temp_value = ''
     try:
         nstep_val_key = 'TASS_simulation_nsteps_value'
         nstep_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
@@ -555,6 +586,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         nstep_value = float(nstep_ProjectToolEssentials_res.key_values)
     except Exception as e:
         print(str(e))
+        nstep_value = ''
 
     os.chdir(file_path)
 
