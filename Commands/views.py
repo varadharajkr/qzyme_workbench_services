@@ -7109,7 +7109,7 @@ class Loop_Modelling(APIView):
 
 #END OF ACTUALWORKING AUTODOCK
 
-class CatmecandAutodock(APIView):
+class CatMecandAutodock(APIView):
     def get(self,request):
         pass
 
