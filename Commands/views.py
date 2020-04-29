@@ -7243,7 +7243,7 @@ class CatMecandAutodock(APIView):
                 update_command_status(inp_command_id, status_id)
 
             except db.OperationalError as e:
-                print("<<<<<<<<<<<<<<<<<<<<<<< in except of autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of Docking >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
                 update_command_status(inp_command_id, status_id)
