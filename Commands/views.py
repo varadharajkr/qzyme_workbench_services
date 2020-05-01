@@ -727,6 +727,7 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
     print("*******************************************************************")
     print(plot_energy_variable_to_list)
     print(plot_energy_variable_to_list_len)
+    print('plumed sum_hills --hills HILLS --kt 2.5 --mintozero --idw ' + str(','.join(plot_energy_variable_to_list)))
     print("*******************************************************************")
     simulation_script = 'plot_energy_windows_format.sh'
     if plot_energy_variable_to_list_len > 1 or plot_energy_variable_to_list_len == 0:
