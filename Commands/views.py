@@ -174,7 +174,7 @@ class gromacs(APIView):
 
 
 @csrf_exempt
-def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads, command_title):
+def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads, command_title, plumed_command=''):
     print('inside generate_TASS_slurm_script function')
     print('file_path ',)
     print('server_name ',server_name)
@@ -192,6 +192,8 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
                 new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
             elif 'QZTHREADS' in line:
                 new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            elif 'PLUMED_COMMAND_REPLACEMENT' in line:
+                new_shell_script_lines += (line.replace('PLUMED_COMMAND_REPLACEMENT',str(plumed_command)))
             else:
                 new_shell_script_lines += line
     if os.path.exists(file_path +'/'+ simulation_script_file_name):
@@ -300,7 +302,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
         pre_simulation_script = 'pre_TASS_NVT_equilibration.sh'
         simulation_script = 'TASS_NVT_equilibration_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
-                                   number_of_threads, command_title)
+                                   number_of_threads, command_title,'')
 
         print('after generate_slurm_script ************************************************************************')
         print('before changing directory')
@@ -445,7 +447,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
         pre_simulation_script = 'pre_TASS_NVT_simulation.sh'
         simulation_script = 'TASS_NVT_simulation_windows_format.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
-                                   number_of_threads, command_title)
+                                   number_of_threads, command_title,'')
 
         print('after generate_slurm_script ************************************************************************')
         print('before changing directory')
@@ -615,7 +617,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
             pre_simulation_script = 'pre_TASS_simulation.sh'
             simulation_script = 'TASS_simulation_windows_format.sh'
             generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
-                                       number_of_threads, command_title)
+                                       number_of_threads, command_title,'')
 
             print('after generate_slurm_script ************************************************************************')
             print('before changing directory')
@@ -687,6 +689,119 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
         return False
 
 
+@csrf_exempt
+def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+    print("inside plot_energy_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print("inside plot_energy_preparation function")
+    print('TASS_simulation_path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/'
+    print(file_path)
+
+    plot_energy_variable_key = 'plot_energy_variables'
+    ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                           key_name=plot_energy_variable_key).latest(
+        'entry_time')
+
+    plot_energy_variable = ProjectToolEssentials_res.key_values
+    plot_energy_variable_to_list = eval(plot_energy_variable)
+    plot_energy_variable_to_list_len = len(plot_energy_variable_to_list)
+
+    source_file_path = file_path
+    print('source file path in TASS NVT Simulation preparation --------------')
+    print(source_file_path)
+
+    os.chdir(file_path)
+
+    print('replace inp file function returned true')
+    print('slurm value selected is yes')
+    initial_string = 'QZW'
+    # module_name = 'CatMec'
+    module_name = 'TASS'
+    # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+    job_name = str(initial_string) + '_' + module_name
+    job_detail_string = module_name + '_PLOT_ENERGY'
+    server_value = ''
+    simulation_script = 'plot_energy_windows_format.sh'
+    if plot_energy_variable_to_list_len > 1 or plot_energy_variable_to_list_len == 0:
+        pre_simulation_script = 'pre_plot_energy_with_multiple_parameter.sh'
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   '', command_title,'')
+    elif plot_energy_variable == 1:
+        pre_simulation_script = 'pre_plot_energy_with_single_parameter.sh'
+        dynamic_Variable_Str = '--idw ' + str(','.join(plot_energy_variable_to_list))
+        plumed_cmd = 'plumed sum_hills --hills HILLS --kt 2.5 --mintozero ' + dynamic_Variable_Str
+        generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                   '', command_title, plumed_cmd)
+
+
+    print('after generate_slurm_script ************************************************************************')
+    print('before changing directory')
+    print(os.getcwd())
+    print('after changing directory')
+    os.chdir(source_file_path)
+    print(os.getcwd())
+    print("Converting from windows to unix format")
+    print("perl -p -e 's/\r$//' < plot_energy_windows_format.sh > plot_energy.sh")
+    os.system("perl -p -e 's/\r$//' < plot_energy_windows_format.sh > plot_energy.sh")
+    print('queuing **********************************************************************************')
+    cmd = "sbatch "+ source_file_path + "/" + "TASS_simulation.sh"
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               job_id=job_id,
+                                                                               job_status="1",
+                                                                               job_title=job_name,
+                                                                               job_details=job_detail_string)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title=job_name,
+                                                            job_details=job_detail_string)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
+
+    return True
+
+
+
 # TASS
 class TASS(APIView):
     def get(self,request):
@@ -712,6 +827,8 @@ class TASS(APIView):
             returned_preparation_value = TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
         elif commandDetails_result.command_title == "TASS_qmm_mm":
             returned_preparation_value = TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+        elif commandDetails_result.command_title == "plot_energy":
+            returned_preparation_value = plot_energy_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
 
         print('primary_command_runnable')
         print(primary_command_runnable)
