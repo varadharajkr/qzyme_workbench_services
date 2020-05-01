@@ -727,6 +727,7 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
     simulation_script = 'plot_energy_windows_format.sh'
     if plot_energy_variable_to_list_len > 1 or plot_energy_variable_to_list_len == 0:
         print("*******************************************************************")
+        print(plot_energy_variable_to_list)
         print(plot_energy_variable_to_list_len)
         print("*******************************************************************")
         pre_simulation_script = 'pre_plot_energy_with_multiple_parameter.sh'
@@ -734,6 +735,7 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
                                    '', command_title,'')
     elif plot_energy_variable == 1:
         print("*******************************************************************")
+        print(plot_energy_variable_to_list)
         print(plot_energy_variable_to_list_len)
         print("*******************************************************************")
         pre_simulation_script = 'pre_plot_energy_with_single_parameter.sh'
