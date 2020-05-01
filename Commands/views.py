@@ -723,7 +723,7 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
     # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
     job_name = str(initial_string) + '_' + module_name
     job_detail_string = module_name + '_PLOT_ENERGY'
-    server_value = ''
+    server_value = 'qzyme2'
     print("*******************************************************************")
     print(plot_energy_variable_to_list)
     print(plot_energy_variable_to_list_len)
