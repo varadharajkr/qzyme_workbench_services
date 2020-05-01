@@ -726,10 +726,16 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
     server_value = ''
     simulation_script = 'plot_energy_windows_format.sh'
     if plot_energy_variable_to_list_len > 1 or plot_energy_variable_to_list_len == 0:
+        print("*******************************************************************")
+        print(plot_energy_variable_to_list_len)
+        print("*******************************************************************")
         pre_simulation_script = 'pre_plot_energy_with_multiple_parameter.sh'
         generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
                                    '', command_title,'')
     elif plot_energy_variable == 1:
+        print("*******************************************************************")
+        print(plot_energy_variable_to_list_len)
+        print("*******************************************************************")
         pre_simulation_script = 'pre_plot_energy_with_single_parameter.sh'
         dynamic_Variable_Str = '--idw ' + str(','.join(plot_energy_variable_to_list))
         plumed_cmd = 'plumed sum_hills --hills HILLS --kt 2.5 --mintozero ' + dynamic_Variable_Str
