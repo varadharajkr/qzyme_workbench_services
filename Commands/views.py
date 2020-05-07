@@ -6975,12 +6975,12 @@ class NMA(APIView):
 
 
 @csrf_exempt
-def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,windows_format_slurm_script,slurm_script,server_value):
+def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,windows_format_slurm_script,pre_slurm_script,slurm_script,server_value):
     print("inside modeller_catmec_slurm_preparation function")
     print("primary_command_runnable is ",primary_command_runnable)
     os.chdir(file_path)
 
-    generate_modeller_catmec_slurm_script(file_path, server_value, job_name, windows_format_slurm_script, slurm_script,primary_command_runnable)
+    generate_modeller_catmec_slurm_script(file_path, server_value, job_name, pre_slurm_script, windows_format_slurm_script, primary_command_runnable)
 
     print('after generate_slurm_script ************************************************************************')
     print('before changing directory')
@@ -7108,11 +7108,14 @@ class Homology_Modelling(APIView):
 
         initial_string = 'QZW_'
         module_name = 'Homology_Modelling'
-        modelling_script = 'homology_modelling_windows_format.sh'
+        windows_modelling_script = 'homology_modelling_windows_format.sh'
         pre_modelling_script = 'pre_homology_modelling.sh'
+        modelling_script = 'homology_modelling.sh'
         job_name = str(initial_string) + '_' + module_name
         server_value = 'allcpu'
-        modeller_catmec_slurm_preparation(project_id,commandDetails_result.user_id,primary_command_runnable,file_path,job_name,modelling_script,pre_modelling_script,server_value)
+        modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
+                                          file_path, job_name, windows_modelling_script,
+                                          pre_modelling_script, modelling_script, server_value)
         primary_command_runnable = ""
         process_return = Popen(
             args=primary_command_runnable,
@@ -7227,12 +7230,14 @@ class Loop_Modelling(APIView):
         # process_return = execute_command(primary_command_runnable)
         initial_string = 'QZW_'
         module_name = 'Loop_Modelling'
-        modelling_script = 'loop_modelling_windows_format.sh'
+        windpws_modelling_script = 'loop_modelling_windows_format.sh'
         pre_modelling_script = 'pre_loop_modelling.sh'
+        modelling_script = 'loop_modelling.sh'
         job_name = str(initial_string) + '_' + module_name
         server_value = 'allcpu'
         modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
-                                          file_path, job_name, modelling_script, pre_modelling_script, server_value)
+                                          file_path, job_name, windpws_modelling_script,
+                                          pre_modelling_script, modelling_script, server_value)
         primary_command_runnable = ""
         process_return = Popen(
             args=primary_command_runnable,
@@ -7463,11 +7468,14 @@ class CatMecandAutodock(APIView):
                 file_path = ""
                 initial_string = 'QZW_'
                 module_name = 'Docking'
+                docking_script = 'docking.sh'
                 pre_docking_script = 'pre_docking.sh'
-                docking_script = 'pre_docking_windows_format.sh'
+                windows_docking_script = 'pre_docking_windows_format.sh'
                 job_name = str(initial_string) + '_' + module_name
                 server_value = 'allcpu'
-                modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,docking_script,pre_docking_script,server_value)
+                modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
+                                                  file_path, job_name, windows_docking_script,
+                                                  pre_docking_script, docking_script, server_value)
                 primary_command_runnable = ""
             print('inside else')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
@@ -7797,12 +7805,15 @@ class CatMec(APIView):
             ##########################################
             initial_string = 'QZW_'
             module_name = 'Ligand_Parametrization'
-            parametrization_script = 'parametrization_windows_format.sh'
+            windows_parametrization_script = 'parametrization_windows_format.sh'
             pre_parametrization_script = 'pre_parametrization.sh'
+            parametrization_script = 'parametrization.sh'
             job_name = str(initial_string) + '_' + module_name
             server_value = 'allcpu'
+
             modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
-                                              file_path, job_name, parametrization_script, pre_parametrization_script, server_value)
+                                              file_path, job_name, windows_parametrization_script,
+                                              pre_parametrization_script, parametrization_script, server_value)
             primary_command_runnable = ""
             ##########################################
             process_return = execute_command(primary_command_runnable, inp_command_id)
