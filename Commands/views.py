@@ -7474,6 +7474,26 @@ class CatMecandAutodock(APIView):
                 windows_docking_script = 'pre_docking_windows_format.sh'
                 job_name = str(initial_string) + '_' + module_name
                 server_value = 'allcpu'
+
+                enzyme_key = 'enzyme_file'
+                ligand_key = 'ligand_file'
+
+                ProjectToolEssentials_enzyme_res = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=enzyme_key).latest('entry_time')
+                enzyme_file_name = ProjectToolEssentials_enzyme_res.key_values
+
+                ProjectToolEssentials_substrate_res = \
+                    ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                               key_name=ligand_key).latest('entry_time')
+                autodock_substrate_file_name = ProjectToolEssentials_substrate_res.key_values
+
+                enzyme_dlg_file_without_extension = enzyme_file_name[:-4]
+                enzyme_dlg_file_name = enzyme_dlg_file_without_extension + '.dlg'
+
+                primary_command_runnable = config.PATH_CONFIG[
+                                                   'dlg_to_pdb_command'] + ' ' + enzyme_dlg_file_name + ' ALL ' + autodock_substrate_file_name
+
                 modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
                                                   file_path, job_name, windows_docking_script,
                                                   pre_docking_script, docking_script, server_value)
