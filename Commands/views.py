@@ -7081,17 +7081,17 @@ class Homology_Modelling(APIView):
         primary_command_runnable = re.sub('%model_single_python_file_path%', config.PATH_CONFIG[
             'shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
                                           primary_command_runnable)
-        editable_string = primary_command_runnable
-        editable_string = editable_string.split()
-        print("editable strign after split is")
-        target = editable_string[2]
-        print(target)
-        template = editable_string[3]
-        print(template)
-        residue_no = editable_string[4]
-        print(residue_no)
-        ending_model_no = editable_string[5]
-        print(ending_model_no)
+        # editable_string = primary_command_runnable
+        # editable_string = editable_string.split()
+        # print("editable strign after split is")
+        # target = editable_string[2]
+        # print(target)
+        # template = editable_string[3]
+        # print(template)
+        # residue_no = editable_string[4]
+        # print(residue_no)
+        # ending_model_no = editable_string[5]
+        # print(ending_model_no)
         file_path = config.PATH_CONFIG[
                      'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
         os.chdir(file_path)
@@ -7204,18 +7204,19 @@ class Loop_Modelling(APIView):
         primary_command_runnable = re.sub('%model_single_python_file_path%', config.PATH_CONFIG[
             'shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/',
                                           primary_command_runnable)
-        editable_string = primary_command_runnable
-        editable_string = editable_string.split()
-        file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
-        print("editable strign after split is")
-        target = editable_string[2]
-        print(target)
-        template = editable_string[3]
-        print(template)
-        residue_no = editable_string[4]
-        print(residue_no)
-        ending_model_no = editable_string[5]
-        print(ending_model_no)
+        # editable_string = primary_command_runnable
+        # editable_string = editable_string.split()
+        # print("editable strign after split is")
+        # target = editable_string[2]
+        # print(target)
+        # template = editable_string[3]
+        # print(template)
+        # residue_no = editable_string[4]
+        # print(residue_no)
+        # ending_model_no = editable_string[5]
+        # print(ending_model_no)
+        file_path = config.PATH_CONFIG[
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
         os.chdir(file_path)
 
         dirName = os.getcwd()
