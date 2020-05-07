@@ -7803,7 +7803,7 @@ class CatMec(APIView):
             print (primary_command_runnable, inp_command_id)
 
             ##########################################
-            initial_string = 'QZW_'
+            initial_string = 'QZW'
             module_name = 'Ligand_Parametrization'
             windows_parametrization_script = 'parametrization_windows_format.sh'
             pre_parametrization_script = 'pre_parametrization.sh'
