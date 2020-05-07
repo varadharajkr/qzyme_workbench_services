@@ -176,8 +176,11 @@ class gromacs(APIView):
 @csrf_exempt
 def generate_modeller_catmec_slurm_script(file_path, server_name, job_name, pre_slurm_script_file_name, slurm_script_file_name,primary_command_runnable):
     print('inside generate_modeller_slurm_script function')
+    print(file_path +'/'+ pre_slurm_script_file_name)
+    print("primary_command_runnable is ",primary_command_runnable)
+    print(file_path +'/'+ slurm_script_file_name)
     new_shell_script_lines = ''
-    number_of_threads = config.CONSTS['modeller_catmec_number_of_threads']
+    number_of_threads = int(config.CONSTS['modeller_catmec_number_of_threads'])
     print('before opening ',file_path +'/'+ pre_slurm_script_file_name)
     with open(file_path +'/'+ pre_slurm_script_file_name,'r') as source_file:
         print('inside opening ', file_path +'/'+ pre_slurm_script_file_name)
@@ -198,7 +201,7 @@ def generate_modeller_catmec_slurm_script(file_path, server_name, job_name, pre_
     with open(file_path +'/'+ slurm_script_file_name,'w+')as new_bash_script:
         print('opened ',file_path +'/'+ slurm_script_file_name)
         new_bash_script.write(new_shell_script_lines+"\n")
-        new_bash_script.write(primary_command_runnable+"\n")
+        new_bash_script.write(str(primary_command_runnable)+"\n")
         new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
     print('outside the loop')
     return True
@@ -6971,7 +6974,7 @@ class NMA(APIView):
 
 @csrf_exempt
 def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,windows_format_slurm_script,slurm_script,server_value):
-    print("inside docking_preparation function")
+    print("inside modeller_catmec_slurm_preparation function")
     print("primary_command_runnable is ",primary_command_runnable)
     os.chdir(file_path)
 
