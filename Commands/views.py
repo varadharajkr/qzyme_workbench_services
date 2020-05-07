@@ -174,6 +174,37 @@ class gromacs(APIView):
 
 
 @csrf_exempt
+def generate_modeller_catmec_slurm_script(file_path, server_name, job_name, pre_slurm_script_file_name, slurm_script_file_name,primary_command_runnable):
+    print('inside generate_modeller_slurm_script function')
+    new_shell_script_lines = ''
+    number_of_threads = config.CONSTS['modeller_catmec_number_of_threads']
+    print('before opening ',file_path +'/'+ pre_slurm_script_file_name)
+    with open(file_path +'/'+ pre_slurm_script_file_name,'r') as source_file:
+        print('inside opening ', file_path +'/'+ pre_slurm_script_file_name)
+        content = source_file.readlines()
+        for line in content:
+            if 'QZSERVER' in line:
+                new_shell_script_lines += (line.replace('QZSERVER',str(server_name)))
+            elif 'QZJOBNAME' in line:
+                new_shell_script_lines += (line.replace('QZJOBNAME',str(job_name)))
+            elif 'QZTHREADS' in line:
+                new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
+            else:
+                new_shell_script_lines += line
+    if os.path.exists(file_path +'/'+ slurm_script_file_name):
+        print('removing ',file_path + slurm_script_file_name)
+        os.remove(file_path + '/' + slurm_script_file_name)
+    # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+    with open(file_path +'/'+ slurm_script_file_name,'w+')as new_bash_script:
+        print('opened ',file_path +'/'+ slurm_script_file_name)
+        new_bash_script.write(new_shell_script_lines+"\n")
+        new_bash_script.write(primary_command_runnable+"\n")
+        new_bash_script.write("rsync -avz /scratch/$SLURM_JOB_ID/* $SLURM_SUBMIT_DIR/")
+    print('outside the loop')
+    return True
+
+
+@csrf_exempt
 def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_script_file_name, simulation_script_file_name,number_of_threads, command_title, plumed_command=''):
     print('inside generate_TASS_slurm_script function')
     print('file_path ',)
@@ -6938,6 +6969,165 @@ class NMA(APIView):
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
+@csrf_exempt
+def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,windows_format_slurm_script,slurm_script,server_value):
+    print("inside docking_preparation function")
+    os.chdir(file_path)
+
+    generate_modeller_catmec_slurm_script(file_path, server_value, job_name, windows_format_slurm_script, slurm_script,primary_command_runnable)
+
+    print('after generate_slurm_script ************************************************************************')
+    print('before changing directory')
+    print(os.getcwd())
+    print('after changing directory')
+    print(os.getcwd())
+    print("Converting from windows to unix format")
+    print("perl -p -e 's/\r$//' < "+windows_format_slurm_script+" > "+slurm_script)
+    os.system("perl -p -e 's/\r$//' < "+windows_format_slurm_script+" > "+slurm_script)
+    print('queuing **********************************************************************************')
+    cmd = "sbatch "+ file_path + "/" + slurm_script
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of Docking JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               job_id=job_id,
+                                                                               job_status="1",
+                                                                               job_title=job_name,
+                                                                               job_details=job_name)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Docking JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title=job_name,
+                                                            job_details=job_name)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Docking JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
+    return True
+
+
+@csrf_exempt
+def parameterization_preparation(inp_command_id,primary_command_runnable,project_id,project_name,command_tool,command_title,user_id=''):
+    print("inside parameterization_preparation function")
+    print("user id is ",user_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    print('parameterization path is')
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_title + '/'
+    print(file_path)
+
+    os.chdir(file_path)
+
+    initial_string = 'QZW_'
+    # module_name = 'CatMec'
+    module_name = 'Parametrization'
+    # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
+    job_name = str(initial_string) + '_' + module_name
+    job_detail_string = initial_string + module_name
+    server_value = 'qzyme2'
+
+    pre_docking_script = 'parametrization_windows_format.sh'
+
+
+    docking_script = 'pre_parametrization.sh'
+
+    generate_docking_slurm_script(file_path, server_value, job_name, pre_docking_script, docking_script,'',primary_command_runnable)
+
+
+    print('after generate_slurm_script ************************************************************************')
+    print('before changing directory')
+    print(os.getcwd())
+    print('after changing directory')
+    print(os.getcwd())
+    print("Converting from windows to unix format")
+    print("perl -p -e 's/\r$//' < parametrization_windows_format.sh > parametrization.sh")
+    os.system("perl -p -e 's/\r$//' < parametrization_windows_format.sh > parametrization.sh")
+    print('queuing **********************************************************************************')
+    cmd = "sbatch "+ file_path + "/" + "parametrization.sh"
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               job_id=job_id,
+                                                                               job_status="1",
+                                                                               job_title=job_name,
+                                                                               job_details=job_detail_string)
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title=job_name,
+                                                            job_details=job_detail_string)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
+    return True
+
+
 class Homology_Modelling(APIView):
     def get(self,request):
         pass
@@ -6985,8 +7175,9 @@ class Homology_Modelling(APIView):
         print(residue_no)
         ending_model_no = editable_string[5]
         print(ending_model_no)
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        file_path = config.PATH_CONFIG[
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+        os.chdir(file_path)
 
         dirName = os.getcwd()
         print("dirname")
@@ -6994,11 +7185,18 @@ class Homology_Modelling(APIView):
 
         print("runnable command is")
         print(primary_command_runnable)
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        os.chdir(file_path)
         print("working directory after changing CHDIR")
         print(os.system("pwd"))
-        # process_return = execute_command(primary_command_runnable)
+
+        initial_string = 'QZW_'
+        module_name = 'Homology_Modelling'
+        modelling_script = 'homology_modelling_windows_format.sh'
+        pre_modelling_script = 'pre_homology_modelling.sh'
+        job_name = str(initial_string) + '_' + module_name
+        server_value = 'allcpu'
+        modeller_catmec_slurm_preparation(project_id,commandDetails_result.user_id,primary_command_runnable,file_path,job_name,modelling_script,pre_modelling_script,server_value)
+        primary_command_runnable = ""
         process_return = Popen(
             args=primary_command_runnable,
             stdout=PIPE,
@@ -7088,6 +7286,7 @@ class Loop_Modelling(APIView):
                                           primary_command_runnable)
         editable_string = primary_command_runnable
         editable_string = editable_string.split()
+        file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
         print("editable strign after split is")
         target = editable_string[2]
         print(target)
@@ -7097,8 +7296,7 @@ class Loop_Modelling(APIView):
         print(residue_no)
         ending_model_no = editable_string[5]
         print(ending_model_no)
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        os.chdir(file_path)
 
         dirName = os.getcwd()
         print("dirname")
@@ -7106,11 +7304,19 @@ class Loop_Modelling(APIView):
 
         print("runnable command is")
         print(primary_command_runnable)
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/')
+        os.chdir(file_path)
         print("working directory after changing CHDIR")
         print(os.system("pwd"))
         # process_return = execute_command(primary_command_runnable)
+        initial_string = 'QZW_'
+        module_name = 'Loop_Modelling'
+        modelling_script = 'loop_modelling_windows_format.sh'
+        pre_modelling_script = 'pre_loop_modelling.sh'
+        job_name = str(initial_string) + '_' + module_name
+        server_value = 'allcpu'
+        modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
+                                          file_path, job_name, modelling_script, pre_modelling_script, server_value)
+        primary_command_runnable = ""
         process_return = Popen(
             args=primary_command_runnable,
             stdout=PIPE,
@@ -7247,6 +7453,7 @@ class CatMecandAutodock(APIView):
         pre_command_tool = commandDetails_result.command_tool
         length_of_pre_command_tool = len(pre_command_tool.split('and')) - 1
         command_tool = pre_command_tool.split('and')[length_of_pre_command_tool - 1]
+        user_id = commandDetails_result.user_id
         print("tool before")
         print(command_tool_title)
         print(command_tool)
@@ -7335,6 +7542,16 @@ class CatMecandAutodock(APIView):
                 os.chdir(config.PATH_CONFIG[
                              'local_shared_folder_path'] + project_name + '/' + 'CatMec'  +'/' + command_tool_title + '/')
         else:
+            if str_command_tool_title == "bundle":
+                file_path = ""
+                initial_string = 'QZW_'
+                module_name = 'Docking'
+                pre_docking_script = 'pre_docking.sh'
+                docking_script = 'pre_docking_windows_format.sh'
+                job_name = str(initial_string) + '_' + module_name
+                server_value = 'allcpu'
+                modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,docking_script,pre_docking_script,server_value)
+                primary_command_runnable = ""
             print('inside else')
             print(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_tool_title + '/')
             os.chdir(config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + 'CatMec' + '/' + command_tool_title + '/')
@@ -7640,8 +7857,9 @@ class CatMec(APIView):
             primary_command_runnable = re.sub('%input_output_folder_name%', config.PATH_CONFIG[
                 'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/',
                                               primary_command_runnable)
-            os.chdir(config.PATH_CONFIG[
-                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/')
+            file_path = config.PATH_CONFIG[
+                         'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/' + command_tool_title + '/'
+            os.chdir(file_path)
             print(os.system("pwd"))
             print(os.getcwd())
             print("=========== title is ==============")
@@ -7658,6 +7876,18 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
+
+            ##########################################
+            initial_string = 'QZW_'
+            module_name = 'Ligand_Parametrization'
+            parametrization_script = 'parametrization_windows_format.sh'
+            pre_parametrization_script = 'pre_parametrization.sh'
+            job_name = str(initial_string) + '_' + module_name
+            server_value = 'allcpu'
+            modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
+                                              file_path, job_name, parametrization_script, pre_parametrization_script, server_value)
+            primary_command_runnable = ""
+            ##########################################
             process_return = execute_command(primary_command_runnable, inp_command_id)
 
             command_title_folder = commandDetails_result.command_title
