@@ -6985,6 +6985,7 @@ def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnabl
     print("perl -p -e 's/\r$//' < "+windows_format_slurm_script+" > "+slurm_script)
     os.system("perl -p -e 's/\r$//' < "+windows_format_slurm_script+" > "+slurm_script)
     print('queuing **********************************************************************************')
+    print("sbatch "+ file_path + "/" + slurm_script)
     cmd = "sbatch "+ file_path + "/" + slurm_script
     print("Submitting Job1 with command: %s" % cmd)
     status, jobnum = commands.getstatusoutput(cmd)
