@@ -7038,96 +7038,6 @@ def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnabl
     return True
 
 
-@csrf_exempt
-def parameterization_preparation(inp_command_id,primary_command_runnable,project_id,project_name,command_tool,command_title,user_id=''):
-    print("inside parameterization_preparation function")
-    print("user id is ",user_id)
-    status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
-    print('parameterization path is')
-    file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool + '/' + command_title + '/'
-    print(file_path)
-
-    os.chdir(file_path)
-
-    initial_string = 'QZW_'
-    # module_name = 'CatMec'
-    module_name = 'Parametrization'
-    # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
-    job_name = str(initial_string) + '_' + module_name
-    job_detail_string = initial_string + module_name
-    server_value = 'qzyme2'
-
-    pre_docking_script = 'parametrization_windows_format.sh'
-
-
-    docking_script = 'pre_parametrization.sh'
-
-    generate_docking_slurm_script(file_path, server_value, job_name, pre_docking_script, docking_script,'',primary_command_runnable)
-
-
-    print('after generate_slurm_script ************************************************************************')
-    print('before changing directory')
-    print(os.getcwd())
-    print('after changing directory')
-    print(os.getcwd())
-    print("Converting from windows to unix format")
-    print("perl -p -e 's/\r$//' < parametrization_windows_format.sh > parametrization.sh")
-    os.system("perl -p -e 's/\r$//' < parametrization_windows_format.sh > parametrization.sh")
-    print('queuing **********************************************************************************')
-    cmd = "sbatch "+ file_path + "/" + "parametrization.sh"
-    print("Submitting Job1 with command: %s" % cmd)
-    status, jobnum = commands.getstatusoutput(cmd)
-    print("job id is ", jobnum)
-    print("status is ", status)
-    print("job id is ", jobnum)
-    print("status is ", status)
-    print(jobnum.split())
-    lenght_of_split = len(jobnum.split())
-    index_value = lenght_of_split - 1
-    print(jobnum.split()[index_value])
-    job_id = jobnum.split()[index_value]
-    # save job id
-    job_id_key_name = "job_id"
-    entry_time = datetime.now()
-    try:
-        print(
-            "<<<<<<<<<<<<<<<<<<<<<<< in try of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                               project_id=project_id,
-                                                                               entry_time=entry_time,
-                                                                               job_id=job_id,
-                                                                               job_status="1",
-                                                                               job_title=job_name,
-                                                                               job_details=job_detail_string)
-        QzwSlurmJobDetails_save_job_id.save()
-    except db.OperationalError as e:
-        print("<<<<<<<<<<<<<<<<<<<<<<< in except of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        db.close_old_connections()
-        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                            project_id=project_id,
-                                                            entry_time=entry_time,
-                                                            job_id=job_id,
-                                                            job_status="1",
-                                                            job_title=job_name,
-                                                            job_details=job_detail_string)
-        QzwSlurmJobDetails_save_job_id.save()
-        print("saved")
-    except Exception as e:
-        print("<<<<<<<<<<<<<<<<<<<<<<< in except of parametrization JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("exception is ",str(e))
-        pass
-        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                               project_id=project_id,
-                                                                               entry_time=entry_time,
-                                                                               values=job_id,
-                                                                               job_id=job_id)
-        QzwSlurmJobDetails_save_job_id.save()
-        print("saved")'''
-    print('queued')
-    return True
-
-
 class Homology_Modelling(APIView):
     def get(self,request):
         pass
@@ -7885,7 +7795,7 @@ class CatMec(APIView):
             job_name = str(initial_string) + '_' + module_name
             server_value = 'allcpu'
             modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
-                                              file_path, job_name, parametrization_script, pre_parametrization_script, server_value)
+                                              file_path, job_name, pre_parametrization_script, parametrization_script, server_value)
             primary_command_runnable = ""
             ##########################################
             process_return = execute_command(primary_command_runnable, inp_command_id)
