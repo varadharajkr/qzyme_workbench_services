@@ -7796,7 +7796,7 @@ class CatMec(APIView):
             job_name = str(initial_string) + '_' + module_name
             server_value = 'allcpu'
             modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
-                                              file_path, job_name, pre_parametrization_script, parametrization_script, server_value)
+                                              file_path, job_name, parametrization_script, pre_parametrization_script, server_value)
             primary_command_runnable = ""
             ##########################################
             process_return = execute_command(primary_command_runnable, inp_command_id)
