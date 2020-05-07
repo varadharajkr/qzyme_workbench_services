@@ -6972,6 +6972,7 @@ class NMA(APIView):
 @csrf_exempt
 def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnable,file_path,job_name,windows_format_slurm_script,slurm_script,server_value):
     print("inside docking_preparation function")
+    print("primary_command_runnable is ",primary_command_runnable)
     os.chdir(file_path)
 
     generate_modeller_catmec_slurm_script(file_path, server_value, job_name, windows_format_slurm_script, slurm_script,primary_command_runnable)
