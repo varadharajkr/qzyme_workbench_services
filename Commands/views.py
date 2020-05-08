@@ -7823,6 +7823,9 @@ class CatMec(APIView):
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
 
+            print("primary_command_runnable")
+            print('primary_command_runnable.split()[2]',primary_command_runnable.split()[2])
+            exit()
             ##########################################
             initial_string = 'QZW'
             module_name = 'Ligand_Parametrization'
