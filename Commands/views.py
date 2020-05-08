@@ -7824,7 +7824,10 @@ class CatMec(APIView):
             print (primary_command_runnable, inp_command_id)
 
             print("primary_command_runnable")
+            print('primary_command_runnable.split()[0]',primary_command_runnable.split()[0])
+            print('primary_command_runnable.split()[1]',primary_command_runnable.split()[1])
             print('primary_command_runnable.split()[2]',primary_command_runnable.split()[2])
+            print('primary_command_runnable.split()[3]',primary_command_runnable.split()[3])
             exit()
             ##########################################
             initial_string = 'QZW'
