@@ -7823,26 +7823,23 @@ class CatMec(APIView):
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
 
-            print("primary_command_runnable")
-            print('primary_command_runnable.split()[0]',primary_command_runnable.split()[0])
-            print('primary_command_runnable.split()[1]',primary_command_runnable.split()[1])
-            print('primary_command_runnable.split()[2]',primary_command_runnable.split()[2])
-            print('primary_command_runnable.split()[3]',primary_command_runnable.split()[3])
-            exit()
-            ##########################################
-            initial_string = 'QZW'
-            module_name = 'Ligand_Parametrization'
-            windows_parametrization_script = 'parametrization_windows_format.sh'
-            pre_parametrization_script = 'pre_parametrization.sh'
-            parametrization_script = 'parametrization.sh'
-            job_name = str(initial_string) + '_' + module_name
-            server_value = 'allcpu'
 
-            modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
-                                              file_path, job_name, windows_parametrization_script,
-                                              pre_parametrization_script, parametrization_script, server_value)
-            primary_command_runnable = ""
-            ##########################################
+            print('primary_command_runnable.split()[1]',primary_command_runnable.split()[1])
+            if primary_command_runnable.split()[1] == "pre_process_parameterize.py":
+                ##########################################
+                initial_string = 'QZW'
+                module_name = 'Ligand_Parametrization'
+                windows_parametrization_script = 'parametrization_windows_format.sh'
+                pre_parametrization_script = 'pre_parametrization.sh'
+                parametrization_script = 'parametrization.sh'
+                job_name = str(initial_string) + '_' + module_name
+                server_value = 'allcpu'
+
+                modeller_catmec_slurm_preparation(project_id, commandDetails_result.user_id, primary_command_runnable,
+                                                  file_path, job_name, windows_parametrization_script,
+                                                  pre_parametrization_script, parametrization_script, server_value)
+                primary_command_runnable = ""
+                ##########################################
             process_return = execute_command(primary_command_runnable, inp_command_id)
 
             command_title_folder = commandDetails_result.command_title
