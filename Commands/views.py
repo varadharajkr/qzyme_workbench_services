@@ -7466,7 +7466,7 @@ class CatMecandAutodock(APIView):
                              'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
         else:
             if str_command_tool_title == "bundle":
-                file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/'
+                file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title 
                 initial_string = 'QZW_'
                 module_name = 'Docking'
                 docking_script = 'docking.sh'
