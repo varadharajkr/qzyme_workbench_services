@@ -7093,7 +7093,7 @@ class Homology_Modelling(APIView):
         # ending_model_no = editable_string[5]
         # print(ending_model_no)
         file_path = config.PATH_CONFIG[
-                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                     'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool
         os.chdir(file_path)
 
         dirName = os.getcwd()
@@ -7216,7 +7216,7 @@ class Loop_Modelling(APIView):
         # ending_model_no = editable_string[5]
         # print(ending_model_no)
         file_path = config.PATH_CONFIG[
-                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
+                        'local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool
         os.chdir(file_path)
 
         dirName = os.getcwd()
@@ -7466,7 +7466,7 @@ class CatMecandAutodock(APIView):
                              'local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title + '/')
         else:
             if str_command_tool_title == "bundle":
-                file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title 
+                file_path = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + command_tool  +'/' + command_tool_title
                 initial_string = 'QZW_'
                 module_name = 'Docking'
                 docking_script = 'docking.sh'
