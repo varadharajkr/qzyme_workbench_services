@@ -66,6 +66,25 @@ def execute_command(command,inp_command_id):
     # process.wait()
     return process
 
+def execute_fjs_command(command,inp_command_id,program_path,command_title):
+    print('FJS command to execute is ',command)
+    print('FJS inp command id is ',inp_command_id)
+    status_id = config.CONSTS['status_initiated']
+    update_command_status(inp_command_id, status_id)
+    logfile = open(str(program_path)+str(command_title)+'.log', 'w+')
+    process =Popen(
+        args=command,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True
+    )
+    for line in process.stdout:
+        sys.stdout.write(line)
+        logfile.write(line)
+    print("execute command in execute command function")
+    # process.wait()
+    return process
+
 
 def execute_command_md_run(command, change_dir,source_file_path):
     print("in md popen-----")
@@ -5435,6 +5454,50 @@ class Hello_World(APIView):
             return JsonResponse({'success': True})
 
 
+class Execute_Command(APIView):
+    def get(self,request):
+        pass
+    def post(self,request):
+        print ("*************user direct command execution****************88")
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        primary_command_runnable = commandDetails_result.primary_command
+        status_id = config.CONSTS['status_initiated']
+        update_command_status(inp_command_id, status_id)
+        group_project_name = get_group_project_name(str(project_id))
+        command_comment = commandDetails_result.comments
+        command_tool = command_comment.split("#+#")[0]
+        command_title = command_comment.split("#+#")[1]
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + group_project_name + "/" + str(project_name) + '/' + str(command_tool) + '/' +
+                 str(command_title))
+        print(os.system("pwd"))
+        program_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name + "/" + str(
+            project_name) + '/' + str(command_tool) + '/' + str(command_title)+'/'
+        process_return = execute_fjs_command(primary_command_runnable, inp_command_id,program_path,command_title)
+        out, err = process_return.communicate()
+        process_return.wait()
+        if process_return.returncode == 0:
+            print("Success executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + group_project_name + "/" + str(
+                project_name) + '/' + str(command_tool) + '/' + str(command_title) + '/' + str(command_title) + '_final.log',
+                           'w+')
+            fileobj.write(out)
+            status_id = config.CONSTS['status_success']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+        if process_return.returncode != 0:
+            print("Error in executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] + group_project_name + "/" + str(
+                project_name) + '/' + str(command_tool) + '/' + str(command_title) + '/' + str(command_title) + '_final.log',
+                           'w+')
+            fileobj.write(err)
+            status_id = config.CONSTS['status_error']
+            update_command_status(inp_command_id,status_id)
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 class mmpbsa(APIView):
     def get(self,request):
@@ -9424,7 +9487,17 @@ def copytree(source, destination, symlinks=False, ignore=None):
 
 def update_command_status(inp_command_id,status_id):
     print("updating command execution status")
-    QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id)
+    #check if process initiated
+    entry_time = datetime.now()
+    if status_id == 2:
+        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
+                                                                                                       execution_started_at=entry_time)
+    if status_id == 3:
+        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
+                                                                                                       execution_completed_at=entry_time)
+    if status_id == 4:
+        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
+                                                                                                       execution_completed_at=entry_time)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
