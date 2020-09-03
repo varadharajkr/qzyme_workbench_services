@@ -42,12 +42,21 @@ class commandDetails(models.Model):
     command_tool = models.CharField(max_length=150)
     command_title = models.CharField(max_length=200)
     comments = models.TextField()
+    session_values = models.CharField(max_length=150, blank=True, null=True)
+    flexible_command = models.IntegerField(blank=True, null=True)
+    execution_started_at = models.DateTimeField(blank=True, null=True)
+    execution_completed_at = models.DateTimeField(blank=True, null=True)
+    external_command = models.IntegerField(blank=True, null=True)
+    flexible_command = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = "qzw_project_commands"
 
     def __str__(self):
-        return u'%s %s %s %s %s %s %s %s %s' % (self.command_id,self.project_id,self.user_id,self.primary_command,self.entry_time,self.status,self.command_tool,self.command_title,self.comments)
+        return u'%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s' % (
+        self.command_id, self.project_id, self.user_id, self.primary_command, self.entry_time, self.status,
+        self.command_tool, self.command_title, self.comments, self.session_values,self.flexible_command,
+        self.execution_started_at,self.execution_completed_at,self.external_command,self.flexible_command)
 
 class QzwProjectDetails(models.Model):
     project_id = models.AutoField(primary_key=True)
@@ -60,13 +69,17 @@ class QzwProjectDetails(models.Model):
     enabled = models.IntegerField()
     project_json = models.TextField(blank=True, null=True)
     json_selected_text = models.TextField(blank=True, null=True)
+    grouped_project = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'qzw_project_details'
 
     def __str__(self):
-        return u'%s %s %s %s %s %s %s %s' % (self.project_id,self.project_name,self.project_status,self.project_description,self.project_category,self.project_investigator,self.project_code,self.enabled)
+        return u'%s %s %s %s %s %s %s %s %s %s %s' % (self.project_id,self.project_name,self.project_status,
+                                                      self.project_description,self.project_category,
+                                                      self.project_investigator,self.project_code,self.enabled,
+                                                      self.project_json,self.json_selected_text,self.grouped_project)
 
 
 class ProjectToolEssentials(models.Model):
