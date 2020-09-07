@@ -9488,16 +9488,40 @@ def copytree(source, destination, symlinks=False, ignore=None):
 def update_command_status(inp_command_id,status_id):
     print("updating command execution status")
     #check if process initiated
+
     entry_time = datetime.now()
     if status_id == 2:
-        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
-                                                                                                       execution_started_at=entry_time)
+        try:
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_started_at=entry_time)
+        except db.OperationalError as e:
+            db.close_old_connections()
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_started_at=entry_time)
+
     if status_id == 3:
-        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
-                                                                                                       execution_completed_at=entry_time)
+        try:
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_completed_at=entry_time)
+        except db.OperationalError as e:
+            db.close_old_connections()
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_completed_at=entry_time)
+
     if status_id == 4:
-        QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(status=status_id,
-                                                                                                       execution_completed_at=entry_time)
+        try:
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_completed_at=entry_time)
+        except db.OperationalError as e:
+            db.close_old_connections()
+            QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
+                status=status_id,
+                execution_completed_at=entry_time)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
