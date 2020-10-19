@@ -7112,7 +7112,7 @@ def modeller_catmec_slurm_preparation(project_id,user_id,primary_command_runnabl
     entry_time = datetime.now()
     try:
         print(
-            "<<<<<<<<<<<<<<<<<<<<<<< in try of Docking JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of Homology Modelling JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
                                                                                project_id=project_id,
                                                                                entry_time=entry_time,
@@ -9485,6 +9485,57 @@ def copytree(source, destination, symlinks=False, ignore=None):
             #print shutil.copy(path_file, destination)  # change you destination dir
             #print os.system("cp "+path_file+" "+destination)
 
+def send_non_slurm_email(inp_command_id,status_id):
+    print("inside send_non_slurm_email function")
+    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
+    commandDetails_res = commandDetails.objects.all().filter(inp_command_id=inp_command_id)
+
+    command_title = str(commandDetails.command_title)
+    user_id = str(commandDetails.user_id)
+
+    SMTPserver = 'quantumzyme.com'
+    sender =     'sagar.kalmesh@quantumzyme.com'
+    destination = ['varadharaj.ranganatha@quantumzyme.com']
+
+    USERNAME = "qzwebgo"
+    PASSWORD = "Qzyme@786"
+
+    # typical values for text_subtype are plain, html, xml
+    text_subtype = 'plain'
+
+
+    content= "user "+user_id+" is queued job with job name "+command_title+" and currently in execution state"
+
+    subject="Sent from Python"
+
+    import sys
+    import os
+    import re
+
+    from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
+    # from smtplib import SMTP                  # use this for standard SMTP protocol   (port 25, no encryption)
+
+    # old version
+    # from email.MIMEText import MIMEText
+    from email.mime.text import MIMEText
+
+    try:
+        msg = MIMEText(content, text_subtype)
+        msg['Subject']=       subject
+        msg['From']   = sender # some SMTP servers will do this automatically, not all
+
+        conn = SMTP(SMTPserver)
+        conn.set_debuglevel(True)
+        conn.login(USERNAME, PASSWORD)
+        try:
+            conn.sendmail(sender, destination, msg.as_string())
+        finally:
+            conn.quit()
+    except Exception as e:
+        print("exception is ",str(e))
+    #except:
+    #    sys.exit( "mail failed; %s" % "CUSTOM_ERROR" ) # give an error message
+
 def update_command_status(inp_command_id,status_id):
     print("updating command execution status")
     #check if process initiated
@@ -9495,6 +9546,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_started_at=entry_time)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
