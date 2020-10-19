@@ -9542,7 +9542,7 @@ def send_non_slurm_email(inp_command_id,status_id):
 
     content= "user "+user_id+" is queued job with job name "+command_title+" and currently in execution state"
 
-    subject="Sent from Python"
+    subject="Python"
 
     import sys
     import os
