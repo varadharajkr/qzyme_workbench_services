@@ -9524,12 +9524,11 @@ def copytree(source, destination, symlinks=False, ignore=None):
 def send_non_slurm_email(inp_command_id,status_id):
     print("inside send_non_slurm_email function")
     print("*****************************************************************************************")
-    no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
     commandDetails_res = commandDetails.objects.all().filter(command_id=inp_command_id)
-
     command_title = str(commandDetails.command_title)
+    print("command_title is ",command_title)
     user_id = str(commandDetails.user_id)
-
+    print("*****************************************************************************************")
     SMTPserver = 'quantumzyme.com'
     sender =     'sagar.kalmesh@quantumzyme.com'
     destination = ['varadharaj.ranganatha@quantumzyme.com']
