@@ -80,6 +80,42 @@ def execute_fjs_command(command,inp_command_id,program_path,command_title):
     )
     for line in process.stdout:
         sys.stdout.write(line)
+        if "Submitted batch job" in line:
+            # filtering jobID from string
+            slurm_jobid = int(''.join(list(filter(str.isdigit, line))))
+            # query to Slurm sacct
+            slurm_sacct_query = subprocess.check_output(
+                "sacct --format='JobID,JobName%30,Partition,AllocCPUS,State,ExitCode' -j "+str(slurm_jobid)+"", shell=True);
+            
+            with open(program_path+'temp_sacct_details.txt', 'w+') as out:
+                out.write(slurm_sacct_query.decode())
+            with open(program_path+'temp_sacct_details.txt', 'r') as file:
+                for line in file:
+                    if line.startswith(str(slurm_jobid)+" "):
+                        JobID, JobName, Partition, AllocCPUS, State, ExitCode = line.split()[0], line.split()[1], \
+                                                                                line.split()[2], line.split()[3], \
+                                                                                line.split()[4], line.split()[5]
+                        try:
+                            db.close_old_connections()
+                            # get command details
+                            entry_time = datetime.now()
+                            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+                            project_id = commandDetails_result.project_id
+                            user_id = commandDetails_result.user_id
+                            QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                                project_id=project_id,
+                                                                                entry_time=entry_time,
+                                                                                job_id=JobID,
+                                                                                job_status=State,
+                                                                                job_title=JobName,
+                                                                                job_details=JobName,
+                                                                                command_id=inp_command_id)
+                            QzwSlurmJobDetails_save_job_id.save()
+                            # update details to DB
+                        except db.OperationalError as e:
+                            db.close_old_connections()
+            os.remove(program_path+'temp_sacct_details.txt')
+
         logfile.write(line)
     print("execute command in execute command function")
     # process.wait()

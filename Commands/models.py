@@ -105,6 +105,7 @@ class QzwSlurmJobDetails(models.Model):
     job_status = models.CharField(max_length=45, blank=True, null=True)
     job_title = models.CharField(max_length=100, blank=True, null=True)
     job_details = models.CharField(max_length=100, blank=True, null=True)
+    command_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
