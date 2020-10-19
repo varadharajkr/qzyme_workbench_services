@@ -9523,6 +9523,7 @@ def copytree(source, destination, symlinks=False, ignore=None):
 
 def send_non_slurm_email(inp_command_id,status_id):
     print("inside send_non_slurm_email function")
+    print("*****************************************************************************************")
     no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
     commandDetails_res = commandDetails.objects.all().filter(inp_command_id=inp_command_id)
 
@@ -9594,6 +9595,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9605,6 +9607,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
