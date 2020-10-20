@@ -9528,9 +9528,9 @@ def send_non_slurm_email(inp_command_id,status_id):
     print("status_id is ",status_id)
     commandDetails_res = commandDetails.objects.all().filter(command_id=inp_command_id).latest(
         'entry_time')
-    command_title = str(commandDetails.command_title)
+    command_title = commandDetails_res.command_title
     print("command_title is ",command_title)
-    user_id = str(commandDetails.user_id)
+    user_id = str(commandDetails_res.user_id)
     print("user_id is ",user_id)
     print("*****************************************************************************************")
     exit()
