@@ -9528,7 +9528,9 @@ def send_non_slurm_email(inp_command_id,status_id):
     command_title = str(commandDetails.command_title)
     print("command_title is ",command_title)
     user_id = str(commandDetails.user_id)
+    print("user_id is ",user_id)
     print("*****************************************************************************************")
+    exit()
     SMTPserver = 'quantumzyme.com'
     sender =     'sagar.kalmesh@quantumzyme.com'
     destination = ['varadharaj.ranganatha@quantumzyme.com']
