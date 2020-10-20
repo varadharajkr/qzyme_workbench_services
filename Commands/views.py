@@ -9524,6 +9524,8 @@ def copytree(source, destination, symlinks=False, ignore=None):
 def send_non_slurm_email(inp_command_id,status_id):
     print("inside send_non_slurm_email function")
     print("*****************************************************************************************")
+    print("inp_command_id is ",inp_command_id)
+    print("status_id is ",status_id)
     commandDetails_res = commandDetails.objects.all().filter(command_id=inp_command_id).latest(
         'entry_time')
     command_title = str(commandDetails.command_title)
