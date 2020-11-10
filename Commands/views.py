@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from django.http import request
 from rest_framework import status
 from .models import runCommands, gromacsSample, serverDetails, commandDetails, QzwProjectDetails, QzwResearchPapers, \
-    ProjectToolEssentials, QzwSlurmJobDetails
+    ProjectToolEssentials, QzwSlurmJobDetails, QzEmployeeEmail
 from .serializers import runCommandSerializer , serverrDetailsSerializer
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -341,7 +341,7 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
 
 
 @csrf_exempt
-def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, command_title, user_id=''):
+def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,command_tool, command_title, user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
@@ -349,7 +349,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
     update_command_status(inp_command_id, status_id)
     print("inside TASS_nvt_equilibiration_preparation function")
     print('TASS_simulation_path is')
-    file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/'
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
 
     no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
@@ -465,7 +465,7 @@ def TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,c
 
 
 @csrf_exempt
-def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_nvt_simulation_preparation function")
     print("user id is ",user_id)
@@ -473,7 +473,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
     update_command_status(inp_command_id, status_id)
     print("inside TASS_nvt_simulation_preparation function")
     print('TASS_simulation_path is')
-    file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/'
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
 
     try:
@@ -612,7 +612,7 @@ def TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,comma
 
 
 @csrf_exempt
-def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_qmm_mm_preparation function")
     print("user id is ",user_id)
@@ -620,7 +620,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
     update_command_status(inp_command_id, status_id)
     print("inside TASS_qmm_mm_preparation function")
     print('TASS_simulation_path is')
-    file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/' +project_name + '/' + command_tool + '/'
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/' +project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
 
     no_of_thread_key = "TASS_nvt_equilibration_number_of_threads"
@@ -785,7 +785,7 @@ def TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,command_tool,
 
 
 @csrf_exempt
-def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id=''):
+def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside plot_energy_preparation function")
     print("user id is ",user_id)
@@ -793,7 +793,7 @@ def plot_energy_preparation(inp_command_id,project_id,project_name,command_tool,
     update_command_status(inp_command_id, status_id)
     print("inside plot_energy_preparation function")
     print('TASS_simulation_path is')
-    file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/'
+    file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
 
     plot_energy_variable_key = 'plot_energy_variables'
@@ -923,20 +923,29 @@ class TASS(APIView):
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
+
+        user_mutation_selection_key_name = 'TASS_mutation_selection'
+
+        #get list of index file options for gmx input
+        ProjectToolEssentials_res_mutation_selection = \
+            ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                       key_name=user_mutation_selection_key_name).latest('entry_time')
+        user_selected_mutation = str(ProjectToolEssentials_res_mutation_selection.key_values)
+
         if commandDetails_result.command_title == "nvt_equilibration":
-            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+            returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "nvt_simulation":
-            returned_preparation_value = TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+            returned_preparation_value = TASS_nvt_simulation_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "TASS_qmm_mm":
-            returned_preparation_value = TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+            returned_preparation_value = TASS_qmm_mm_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "plot_energy":
-            returned_preparation_value = plot_energy_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id)
+            returned_preparation_value = plot_energy_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
 
         print('primary_command_runnable')
         print(primary_command_runnable)
 
         os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/')
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + user_selected_mutation + '/')
 
         print("dirname")
         print(os.getcwd())
@@ -944,7 +953,7 @@ class TASS(APIView):
         print("runnable command is")
         print(primary_command_runnable)
         os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/')
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + user_selected_mutation + '/')
         print("working directory after changing CHDIR")
         print(os.system("pwd"))
 
@@ -9526,17 +9535,29 @@ def send_non_slurm_email(inp_command_id,status_id):
     print("*****************************************************************************************")
     print("inp_command_id is ",inp_command_id)
     print("status_id is ",status_id)
+
     commandDetails_res = commandDetails.objects.all().filter(command_id=inp_command_id).latest(
         'entry_time')
     command_title = commandDetails_res.command_title
     print("command_title is ",command_title)
     user_id = str(commandDetails_res.user_id)
     print("user_id is ",user_id)
+    QzEmployeeEmail_res = QzEmployeeEmail.objects.all().filter(qz_user_id=user_id)
+    email_id = QzEmployeeEmail.email_id
+    print("email_id is ",email_id)
     print("*****************************************************************************************")
-    exit()
+    if status_id == 2:
+        status = "started to execute"
+    elif status_id == 3:
+        status = "executed successfully"
+    elif status_id == 4:
+        status = "executed unsuccessful"
+    entry_time = datetime.now()
+
+    table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center><th><center>Time</th></tr><tr><td>" + server_name + "</td><td>" + total_space + "</td><td style='color:red'>" + status + "</td><td>" + free_space + "</td></tr></table></body></html>"
     SMTPserver = 'quantumzyme.com'
-    sender =     'sagar.kalmesh@quantumzyme.com'
-    destination = ['varadharaj.ranganatha@quantumzyme.com']
+    sender = 'varadharaj.ranganatha@quantumzyme.com'
+    destination = ['varadharaj.ranganatha@quantumzyme.com',email_id]
 
     USERNAME = "qzwebgo"
     PASSWORD = "Qzyme@786"

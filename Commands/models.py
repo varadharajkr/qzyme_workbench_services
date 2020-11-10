@@ -20,6 +20,37 @@ class gromacsSample(models.Model):
     def __str__(self):
         return self.abc
 
+
+class QzEmployeeEmail(models.Model):
+    email_id = models.CharField(db_column='Email-ID', max_length=100)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    qz_user_id = models.CharField(db_column='QZ-User-ID', max_length=45)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+
+    class Meta:
+        managed = False
+        db_table = 'QZ_Employee_Email'
+
+    def __str__(self):
+        return u'%s %s' % (self.email_id,self.qz_user_id)
+
+
+class QzEmpNotification(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    qz_emp_notifier_user_id = models.IntegerField()
+    qz_emp_notification_user_id = models.IntegerField()
+    qz_emp_notification_type = models.CharField(max_length=45)
+    qz_emp_notification_message = models.TextField()
+    qz_emp_notification_email_status = models.IntegerField()
+    qz_emp_notification_status = models.IntegerField()
+    qz_emp_notificationcol = models.CharField(max_length=45)
+
+    class Meta:
+        managed = False
+        db_table = 'qz_emp_notification'
+
+    def __str__(self):
+        return u'%s %s %s %s %s %s %s %s' % (self.notification_id,self.qz_emp_notifier_user_id,self.qz_emp_notification_user_id,self.qz_emp_notification_type,self.qz_emp_notification_message,self.qz_emp_notification_email_status,self.qz_emp_notification_status,self.qz_emp_notificationcol)
+
+
 class serverDetails(models.Model):
     idqzw_server_service_details = models.IntegerField(primary_key=True)
     server_id = models.CharField(max_length=11)
