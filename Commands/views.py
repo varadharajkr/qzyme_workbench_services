@@ -9608,7 +9608,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_started_at=entry_time)
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9620,7 +9620,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9632,7 +9632,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
