@@ -22,15 +22,16 @@ class gromacsSample(models.Model):
 
 
 class QzEmployeeEmail(models.Model):
-    email_id = models.CharField(db_column='Email-ID', max_length=100)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    qz_user_id = models.CharField(db_column='QZ-User-ID', max_length=45)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    id = models.AutoField(primary_key=True)
+    email_id = models.CharField(db_column='email_id', max_length=100)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    qz_user_id = models.CharField(db_column='qz_user_id', max_length=45)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
     class Meta:
         managed = False
         db_table = 'QZ_Employee_Email'
 
     def __str__(self):
-        return u'%s %s' % (self.email_id,self.qz_user_id)
+        return u'%s %s %s' % (self.id,self.email_id,self.qz_user_id)
 
 
 class QzEmpNotification(models.Model):
