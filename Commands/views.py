@@ -919,15 +919,15 @@ class TASS(APIView):
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
         user_id = commandDetails_result.user_id
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("user id is "+str(user_id))
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
+        print("email_id.split(' ') "+str(email_id.split(' ')))
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
         user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
