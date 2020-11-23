@@ -9603,11 +9603,13 @@ def update_command_status(inp_command_id,status_id):
     #check if process initiated
 
     entry_time = datetime.now()
+    updated_status = False
     if status_id == 2:
         try:
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_started_at=entry_time)
+            updated_status = True
             #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
@@ -9620,6 +9622,7 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+            updated_status = True
             #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
@@ -9632,12 +9635,15 @@ def update_command_status(inp_command_id,status_id):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+            updated_status = True
             #send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+    if updated_status:
+        send_non_slurm_email(inp_command_id, status_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
