@@ -50,12 +50,12 @@ django_logger = logging.getLogger(__name__)
 
 
 # to run command in shell
-def execute_command(command,inp_command_id):
+def execute_command(command,inp_command_id,user_email_string):
     print('inside execute_command')
     print('command to execute is ',command)
     print('inp command id is ',inp_command_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
+    update_command_status(inp_command_id, status_id,user_email_string)
     process =Popen(
         args=command,
         stdout=PIPE,
@@ -184,6 +184,10 @@ class gromacs(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -914,6 +918,10 @@ class TASS(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
@@ -958,7 +966,7 @@ class TASS(APIView):
         print(os.system("pwd"))
 
         #execute command
-        process_return = execute_command(primary_command_runnable, inp_command_id)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -1014,6 +1022,9 @@ class analyse_mmpbsa(APIView):
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
         user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -5169,6 +5180,10 @@ class pathanalysis(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
@@ -5207,7 +5222,7 @@ class pathanalysis(APIView):
                                  'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/"+script_dir_file)
 
             # execute PathAnalysis command
-            process_return = execute_command(primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
             out, err = process_return.communicate()
             process_return.wait()
             if process_return.returncode == 0:
@@ -5428,6 +5443,10 @@ class get_activation_energy(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -5440,7 +5459,7 @@ class get_activation_energy(APIView):
 
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
 
@@ -5507,6 +5526,10 @@ class Execute_Command(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -5554,6 +5577,10 @@ class mmpbsa(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -5573,7 +5600,7 @@ class mmpbsa(APIView):
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+        process_return = execute_command(primary_command_runnable,inp_command_id, user_email_string)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
@@ -5792,6 +5819,10 @@ class Contact_Score(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
@@ -6841,6 +6872,10 @@ class Complex_Simulations(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -6916,7 +6951,7 @@ class Complex_Simulations(APIView):
 
         print(primary_command_runnable)
 
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
 
         command_title_folder = commandDetails_result.command_title
 
@@ -6951,6 +6986,10 @@ class Literature_Research(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -7000,6 +7039,10 @@ class MakeSubstitution(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -7022,7 +7065,7 @@ class MakeSubstitution(APIView):
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
@@ -7074,6 +7117,10 @@ class NMA(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
@@ -7094,7 +7141,7 @@ class NMA(APIView):
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print("working directory is")
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id)
+        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
         process_return.wait()
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
         command_title_folder = commandDetails_result.command_title
@@ -7203,6 +7250,10 @@ class Homology_Modelling(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
@@ -7327,6 +7378,10 @@ class Loop_Modelling(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
@@ -7519,6 +7574,10 @@ class CatMecandAutodock(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         pre_command_title = commandDetails_result.command_title
         length_of_pre_command_title = len(pre_command_title.split('and')) - 1
         command_tool_title_string = pre_command_title.split('and')[length_of_pre_command_title]
@@ -7659,7 +7718,7 @@ class CatMecandAutodock(APIView):
         print("\nexecute command before ")
         print(primary_command_runnable)
 
-        process_return = execute_command(primary_command_runnable, inp_command_id)
+        process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
         out, err = process_return.communicate()
         process_return.wait()
@@ -7794,6 +7853,10 @@ class CatMec(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
         group_project_name = get_group_project_name(str(project_id))
@@ -7831,7 +7894,7 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
             command_title_folder = commandDetails_result.command_title
 
@@ -7880,7 +7943,7 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
             command_title_folder = commandDetails_result.command_title
 
@@ -7992,7 +8055,7 @@ class CatMec(APIView):
                                                   pre_parametrization_script, parametrization_script, server_value)
                 primary_command_runnable = ""
                 ##########################################
-            process_return = execute_command(primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
             command_title_folder = commandDetails_result.command_title
 
@@ -8094,7 +8157,7 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
             command_title_folder = commandDetails_result.command_title
 
@@ -8279,6 +8342,10 @@ class Designer(APIView):
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         user_id = commandDetails_result.user_id
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         group_project_name = get_group_project_name(str(project_id))
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
@@ -8425,6 +8492,10 @@ class Hotspot(APIView):
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         user_id = commandDetails_result.user_id
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         group_project_name = get_group_project_name(str(project_id))
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
@@ -9046,6 +9117,10 @@ class Designer_Mmpbsa_analyse(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
         group_project_name = get_group_project_name(str(project_id))
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
@@ -9554,7 +9629,7 @@ def send_non_slurm_email(inp_command_id,status_id):
         status = "executed unsuccessful"
     entry_time = datetime.now()
 
-    table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center><th><center>Time</th></tr><tr><td>" + server_name + "</td><td>" + total_space + "</td><td style='color:red'>" + status + "</td><td>" + free_space + "</td></tr></table></body></html>"
+    table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     SMTPserver = 'quantumzyme.com'
     sender = 'varadharaj.ranganatha@quantumzyme.com'
     destination = ['varadharaj.ranganatha@quantumzyme.com',email_id]
@@ -9598,7 +9673,7 @@ def send_non_slurm_email(inp_command_id,status_id):
     #except:
     #    sys.exit( "mail failed; %s" % "CUSTOM_ERROR" ) # give an error message
 
-def update_command_status(inp_command_id,status_id):
+def update_command_status(inp_command_id,status_id,user_email_string):
     print("updating command execution status")
     #check if process initiated
 
@@ -9643,7 +9718,7 @@ def update_command_status(inp_command_id,status_id):
                 status=status_id,
                 execution_completed_at=entry_time)
     if updated_status:
-        send_non_slurm_email(inp_command_id, status_id)
+        send_non_slurm_email(inp_command_id, status_id, user_email_string)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
