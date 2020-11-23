@@ -932,6 +932,9 @@ class TASS(APIView):
                                                        key_name=user_mutation_selection_key_name).latest('entry_time')
         user_selected_mutation = str(ProjectToolEssentials_res_mutation_selection.key_values)
 
+        print("user_selected_mutation is "+user_selected_mutation)
+        print(str(user_selected_mutation.split("["))+str(user_selected_mutation.split("]")))
+        exit()
         if commandDetails_result.command_title == "nvt_equilibration":
             returned_preparation_value = TASS_nvt_equilibiration_preparation(inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "nvt_simulation":
