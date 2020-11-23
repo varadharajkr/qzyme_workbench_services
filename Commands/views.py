@@ -9609,7 +9609,7 @@ def copytree(source, destination, symlinks=False, ignore=None):
             #print shutil.copy(path_file, destination)  # change you destination dir
             #print os.system("cp "+path_file+" "+destination)
 
-def send_non_slurm_email(inp_command_id,status_id):
+def send_non_slurm_email(inp_command_id,status_id,user_email_string):
     print("inside send_non_slurm_email function")
     print("*****************************************************************************************")
     print("inp_command_id is ",inp_command_id)
