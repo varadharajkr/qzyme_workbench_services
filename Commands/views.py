@@ -9631,7 +9631,7 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
         status = "executed successfully"
     elif status_id == 4:
         status = "executed unsuccessful"
-    entry_time = datetime.now()
+    entry_time = str(datetime.now())
 
     table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     SMTPserver = 'quantumzyme.com'
