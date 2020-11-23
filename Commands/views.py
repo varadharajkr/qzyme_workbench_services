@@ -921,21 +921,11 @@ class TASS(APIView):
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        print("email_id.split(' ') "+str(email_id.split(' ')))
         dot_Str_val = email_id.split('@')[0]
         lenght_of_name_with_dots = len(dot_Str_val.split("."))
-        name_of_employee = ""
+        user_email_string = ""
         for i in range(lenght_of_name_with_dots):
-            name_of_employee += dot_Str_val.split(".")[i] + " "
-        print(name_of_employee)
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55")
-        exit()
-        user_email_string = email_id.split(' ')[0] + "." + email_id.split(' ')[1] + "@quantumzyme.com"
+            user_email_string += dot_Str_val.split(".")[i] + " "
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
