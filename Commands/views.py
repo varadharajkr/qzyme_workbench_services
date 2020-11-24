@@ -950,7 +950,7 @@ class TASS(APIView):
         user_selected_mutation = str(ProjectToolEssentials_res_mutation_selection.key_values[1:-1].strip("'"))
 
         if commandDetails_result.command_title == "nvt_equilibration":
-            returned_preparation_value = TASS_nvt_equilibiration_preparation(user_email_stringinp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
+            returned_preparation_value = TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "nvt_simulation":
             returned_preparation_value = TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "TASS_qmm_mm":
@@ -9815,8 +9815,9 @@ def update_command_status(inp_command_id,status_id,user_email_string):
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
+    '''
     if updated_status:
-        send_non_slurm_email(inp_command_id, status_id, user_email_string)
+        send_non_slurm_email(inp_command_id, status_id, user_email_string)'''
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
