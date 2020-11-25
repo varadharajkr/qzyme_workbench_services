@@ -355,7 +355,7 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
+    update_command_status(inp_command_id, status_id,user_email_string)
     print("inside TASS_nvt_equilibiration_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -913,7 +913,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
 
 
 # TASS
-class TASS(APIView):
+class TASS  (APIView):
     def get(self,request):
         pass
 
