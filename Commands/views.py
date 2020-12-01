@@ -474,7 +474,7 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
 
 
 @csrf_exempt
-def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
+def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_nvt_simulation_preparation function")
     print("user id is ",user_id)
@@ -621,7 +621,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
 
 
 @csrf_exempt
-def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
+def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_qmm_mm_preparation function")
     print("user id is ",user_id)
@@ -794,7 +794,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
 
 
 @csrf_exempt
-def plot_energy_preparation(user_email_string, inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
+def plot_energy_preparation(user_email_string, inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside plot_energy_preparation function")
     print("user id is ",user_id)
