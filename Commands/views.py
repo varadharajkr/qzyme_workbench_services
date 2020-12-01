@@ -474,12 +474,12 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
 
 
 @csrf_exempt
-def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
+def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_nvt_simulation_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
+    update_command_status(inp_command_id, status_id,user_email_string)
     print("inside TASS_nvt_simulation_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -621,12 +621,12 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
 
 
 @csrf_exempt
-def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
+def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_qmm_mm_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
+    update_command_status(inp_command_id, status_id,user_email_string)
     print("inside TASS_qmm_mm_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/' +project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -794,12 +794,12 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
 
 
 @csrf_exempt
-def plot_energy_preparation(user_email_string, inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
+def plot_energy_preparation(user_email_string, inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation='',user_email_string=''):
     group_project_name = get_group_project_name(str(project_id))
     print("inside plot_energy_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id)
+    update_command_status(inp_command_id, status_id,user_email_string)
     print("inside plot_energy_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -5495,14 +5495,14 @@ class get_activation_energy(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 class Hello_World(APIView):
@@ -5582,7 +5582,7 @@ class Execute_Command(APIView):
                            'w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("Error in executing command")
@@ -5591,7 +5591,7 @@ class Execute_Command(APIView):
                            'w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 class mmpbsa(APIView):
@@ -5647,14 +5647,14 @@ class mmpbsa(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -7012,14 +7012,14 @@ class Complex_Simulations(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -7073,12 +7073,12 @@ class Literature_Research(APIView):
         if result_crawlerdata_save == True:
             print("inside success")
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
         if result_crawlerdata_save == False:
             print("inside error")
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
 
 
@@ -7146,7 +7146,7 @@ class MakeSubstitution(APIView):
             #     topolfile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/GmxtoPdb/outputFiles/topol.top'
             #     topolfile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
             #     move_topolfile_(topolfile_source,topolfile_destination)
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             #move_files_(inp_command_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
@@ -7155,7 +7155,7 @@ class MakeSubstitution(APIView):
             #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             # moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
             # moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
             # move_outputFiles(moveFile_source, moveFile_destination)
@@ -7219,7 +7219,7 @@ class NMA(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -7227,7 +7227,7 @@ class NMA(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id)
+            update_command_status(inp_command_id,status_id,user_email_string)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
