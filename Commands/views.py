@@ -323,6 +323,7 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
     print('temp_value ',temp_value)
     print('nsteps_value ',nsteps_value)
     print('atom_range ',atom_range)
+    print('net_charge_value ',net_charge_value)
     try:
         original_inp_lines = ''
         with open(file_path+pre_inp_file, 'r') as pre_processed_mdb:
