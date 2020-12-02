@@ -316,7 +316,7 @@ def generate_TASS_slurm_script(file_path, server_name, job_name, pre_simulation_
 
 
 @csrf_exempt
-def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value='', nsteps_value='', atom_range=''):
+def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp_value='', nsteps_value='', atom_range='', net_charge_value=''):
     print('inside replace_temp_and_nsteps_in_inp_file function')
     print(file_path+pre_inp_file)
     print(file_path+inp_file)
@@ -328,11 +328,11 @@ def replace_temp_and_nsteps_in_inp_file(file_path, pre_inp_file,  inp_file, temp
         with open(file_path+pre_inp_file, 'r') as pre_processed_mdb:
             content = pre_processed_mdb.readlines()
             for line in content:
-                if 'QZTEMP' in line or 'QZNSTEPS' in line or 'QZATMORANGE' in line:
+                if 'QZTEMP' in line or 'QZNSTEPS' in line or 'QZATMORANGE' in line or 'QZCHARGE' in line:
                     if nsteps_value == '':
-                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
+                        original_inp_lines += line.replace('QZCHARGE', str(net_charge_value)).replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(nsteps_value)).replace('QZATMORANGE', str(atom_range))
                     else:
-                        original_inp_lines += line.replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
+                        original_inp_lines += line.replace('QZCHARGE', str(net_charge_value)).replace('QZTEMP', str(temp_value)).replace('QZNSTEPS', str(int(nsteps_value))).replace('QZATMORANGE', str(atom_range))
                 else:
                     original_inp_lines += line
 
@@ -388,8 +388,8 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
     source_file_path = file_path
     print('source file path in TASS Equilibration preparation --------------')
     print(source_file_path)
-
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'Heat.in', temp_value, nsteps_value)
+    net_charge_value = ''
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_HEAT.in', 'Heat.in', temp_value, nsteps_value,net_charge_value)
 
     if function_returned_value:
         print('replace inp file function returned true')
@@ -532,9 +532,9 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
-
+    net_charge_value = ''
     #function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', temp_value, nstep_value, atom_range_value)
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', temp_value, nstep_value, atom_range_value,net_charge_value)
 
 
     if function_returned_value:
@@ -694,6 +694,17 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
         print(str(e))
         nstep_value = ''
 
+    try:
+        net_charge_val_key = 'TASS_net_charge'
+        net_charge_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=net_charge_val_key).latest(
+            'entry_time')
+
+        net_charge_value = net_charge_ProjectToolEssentials_res.key_values
+    except Exception as e:
+        print(str(e))
+        net_charge_value = ''
+
     os.chdir(file_path)
 
     if os.path.exists(file_path+'plumed.dat'):
@@ -705,7 +716,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
     if os.path.exists(file_path+'plumed.dat'):
         plumed_replacement_completion = True
 
-    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_md_qmm.in', 'md_qmm.in', temp_value, nstep_value, atom_range_value)
+    function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_md_qmm.in', 'md_qmm.in', temp_value, nstep_value, atom_range_value,net_charge_value)
 
     if plumed_replacement_completion:
         if function_returned_value:
@@ -720,6 +731,8 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
             server_value = 'allcpu'
             pre_simulation_script = 'pre_TASS_simulation.sh'
             simulation_script = 'TASS_simulation_windows_format.sh'
+            generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
+                                       number_of_threads, command_title,'')
             generate_TASS_slurm_script(file_path, server_value, job_name, pre_simulation_script, simulation_script,
                                        number_of_threads, command_title,'')
 
