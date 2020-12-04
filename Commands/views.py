@@ -966,7 +966,7 @@ class TASS(APIView):
         if commandDetails_result.command_title == "gromacs_to_amber":
 
             file_path = config.PATH_CONFIG[
-                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_title) + '/' + user_selected_mutation + '/'
+                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
             print(file_path)
             pre_conv_script = 'pre_conv.sh'
             conv_script = 'conv.sh'
