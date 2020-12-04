@@ -927,7 +927,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
 
 
 # TASS
-class TASS  (APIView):
+class TASS(APIView):
     def get(self,request):
         pass
 
@@ -963,7 +963,32 @@ class TASS  (APIView):
                                                        key_name=user_mutation_selection_key_name).latest('entry_time')
         user_selected_mutation = str(ProjectToolEssentials_res_mutation_selection.key_values[1:-1].strip("'"))
 
-        if commandDetails_result.command_title == "nvt_equilibration":
+        if commandDetails_result.command_title == "gromacs_to_amber":
+
+            file_path = config.PATH_CONFIG[
+                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_title) + '/' + user_selected_mutation + '/'
+            print(file_path)
+            pre_conv_script = 'pre_conv.sh'
+            conv_script = 'conv.sh'
+            new_shell_script_lines = ''
+            print('before opening ', file_path + '/' + pre_conv_script)
+            with open(file_path + '/' + pre_conv_script, 'r') as source_file:
+                print('inside opening ', file_path + '/' + pre_conv_script)
+                content = source_file.readlines()
+                for line in content:
+                    if 'QZ_CONV_SCRIPT' in line:
+                        new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
+                    else:
+                        new_shell_script_lines += line
+            if os.path.exists(file_path + '/' + conv_script):
+                print('removing ', file_path + conv_script)
+                os.remove(file_path + '/' + conv_script)
+            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
+                new_bash_script.write(new_shell_script_lines + "\n")
+            primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
+
+        elif commandDetails_result.command_title == "nvt_equilibration":
             returned_preparation_value = TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
         elif commandDetails_result.command_title == "nvt_simulation":
             returned_preparation_value = TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,commandDetails_result.command_tool,commandDetails_result.command_title,commandDetails_result.user_id,user_selected_mutation)
