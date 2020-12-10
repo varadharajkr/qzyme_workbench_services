@@ -529,11 +529,21 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
     except Exception as e:
         print(str(e))
         nstep_value = ''
+    
+    try:
+        net_charge_val_key = 'TASS_net_charge'
+        net_charge_ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,
+                                                                                    key_name=net_charge_val_key).latest(
+            'entry_time')
+
+        net_charge_value = net_charge_ProjectToolEssentials_res.key_values
+    except Exception as e:
+        print(str(e))
+        net_charge_value = ''
 
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
-    net_charge_value = ''
     #function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', '', '', atom_range_value)
     function_returned_value = replace_temp_and_nsteps_in_inp_file(file_path, 'pre_test.in', 'test.in', temp_value, nstep_value, atom_range_value,net_charge_value)
 
