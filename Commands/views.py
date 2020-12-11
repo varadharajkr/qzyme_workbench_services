@@ -538,8 +538,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
         net_charge_value = net_charge_ProjectToolEssentials_res.key_values
     except Exception as e:
         print(str(e))
-        net_charge_value = ''
-    return
+        net_charge_value = ''    
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
