@@ -476,12 +476,11 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
 
 @csrf_exempt
 def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
-    group_project_name = get_group_project_name(str(project_id))
     print("inside TASS_nvt_simulation_preparation function")
+    group_project_name = get_group_project_name(str(project_id))
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
     update_command_status(inp_command_id, status_id,user_email_string)
-    print("inside TASS_nvt_simulation_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
@@ -10131,6 +10130,7 @@ class gromacsSample(APIView):
     def post(self):
         pass
 def get_group_project_name(project_id):
+    print("inside get get_group_project_name function")
     conn= connections['default'].cursor()
     sql_query = config.DB_QUERY['query_get_group_project_name'] % project_id
     print("sql_query is ")
