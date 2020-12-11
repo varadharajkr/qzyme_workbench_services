@@ -539,7 +539,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
     except Exception as e:
         print(str(e))
         net_charge_value = ''
-
+    return
     source_file_path = file_path
     print('source file path in TASS NVT Simulation preparation --------------')
     print(source_file_path)
@@ -551,9 +551,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
         print('replace inp file function returned true')
         print('slurm value selected is yes')
         initial_string = 'QZW'
-        # module_name = 'CatMec'
         module_name = 'TASS'
-        # job_name = initial_string + '_' + str(project_name) + '_' + module_name + '_r' + str(md_run_no_of_conformation)
         job_name = str(initial_string) + '_' + module_name
         job_detail_string = module_name + '_NVT_SIMULATION'
         server_value = 'allcpu'
@@ -627,7 +625,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
         return True
     else:
         print('replace inp file function returned False')
-        return False\
+        return False
 
 
 @csrf_exempt
@@ -10129,6 +10127,9 @@ class gromacsSample(APIView):
 
     def post(self):
         pass
+
+
+
 def get_group_project_name(project_id):
     print("inside get get_group_project_name function")
     conn= connections['default'].cursor()
