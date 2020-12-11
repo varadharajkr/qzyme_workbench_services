@@ -939,7 +939,7 @@ class TASS(APIView):
         pass
 
     def post(self,request):
-
+        print("INSIDE CLASS TASS")
         #get command details from database
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
