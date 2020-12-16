@@ -931,6 +931,117 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
     return True
 
 
+# TASS
+class Preliminary_Studies(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+        print("INSIDE CLASS Preliminary_Studies")
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        dot_Str_val = email_id.split('@')[0]
+        lenght_of_name_with_dots = len(dot_Str_val.split("."))
+        user_email_string = ""
+        for i in range(lenght_of_name_with_dots):
+            user_email_string += dot_Str_val.split(".")[i] + " "
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        group_project_name = get_group_project_name(str(project_id))
+
+        primary_command_runnable = commandDetails_result.primary_command
+
+        database_key_names = ["output_option_key","no_of_thread_key","max_no_of_sequences_key","query_type_name_key","evalue_option_key","preliminary_query_fasta_file_name","preliminary_database_fasta_file_name"]
+        database_values = []
+        for key_names in database_key_names:
+            try:
+                ProjectToolEssentials_res = ProjectToolEssentials.objects.all().filter(project_id=project_id,key_name=key_names).latest('entry_time')
+                fetched_value_from_db = str(ProjectToolEssentials_res.key_values)
+                database_values.append(fetched_value_from_db)
+            except Exception as e:
+                database_values.append('')
+        blastx_string = ''
+        if database_values[3] == "prot":
+            blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastp"
+        elif database_values[3] == "nucl":
+            blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastn"
+        elif database_values[3] == "mrna":
+            blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
+        else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
+        shell_script_content = "#!/bin/bash\n\n"
+        shell_script_content += "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])+"\n"
+        shell_script_content += "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+int(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+int(database_values[1])+" -max_target_seqs "+int(database_values[2])+" -outfmt "+int(database_values[0])+""
+        with open("blast_windows_format.sh","w+") as windows_shell_script:
+            for line in shell_script_content:
+                windows_shell_script.write(line)
+        os.system("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
+
+        print('primary_command_runnable')
+        print(primary_command_runnable)
+
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' )
+
+        print("dirname")
+        print(os.getcwd())
+
+        print("runnable command is")
+        print(primary_command_runnable)
+        os.chdir(config.PATH_CONFIG[
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/')
+        print("working directory after changing CHDIR")
+        print(os.system("pwd"))
+
+        #execute command
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
+        out, err = process_return.communicate()
+        process_return.wait()
+        # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
+
+        command_title_folder = commandDetails_result.command_title
+        command_tool_title = commandDetails_result.command_tool
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
+
+        if process_return.returncode == 0:
+            print("success executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+'/'+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id,user_email_string)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id,user_email_string)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+
+        if process_return.returncode != 0:
+            print("error executing command!!")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< try block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id,user_email_string)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id,user_email_string)
+
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
+
+
 
 # TASS
 class TASS(APIView):
@@ -9828,7 +9939,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_started_at=entry_time)
             updated_status = True
-            #send_non_slurm_email(inp_command_id, status_id)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9841,7 +9952,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            #send_non_slurm_email(inp_command_id, status_id)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9854,7 +9965,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            #send_non_slurm_email(inp_command_id, status_id)
+            send_non_slurm_email(inp_command_id, status_id)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
