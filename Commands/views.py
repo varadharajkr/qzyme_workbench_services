@@ -978,14 +978,22 @@ class Preliminary_Studies(APIView):
         print(database_values)
         print("time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+"")
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        shell_script_content = "#!/bin/bash\n\n"
-        shell_script_content += "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])+"\n"
-        shell_script_content += "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
+
+        blast_cmd_1 = "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
+        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
         file_path = config.PATH_CONFIG[
                      'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/'
-        with open(file_path+"blast_windows_format.sh","w+") as windows_shell_script:
-            for line in shell_script_content:
-                windows_shell_script.write(line)
+        new_shell_script_lines = ''
+        with open(file_path + "blast_windows_format.sh", 'r') as source_file:
+            print('inside opening ', file_path + 'blast_windows_format')
+            content = source_file.readlines()
+            for line in content:
+                if 'blast_1_cmd' in line or 'blast_2_cmd' in line:
+                    new_shell_script_lines += line.replace('blast_1_cmd', str(blast_cmd_1)).replace('blast_2_cmd', str(blast_cmd_2))
+                else:
+                    new_shell_script_lines += line
+        with open(file_path + 'blast.sh', 'w+')as new_bash_script:
+            new_bash_script.write(new_shell_script_lines)
         os.system("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
 
         print('primary_command_runnable')
