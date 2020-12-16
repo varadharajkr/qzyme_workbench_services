@@ -981,10 +981,12 @@ class Preliminary_Studies(APIView):
         shell_script_content = "#!/bin/bash\n\n"
         shell_script_content += "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])+"\n"
         shell_script_content += "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
-        with open("blast_windows_format.sh","w+") as windows_shell_script:
+        file_path = config.PATH_CONFIG[
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/'
+        with open(file_path+"blast_windows_format.sh","w+") as windows_shell_script:
             for line in shell_script_content:
                 windows_shell_script.write(line)
-        os.system("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
+        os.system("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
 
         print('primary_command_runnable')
         print(primary_command_runnable)
