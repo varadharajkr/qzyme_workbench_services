@@ -976,6 +976,7 @@ class Preliminary_Studies(APIView):
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("database_values")
         print(database_values)
+        print("./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3]))
         print("time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+"")
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
@@ -983,6 +984,8 @@ class Preliminary_Studies(APIView):
         blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
         file_path = config.PATH_CONFIG[
                      'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/'
+        print("file path is ")
+        print(file_path)
         new_shell_script_lines = ''
         with open(file_path + "blast_windows_format.sh", 'r') as source_file:
             print('inside opening ', file_path + 'blast_windows_format')
@@ -1000,8 +1003,7 @@ class Preliminary_Studies(APIView):
         print('primary_command_runnable')
         print(primary_command_runnable)
 
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' )
+        os.chdir(file_path)
 
         print("dirname")
         print(os.getcwd())
