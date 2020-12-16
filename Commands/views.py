@@ -973,9 +973,14 @@ class Preliminary_Studies(APIView):
         elif database_values[3] == "mrna":
             blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print("database_values")
+        print(database_values)
+        print("time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+"")
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         shell_script_content = "#!/bin/bash\n\n"
         shell_script_content += "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])+"\n"
-        shell_script_content += "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+int(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+int(database_values[1])+" -max_target_seqs "+int(database_values[2])+" -outfmt "+int(database_values[0])+""
+        shell_script_content += "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
         with open("blast_windows_format.sh","w+") as windows_shell_script:
             for line in shell_script_content:
                 windows_shell_script.write(line)
