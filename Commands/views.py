@@ -982,7 +982,7 @@ class Preliminary_Studies(APIView):
         blast_cmd_1 = "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
         blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
         file_path = config.PATH_CONFIG[
-                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/'
+                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/'
         new_shell_script_lines = ''
         with open(file_path + "blast_windows_format.sh", 'r') as source_file:
             print('inside opening ', file_path + 'blast_windows_format')
