@@ -994,6 +994,7 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += line
         with open(file_path + 'blast.sh', 'w+')as new_bash_script:
             new_bash_script.write(new_shell_script_lines)
+        print("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
         os.system("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
 
         print('primary_command_runnable')
@@ -9954,7 +9955,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_started_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id, user_email_string)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9967,7 +9968,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id, user_email_string)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -9980,7 +9981,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id)
+            #send_non_slurm_email(inp_command_id, status_id, user_email_string)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
