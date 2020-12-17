@@ -1002,6 +1002,8 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
         print(new_shell_script_lines)
+        if os.path.exists(file_path + 'blast.sh'):
+            os.remove(file_path + 'blast.sh')
         with open(file_path + 'blast.sh', 'w+')as new_bash_script:
             new_bash_script.write(new_shell_script_lines)
         print("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
