@@ -974,7 +974,7 @@ class Preliminary_Studies(APIView):
             blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         blast_cmd_1 = "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
-        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
+        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
 
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("database_values")
