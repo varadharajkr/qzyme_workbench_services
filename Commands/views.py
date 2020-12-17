@@ -1026,8 +1026,7 @@ class Preliminary_Studies(APIView):
 
         print("runnable command is")
         print(primary_command_runnable)
-        os.chdir(config.PATH_CONFIG[
-                     'local_shared_folder_path'] + group_project_name+'/'+project_name + '/')
+        os.chdir(file_path)
         print("working directory after changing CHDIR")
         print(os.system("pwd"))
 
