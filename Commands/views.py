@@ -973,15 +973,16 @@ class Preliminary_Studies(APIView):
         elif database_values[3] == "mrna":
             blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
+        blast_cmd_1 = "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
+        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
+
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("database_values")
         print(database_values)
-        print("./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3]))
-        print("time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+"")
+        print(blast_cmd_1)
+        print(blast_cmd_2)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
-        blast_cmd_1 = "./makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
-        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str()+" -db "+str(database_values[5])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
         file_path = config.PATH_CONFIG[
                      'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/'
         print("file path is ")
@@ -992,8 +993,12 @@ class Preliminary_Studies(APIView):
             content = source_file.readlines()
             for line in content:
                 if 'blast_1_cmd' in line or 'blast_2_cmd' in line:
+                    print("inside replacing blast1 and blast2 cmd")
+                    print(line.replace('blast_1_cmd', str(blast_cmd_1)).replace('blast_2_cmd', str(blast_cmd_2)))
                     new_shell_script_lines += line.replace('blast_1_cmd', str(blast_cmd_1)).replace('blast_2_cmd', str(blast_cmd_2))
                 else:
+                    print("inside else")
+                    print(line)
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
         print(new_shell_script_lines)
