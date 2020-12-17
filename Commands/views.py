@@ -988,17 +988,16 @@ class Preliminary_Studies(APIView):
         print("file path is ")
         print(file_path)
         new_shell_script_lines = ''
-        with open(file_path + "blast_windows_format.sh", 'r') as source_file:
-            print('inside opening ', file_path + 'blast_windows_format')
+
+        with open(file_path + 'blast_windows_format.sh' , 'r') as source_file:
+            print('inside opening ', file_path + 'blast_windows_format.sh')
             content = source_file.readlines()
             for line in content:
-                if 'blast_1_cmd' in line or 'blast_2_cmd' in line:
-                    print("inside replacing blast1 and blast2 cmd")
-                    print(line.replace('blast_1_cmd', str(blast_cmd_1)).replace('blast_2_cmd', str(blast_cmd_2)))
-                    new_shell_script_lines += line.replace('blast_1_cmd', str(blast_cmd_1)).replace('blast_2_cmd', str(blast_cmd_2))
+                if 'blast_1_cmd' in line:
+                    new_shell_script_lines += (line.replace('blast_1_cmd', str(blast_cmd_1)))
+                elif 'blast_2_cmd' in line:
+                    new_shell_script_lines += (line.replace('blast_2_cmd', str(blast_cmd_2)))
                 else:
-                    print("inside else")
-                    print(line)
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
         print(new_shell_script_lines)
@@ -1006,8 +1005,16 @@ class Preliminary_Studies(APIView):
             os.remove(file_path + 'blast.sh')
         with open(file_path + 'blast.sh', 'w+')as new_bash_script:
             new_bash_script.write(new_shell_script_lines)
-        print("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
-        os.system("perl -p -e 's/\r$//' < "+file_path+"blast_windows_format.sh > "+file_path+"blast.sh")
+
+        print('after generate_slurm_script ************************************************************************')
+        print('before changing directory')
+        print(os.getcwd())
+        print('after changing directory')
+        os.chdir(file_path)
+        print(os.getcwd())
+        print("Converting from windows to unix format")
+        print("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
+        os.system("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
 
         print('primary_command_runnable')
         print(primary_command_runnable)
