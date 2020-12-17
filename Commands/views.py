@@ -1001,9 +1001,9 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
         print(new_shell_script_lines)
-        if os.path.exists(file_path + 'blast.sh'):
-            os.remove(file_path + 'blast.sh')
-        with open(file_path + 'blast.sh', 'w+')as new_bash_script:
+        if os.path.exists(file_path + 'blast_wn_frmt.sh'):
+            os.remove(file_path + 'blast_wn_frmt.sh')
+        with open(file_path + 'blast_wn_frmt.sh', 'w+')as new_bash_script:
             new_bash_script.write(new_shell_script_lines)
 
         print('after generate_slurm_script ************************************************************************')
@@ -1013,8 +1013,8 @@ class Preliminary_Studies(APIView):
         os.chdir(file_path)
         print(os.getcwd())
         print("Converting from windows to unix format")
-        print("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
-        os.system("perl -p -e 's/\r$//' < blast_windows_format.sh > blast.sh")
+        print("perl -p -e 's/\r$//' < blast_wn_frmt.sh > blast.sh")
+        os.system("perl -p -e 's/\r$//' < blast_wn_frmt.sh > blast.sh")
 
         print('primary_command_runnable')
         print(primary_command_runnable)
