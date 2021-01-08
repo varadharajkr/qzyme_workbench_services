@@ -9937,6 +9937,11 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
     user_id = str(commandDetails_res.user_id)
     print("user_id is ",user_id)
     QzEmployeeEmail_res = QzEmployeeEmail.objects.all().filter(qz_user_id=user_id)
+    print("user_email_string")
+    print(user_email_string)
+    print("QzEmployeeEmail_res")
+    print(QzEmployeeEmail_res)
+    print(type(QzEmployeeEmail_res))
     email_id = QzEmployeeEmail_res.email_id
     print("email_id is ",email_id)
     print("*****************************************************************************************")
