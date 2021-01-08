@@ -974,7 +974,8 @@ class Preliminary_Studies(APIView):
             blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         blast_cmd_1 = "/software/usr/ncbi-blast-2.11.0+/bin/makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
-        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out "+str(database_values[0])+" -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt "+str(database_values[0])+""
+        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt 6 qseqid sseqid sseq"
+
 
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("database_values")
@@ -7886,7 +7887,38 @@ class CatMecandAutodock(APIView):
         primary_command_runnable = re.sub('%NMA_working_dir%', config.PATH_CONFIG[
             'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + command_tool + '/' + command_tool_title,
                                           primary_command_runnable)
-
+        # if commandDetails_result.command_title == 'DockingandPdbtoPdbqt':
+        #     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + command_tool  +'/' + command_tool_title + '/'
+        #     print("file path is ")
+        #     print(file_path)
+        #     new_shell_script_lines = ''
+        #
+        #     with open(file_path + 'pdb_to_pdbqt_win_frmt.sh', 'r') as source_file:
+        #         print('inside opening ', file_path + 'pdb_to_pdbqt_win_frmt.sh')
+        #         content = source_file.readlines()
+        #         for line in content:
+        #             if 'blast_1_cmd' in line:
+        #                 new_shell_script_lines += (line.replace('PDB_TO_PDBQT_COMMAND', str(primary_command_runnable)))
+        #             else:
+        #                 new_shell_script_lines += line
+        #     print("new_shell_script_lines is ")
+        #     print(new_shell_script_lines)
+        #     if os.path.exists(file_path + 'pdb_to_pdbqt_windows_frmt.sh'):
+        #         os.remove(file_path + 'pdb_to_pdbqt_windows_frmt.sh')
+        #     with open(file_path + 'pdb_to_pdbqt_windows_frmt.sh', 'w+')as new_bash_script:
+        #         new_bash_script.write(new_shell_script_lines)
+        #
+        #     print(
+        #         'after generate_shell script************************************************************************')
+        #     print('before changing directory')
+        #     print(os.getcwd())
+        #     print('after changing directory')
+        #     os.chdir(file_path)
+        #     print(os.getcwd())
+        #     print("Converting from windows to unix format")
+        #     print("perl -p -e 's/\r$//' < pdb_to_pdbqt_windows_frmt.sh > pdb_to_pdbqt.sh")
+        #     os.system("perl -p -e 's/\r$//' < pdb_to_pdbqt_windows_frmt.sh > pdb_to_pdbqt.sh")
+        #     primary_command_runnable = 'sh pdb_to_pdbqt.sh'
         print(primary_command_runnable)
         print("\nworking directory before")
         print('\n',os.system("pwd"))
@@ -9959,6 +9991,7 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
         print("exception is ",str(e))
     #except:
     #    sys.exit( "mail failed; %s" % "CUSTOM_ERROR" ) # give an error message
+
 
 def update_command_status(inp_command_id,status_id,user_email_string):
     print("updating command execution status")
