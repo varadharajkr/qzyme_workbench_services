@@ -50,12 +50,12 @@ django_logger = logging.getLogger(__name__)
 
 
 # to run command in shell
-def execute_command(command,inp_command_id,user_email_string):
+def execute_command(command,inp_command_id,user_email_string,project_name,project_id, command_tool,command_title):
     print('inside execute_command')
     print('command to execute is ',command)
     print('inp command id is ',inp_command_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     process =Popen(
         args=command,
         stdout=PIPE,
@@ -67,11 +67,11 @@ def execute_command(command,inp_command_id,user_email_string):
     return process
 
 
-def execute_fjs_command(command,inp_command_id,program_path,command_title,user_email_string):
+def execute_fjs_command(command,inp_command_id,program_path,command_title,user_email_string,project_name, project_id, command_tool):
     print('FJS command to execute is ',command)
     print('FJS inp command id is ',inp_command_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     logfile = open(str(program_path)+str(command_title)+'.log', 'w+')
     process =Popen(
         args=command,
@@ -197,7 +197,7 @@ class gromacs(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id)) #get group project
         print('before replacing primary_command_runnable')
         print(primary_command_runnable)
@@ -227,14 +227,14 @@ class gromacs(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+'/'+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -356,7 +356,7 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print("inside TASS_nvt_equilibiration_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -480,7 +480,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
     group_project_name = get_group_project_name(str(project_id))
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
@@ -633,7 +633,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
     print("inside TASS_qmm_mm_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print("inside TASS_qmm_mm_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/' +project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -819,7 +819,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
     print("inside plot_energy_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print("inside plot_energy_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -942,6 +942,8 @@ class Preliminary_Studies(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -975,6 +977,7 @@ class Preliminary_Studies(APIView):
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         blast_cmd_1 = "/software/usr/ncbi-blast-2.11.0+/bin/makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
         blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt '6 qseqid sseqid sseq'"
+        blast_cmd_3 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out out.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt '7 qseqid length qlen slen qstart qend sstart send evalue'"
 
 
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
@@ -982,6 +985,7 @@ class Preliminary_Studies(APIView):
         print(database_values)
         print(blast_cmd_1)
         print(blast_cmd_2)
+        print(blast_cmd_3)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
         file_path = config.PATH_CONFIG[
@@ -998,6 +1002,8 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += (line.replace('blast_1_cmd', str(blast_cmd_1)))
                 elif 'blast_2_cmd' in line:
                     new_shell_script_lines += (line.replace('blast_2_cmd', str(blast_cmd_2)))
+                elif 'blast_3_cmd' in line:
+                    new_shell_script_lines += (line.replace('blast_3_cmd', str(blast_cmd_3)))
                 else:
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
@@ -1032,7 +1038,7 @@ class Preliminary_Studies(APIView):
         print(os.system("pwd"))
 
         #execute command
-        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string,project_name,project_id,commandDetails_result.command_tool,commandDetails_result.command_title)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -1051,12 +1057,12 @@ class Preliminary_Studies(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success try block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success except block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -1066,12 +1072,12 @@ class Preliminary_Studies(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< try block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error except block PROTEIN INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
@@ -1088,6 +1094,8 @@ class TASS(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -1165,7 +1173,10 @@ class TASS(APIView):
         print(os.system("pwd"))
 
         #execute command
-        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
+
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -1184,12 +1195,12 @@ class TASS(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success except block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -1199,12 +1210,12 @@ class TASS(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< try block TASS >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error except block TASS  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
@@ -1220,6 +1231,8 @@ class analyse_mmpbsa(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -1232,9 +1245,9 @@ class analyse_mmpbsa(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
-        
+
         key_name_indexfile_input = 'mmpbsa_index_file_dict'
 
         #get list of index file options for gmx input
@@ -3572,7 +3585,7 @@ def pre_process_mmpbsa_imput(project_id, project_name, tpr_file_split, CatMec_in
                                     topology_content_dihedrals + topology_file_dihedrals_content + "\n" + topology_content_dihedrals_filtered)
 
         atoms_final_count = atoms_lastcount
-        
+
 
 
     #--------------------   update INPUT.dat file ---------------------------------
@@ -5431,7 +5444,9 @@ class pathanalysis(APIView):
                                  'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_title + '/Analysis/' + commandDetails_result.command_tool+"/"+script_dir_file)
 
             # execute PathAnalysis command
-            process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string)
+            process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
             out, err = process_return.communicate()
             process_return.wait()
             if process_return.returncode == 0:
@@ -5664,7 +5679,7 @@ class get_activation_energy(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
 
         print('before replacing primary_command_runnable')
@@ -5672,7 +5687,9 @@ class get_activation_energy(APIView):
 
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
         command_title_folder = commandDetails_result.command_title
         command_tool_title= commandDetails_result.command_tool
 
@@ -5685,14 +5702,14 @@ class get_activation_energy(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails.command_tool,commandDetails.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails.command_tool,commandDetails.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 class Hello_World(APIView):
@@ -5751,7 +5768,7 @@ class Execute_Command(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
         command_comment = commandDetails_result.comments
         command_tool = command_comment.split("#+#")[0]
@@ -5762,7 +5779,7 @@ class Execute_Command(APIView):
         print(os.system("pwd"))
         program_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name + "/" + str(
             project_name) + '/' + str(command_tool) + '/' + str(command_title)+'/'
-        process_return = execute_fjs_command(primary_command_runnable, inp_command_id,program_path,command_title,user_email_string)
+        process_return = execute_fjs_command(primary_command_runnable, inp_command_id,program_path,command_title,user_email_string,project_name, project_id, command_tool)
         out, err = process_return.communicate()
         process_return.wait()
         if process_return.returncode == 0:
@@ -5772,7 +5789,7 @@ class Execute_Command(APIView):
                            'w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("Error in executing command")
@@ -5781,7 +5798,7 @@ class Execute_Command(APIView):
                            'w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 class mmpbsa(APIView):
@@ -5806,7 +5823,7 @@ class mmpbsa(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
 
 
@@ -5821,7 +5838,7 @@ class mmpbsa(APIView):
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id, user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name, project_id, commandDetails.command_tool,commandDetails.command_title)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
@@ -5837,14 +5854,14 @@ class mmpbsa(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails.command_tool,commandDetails.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -6040,6 +6057,8 @@ class Contact_Score(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -6057,7 +6076,7 @@ class Contact_Score(APIView):
         if commandDetails_result.command_title == "CatMec":
             #Execute for CatMec module
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             primary_command_runnable = commandDetails_result.primary_command
 
@@ -6165,7 +6184,7 @@ class Contact_Score(APIView):
             #Execute for Designer module
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             with open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + 'Designer' + '/mutated_list.txt', 'r') as fp_mutated_list:
                 mutated_list_lines = fp_mutated_list.readlines()
                 variant_index_count = 0
@@ -6573,7 +6592,7 @@ def md_simulation_preparation(inp_command_id,project_id,project_name,command_too
     for i in range(lenght_of_name_with_dots):
         user_email_string += dot_Str_val.split(".")[i] + " "
 
-    update_command_status(inp_command_id, status_id,user_email_string)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print("inside md_simulation_preparation function")
     key_name = 'md_simulation_no_of_runs'
     print('md_simulation_path is')
@@ -7105,6 +7124,8 @@ class Complex_Simulations(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -7118,7 +7139,7 @@ class Complex_Simulations(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         user_id = commandDetails_result.user_id
         group_project_name = get_group_project_name(str(project_id))
 
@@ -7189,7 +7210,9 @@ class Complex_Simulations(APIView):
 
         print(primary_command_runnable)
 
-        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
 
         command_title_folder = commandDetails_result.command_title
 
@@ -7202,14 +7225,14 @@ class Complex_Simulations(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
             print("inside error")
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -7224,6 +7247,8 @@ class Literature_Research(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -7237,7 +7262,7 @@ class Literature_Research(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
 
         print('before replacing primary_command_runnable')
@@ -7263,12 +7288,12 @@ class Literature_Research(APIView):
         if result_crawlerdata_save == True:
             print("inside success")
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
         if result_crawlerdata_save == False:
             print("inside error")
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':result_crawlerdata_save,'process_returncode':result_crawlerdata_save})
 
 
@@ -7282,6 +7307,8 @@ class MakeSubstitution(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -7295,7 +7322,7 @@ class MakeSubstitution(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
 
         print('before replacing primary_command_runnable')
@@ -7313,7 +7340,9 @@ class MakeSubstitution(APIView):
         # command is (gmx pdb2gmx -f xyz.pdb -o xyz.gro -p topol.top -i xyz.itp -water spc -ff gromos43a1)
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
 
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
 
@@ -7336,7 +7365,7 @@ class MakeSubstitution(APIView):
             #     topolfile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/GmxtoPdb/outputFiles/topol.top'
             #     topolfile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
             #     move_topolfile_(topolfile_source,topolfile_destination)
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             #move_files_(inp_command_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
         if process_return.returncode != 0:
@@ -7345,7 +7374,7 @@ class MakeSubstitution(APIView):
             #fileobj = open(shared_folder_path + 'Project/Project1/'+command_tool_title+'/'+ command_title_folder + '/logFiles/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             # moveFile_source = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/' + commandDetails_result.command_tool + '/'
             # moveFile_destination = config.PATH_CONFIG['local_shared_folder_path'] + project_name + '/common_outputFiles/'
             # move_outputFiles(moveFile_source, moveFile_destination)
@@ -7378,7 +7407,7 @@ class NMA(APIView):
         project_name = QzwProjectDetails_res.project_name
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         group_project_name = get_group_project_name(str(project_id))
 
         print('before replacing primary_command_runnable')
@@ -7394,7 +7423,9 @@ class NMA(APIView):
         os.chdir(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool +'/')
         print("working directory is")
         print(os.system("pwd"))
-        process_return = execute_command(primary_command_runnable,inp_command_id,user_email_string)
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
         process_return.wait()
         shared_folder_path = config.PATH_CONFIG['shared_folder_path']
         command_title_folder = commandDetails_result.command_title
@@ -7409,7 +7440,7 @@ class NMA(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+"/"+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
             fileobj.write(out)
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -7417,7 +7448,7 @@ class NMA(APIView):
             fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
             fileobj.write(err)
             status_id = config.CONSTS['status_error']
-            update_command_status(inp_command_id,status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -7518,7 +7549,7 @@ class Homology_Modelling(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
         print('before replacing primary_command_runnable')
         print(primary_command_runnable)
@@ -7600,12 +7631,12 @@ class Homology_Modelling(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -7615,12 +7646,12 @@ class Homology_Modelling(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error try block homology modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error except block homology modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
@@ -7651,7 +7682,7 @@ class Loop_Modelling(APIView):
 
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
         print('before replacing primary_command_runnable')
         print(primary_command_runnable)
@@ -7733,12 +7764,12 @@ class Loop_Modelling(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -7748,12 +7779,12 @@ class Loop_Modelling(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error try block loop modelling >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error except block loop modelling  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
@@ -7866,7 +7897,7 @@ class CatMecandAutodock(APIView):
         enzyme_file_name = ProjectToolEssentials_res.key_values
         primary_command_runnable = commandDetails_result.primary_command
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         print('\nbefore replacing primary_command_runnable')
         print(primary_command_runnable)
         #shared_scripts
@@ -8034,13 +8065,13 @@ class CatMecandAutodock(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in try autodock >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except of Docking >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
@@ -8050,7 +8081,7 @@ class CatMecandAutodock(APIView):
                                'w+')
                 fileobj.write(out)
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except autodock error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -8060,7 +8091,7 @@ class CatMecandAutodock(APIView):
                                'w+')
                 fileobj.write(err)
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
@@ -8152,6 +8183,8 @@ class CatMec(APIView):
         inp_command_id = request.POST.get("command_id")
         commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
         project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
         user_id = commandDetails_result.user_id
         QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
         email_id = QzEmployeeEmail_result.email_id
@@ -8173,7 +8206,7 @@ class CatMec(APIView):
             project_name = QzwProjectDetails_res.project_name
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
@@ -8213,7 +8246,7 @@ class CatMec(APIView):
                                'w+')
                 fileobj.write(out)
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print("inside error")
@@ -8222,7 +8255,7 @@ class CatMec(APIView):
                                'w+')
                 fileobj.write(err)
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id,user_email_string,project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "process_pdb_with_babel":
             print('inside process_pdb_with_babel section')
@@ -8235,7 +8268,7 @@ class CatMec(APIView):
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
             print("before command update")
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             print("after command update")
             os.chdir(config.PATH_CONFIG[
                          'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + config.PATH_CONFIG['ligand_parametrization_path'] + '/')
@@ -8265,13 +8298,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print("inside error")
@@ -8282,13 +8315,13 @@ class CatMec(APIView):
                 try:
                     print("<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         elif command_tool_title == "Ligand_Parametrization":
             '''print('exec(open(/usr/share/Modules/init/python.py).read())')
@@ -8307,7 +8340,7 @@ class CatMec(APIView):
             project_name = QzwProjectDetails_res.project_name
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(project_id=project_id)
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
@@ -8377,13 +8410,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 '''
                 try:
                     # module accessing
@@ -8402,13 +8435,13 @@ class CatMec(APIView):
                 try:
                     print("<<<<<<<<<<<<<<<<<<<<<<< error try block Ligand_Parametrization >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error except block Ligand_Parametrization  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 '''
                 try:
                     # module accessing
@@ -8430,7 +8463,7 @@ class CatMec(APIView):
             project_name = QzwProjectDetails_res.project_name
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(ppartial_charge_selection_nameroject_id=project_id)
             # ligand_name = QzwProjectEssentials_res.command_key
             # print "+++++++++++++++ligand name is++++++++++++"
@@ -8449,13 +8482,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True})
             print("primary_command_runnable.........................................")
             print(primary_command_runnable)
@@ -8479,13 +8512,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 print("inside error")
@@ -8497,13 +8530,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error try block get_make_complex_parameter_details or make_complex_params or md_run >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
         elif command_tool_title == "MD_Simulation":
@@ -8520,7 +8553,7 @@ class CatMec(APIView):
             enzyme_file_name = ProjectToolEssentials_res.key_values
             primary_command_runnable = commandDetails_result.primary_command
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             #shared_scripts
             primary_command_runnable = re.sub("pdb_to_pdbqt.py", config.PATH_CONFIG['shared_scripts'] +str(command_tool)+ +str(command_tool_title)+ "/pdb_to_pdbqt.py",primary_command_runnable)
@@ -8609,13 +8642,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success try block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< success except block Catmec docking condition   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
             if process_return.returncode != 0:
                 fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
@@ -8624,13 +8657,13 @@ class CatMec(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error try block Catmec docking condition >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error except block Catmec docking condition  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 #move_files_(inp_command_id)
                 return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
@@ -8673,7 +8706,7 @@ class Designer(APIView):
 
         elif command_tool_title == "Designer_Mutations":
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             # execute Designer Mutations
             process_return = Popen(
                 args=primary_command_runnable,
@@ -8699,28 +8732,28 @@ class Designer(APIView):
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< in success try mutations after make complex, md run and MMPBSA   >>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< in success except mutations after make complex, md run and MMPBSA >>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 try:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< in error try mutations after make complex, md run and MMPBSA >>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< in error except mutations after make complex, md run and MMPBSA  >>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
@@ -8743,15 +8776,15 @@ class Designer(APIView):
                 print("output of out is")
                 print(out)
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
         else:
             status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id,user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             process_return = Popen(
                 args=primary_command_runnable,
                 stdout=PIPE,
@@ -8768,25 +8801,25 @@ class Designer(APIView):
                 try:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in else success try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
                 except db.OperationalError as e:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in else success except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
             if process_return.returncode != 0:
                 try:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in else error try mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
                 except db.OperationalError as e:
                     print("<<<<<<<<<<<<<<<<<<<<<<< in else error except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id,user_email_string)
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
 
@@ -8816,7 +8849,7 @@ class Hotspot(APIView):
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
         project_name = QzwProjectDetails_res.project_name
         status_id = config.CONSTS['status_initiated']
-        update_command_status(inp_command_id, status_id,user_email_string)
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
         os.chdir(config.PATH_CONFIG[
                      'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' )
         print(os.system("pwd"))
@@ -8905,25 +8938,25 @@ class Hotspot(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in try mutations success >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
         if process_return.returncode != 0:
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in try mutations error >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except mutations >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id,user_email_string)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
@@ -9923,8 +9956,19 @@ def copytree(source, destination, symlinks=False, ignore=None):
             #path_file = os.path.join(root, file)
             #print shutil.copy(path_file, destination)  # change you destination dir
             #print os.system("cp "+path_file+" "+destination)
+            
 
-def send_non_slurm_email(inp_command_id,status_id,user_email_string):
+def extract_user_name_from_email(email_id):
+    dot_Str_val = email_id.split('@')[0]
+    lenght_of_name_with_dots = len(dot_Str_val.split("."))
+    name_of_employee = ""
+    for i in range(lenght_of_name_with_dots):
+        name_of_employee += dot_Str_val.split(".")[i] + " "
+    print(name_of_employee)
+    return name_of_employee
+
+
+def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,command_tool,command_title):
     print("inside send_non_slurm_email function")
     print("*****************************************************************************************")
     print("inp_command_id is ",inp_command_id)
@@ -9945,6 +9989,11 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
     email_id = QzEmployeeEmail_res.email_id
     print("email_id is ",email_id)
     print("*****************************************************************************************")
+    entry_time = datetime.now()
+    #local_time = entry_time.strftime("%x %X")
+    local_time = entry_time.strftime("%m/%d/%Y, %H:%M:%S")
+    user_name = str(extract_user_name_from_email(str(email_id)))
+    
     if status_id == 2:
         status = "started to execute"
     elif status_id == 3:
@@ -9953,16 +10002,60 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
         status = "executed unsuccessful"
     entry_time = str(datetime.now())
 
-    table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
+    #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
+    table_design = """
+    <html>
+        <head>
+            <style>td,th{border: 1px solid;padding: 8px;} table{border-spacing: 0px;border-collapse: collapse;}</style>
+        </head>
+        <body>
+        <p> Dear """+str(user_name)+""",</p>
+        <p>This is a mail to notify about the """+str(command_title)+""" job submitted using QZyme WorkBench is started to execute, and the details of the job are as follows</p>
+            <table>
+                <tr>
+                    <th><center>Project Name</center></th>
+                    <th><center>Module Name</center></th>
+                    <th><center>Sub Module Name</center></th>
+                    <th><center>Server</center></th>
+                    <th><center>Job ID</center></th>
+                    <th><center>Submitted By</center></th>
+                    <th><center>Time</center></th>
+                    <th><center>Status</center></th>
+                    <th><center>Slurm Job</center></th>
+                </tr>
+                <tr>
+                    <td>""" + str(project_name) + """</td>
+                    <td>""" + str(command_tool) + """</td>
+                    <td>""" + str(command_title) + """</td>
+                    <td>QZyme2</td>
+                    <td>""" + str(inp_command_id) + """</td>
+                    <td>""" + str(user_name) + """</td>
+                    <td>""" + str(local_time) + """</td>
+                    <td style='color:red'>""" + str(status) + """</td>
+                    <td>No</td>
+                </tr>
+            </table>
+            <p>"""+new_message+"""</p>
+        </body>
+    </html>
+    """
+
+    '''currently commenting as quantumzyme email are being blocked when sent using scripts
     SMTPserver = 'quantumzyme.com'
     sender = 'varadharaj.ranganatha@quantumzyme.com'
     destination = ['varadharaj.ranganatha@quantumzyme.com',email_id]
 
     USERNAME = "qzwebgo"
-    PASSWORD = "Qzyme@786"
+    PASSWORD = "Qzyme@786"'''
+    SMTPserver = 'smtp.gmail.com'
+    sender = 'testsendingemailusingpython@gmail.com'
+    destination = ['testsendingemailusingpython@gmail.com',email_id]
+
+    USERNAME = "testsendingemailusingpython@gmail.com"
+    PASSWORD = "ysfpsehpndheivem"
 
     # typical values for text_subtype are plain, html, xml
-    text_subtype = 'plain'
+    text_subtype = 'html'
 
 
     content= "user "+user_id+" is queued job with job name "+command_title+" and currently in execution state"
@@ -9982,8 +10075,8 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
 
     try:
         msg = MIMEText(content, text_subtype)
-        msg['Subject']=       subject
-        msg['From']   = sender # some SMTP servers will do this automatically, not all
+        msg['Subject']=subject
+        msg['From']= sender # some SMTP servers will do this automatically, not all
 
         conn = SMTP(SMTPserver)
         conn.set_debuglevel(True)
@@ -9998,7 +10091,7 @@ def send_non_slurm_email(inp_command_id,status_id,user_email_string):
     #    sys.exit( "mail failed; %s" % "CUSTOM_ERROR" ) # give an error message
 
 
-def update_command_status(inp_command_id,status_id,user_email_string):
+def update_command_status(inp_command_id,status_id,user_email_string,project_name, project_id,command_tool,command_title):
     print("updating command execution status")
     #check if process initiated
 
@@ -10010,7 +10103,9 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_started_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, user_email_string)
+            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
+
+            
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -10023,7 +10118,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, user_email_string)
+            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -10036,7 +10131,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, user_email_string)
+            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -10044,7 +10139,7 @@ def update_command_status(inp_command_id,status_id,user_email_string):
                 execution_completed_at=entry_time)
     '''
     if updated_status:
-        send_non_slurm_email(inp_command_id, status_id, user_email_string)'''
+        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)'''
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
