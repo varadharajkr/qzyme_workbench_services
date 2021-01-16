@@ -10071,9 +10071,9 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     text_subtype = 'html'
 
 
-    content= "user "+user_id+" is queued job with job name "+command_title+" and currently in execution state"
+    content= table_design
 
-    subject="Python"
+    subject=project_name+" Notification(QZyme WorkBench)"
 
     import sys
     import os
