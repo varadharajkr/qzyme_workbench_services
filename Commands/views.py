@@ -9981,11 +9981,11 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     user_id = str(commandDetails_res.user_id)
     print("user_id is ",user_id)
     QzEmployeeEmail_res = QzEmployeeEmail.objects.get(qz_user_id=user_id)
-    print("user_email_string")
-    print(user_email_string)
-    print("QzEmployeeEmail_res")
-    print(QzEmployeeEmail_res)
-    print(type(QzEmployeeEmail_res))
+    #print("user_email_string")
+    #print(user_email_string)
+    #print("QzEmployeeEmail_res")
+    #print(QzEmployeeEmail_res)
+    #print(type(QzEmployeeEmail_res))
     email_id = QzEmployeeEmail_res.email_id
     print("email_id is ",email_id)
     print("*****************************************************************************************")
@@ -9993,13 +9993,25 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     #local_time = entry_time.strftime("%x %X")
     local_time = entry_time.strftime("%m/%d/%Y, %H:%M:%S")
     user_name = str(extract_user_name_from_email(str(email_id)))
-    
-    if status_id == 2:
+
+    if status_id == 1:
+        status = "submitted the job for execution"
+        new_message = "you will receive another completion notification email update, after the job is executed"
+    elif status_id == 2:
         status = "started to execute"
+        new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 3:
         status = "executed successfully"
+        new_message = ""
     elif status_id == 4:
         status = "executed unsuccessful"
+        new_message = ""
+    # if status_id == 2:
+    #     status = "started to execute"
+    # elif status_id == 3:
+    #     status = "executed successfully"
+    # elif status_id == 4:
+    #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
 
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
