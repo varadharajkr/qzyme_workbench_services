@@ -10116,7 +10116,7 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
                 status=status_id,
                 execution_started_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
+            #send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
 
             
         except db.OperationalError as e:
@@ -10131,7 +10131,7 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
+            #send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
@@ -10144,15 +10144,15 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
                 status=status_id,
                 execution_completed_at=entry_time)
             updated_status = True
-            send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
+            #send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
         except db.OperationalError as e:
             db.close_old_connections()
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
-    '''
+
     if updated_status:
-        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)'''
+        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
