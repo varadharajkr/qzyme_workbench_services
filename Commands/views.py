@@ -10052,6 +10052,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     </html>
     """
 
+
     '''currently commenting as quantumzyme email are being blocked when sent using scripts
     SMTPserver = 'quantumzyme.com'
     sender = 'varadharaj.ranganatha@quantumzyme.com'
