@@ -55,7 +55,6 @@ def execute_command(command,inp_command_id,user_email_string,project_name,projec
     print('command to execute is ',command)
     print('inp command id is ',inp_command_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     process =Popen(
         args=command,
         stdout=PIPE,
@@ -64,6 +63,7 @@ def execute_command(command,inp_command_id,user_email_string,project_name,projec
     )
     print("execute command in execute command function")
     # process.wait()
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     return process
 
 
