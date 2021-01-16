@@ -8048,8 +8048,9 @@ class CatMecandAutodock(APIView):
         print("\nexecute command before ")
         print(primary_command_runnable)
 
-        process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
+
+        process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, command_tool,command_tool_title)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -8231,8 +8232,7 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
-
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, command_tool,command_tool_title)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -8280,8 +8280,7 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
-
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, command_tool,command_tool_title)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -8392,7 +8391,8 @@ class CatMec(APIView):
                                                   pre_parametrization_script, parametrization_script, server_value)
                 primary_command_runnable = ""
                 ##########################################
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
+
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
 
             command_title_folder = commandDetails_result.command_title
 
@@ -8494,8 +8494,8 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string)
 
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
