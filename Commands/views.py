@@ -10150,7 +10150,9 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
             QzwProjectDetails_update_res = commandDetails.objects.filter(command_id=inp_command_id).update(
                 status=status_id,
                 execution_completed_at=entry_time)
-
+    print("updated_status is *********************************************************")
+    print(updated_status)
+    print("updated_status is *********************************************************")
     if updated_status:
         send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
     print("result of update command execution status")
