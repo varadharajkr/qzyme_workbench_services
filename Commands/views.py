@@ -979,7 +979,8 @@ class Preliminary_Studies(APIView):
         blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt '6 qseqid sseqid sseq'"
         blast_cmd_3 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out out.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[2])+" -outfmt '7 qseqid length qlen slen qstart qend sstart send evalue'"
         protein_analysis_computation_script_command = "python generate_protein_analysis_calculations.py "+str(project_id)
-
+        print("protein_analysis_computation_script_command")
+        print(protein_analysis_computation_script_command)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("database_values")
         print(database_values)
@@ -10015,7 +10016,9 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     # elif status_id == 4:
     #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
-
+    slurm_job = "Yes"
+    if (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
+        slurm_job = "No"
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
@@ -10046,7 +10049,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
                     <td>""" + str(user_name) + """</td>
                     <td>""" + str(local_time) + """</td>
                     <td style='color:red'>""" + str(status) + """</td>
-                    <td>No</td>
+                    <td>""" +str(slurm_job)+"""</td>
                 </tr>
             </table>
             <p>"""+new_message+"""</p>
@@ -10063,11 +10066,14 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     USERNAME = "qzwebgo"
     PASSWORD = "Qzyme@786"'''
     SMTPserver = 'smtp.gmail.com'
-    sender = 'testsendingemailusingpython@gmail.com'
-    destination = ['testsendingemailusingpython@gmail.com',email_id]
+    #sender = 'testsendingemailusingpython@gmail.com'
+    sender = 'workbench.notification@gmail.com'
+    destination = [email_id]
 
-    USERNAME = "testsendingemailusingpython@gmail.com"
-    PASSWORD = "ysfpsehpndheivem"
+    #USERNAME = "testsendingemailusingpython@gmail.com"
+    #PASSWORD = "ysfpsehpndheivem"
+    USERNAME = "workbench.notification@gmail.com"
+    PASSWORD = "ekdbspktyqjunpuf"
 
     # typical values for text_subtype are plain, html, xml
     text_subtype = 'html'
