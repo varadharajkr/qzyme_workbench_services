@@ -988,7 +988,7 @@ class Preliminary_Studies(APIView):
         print(blast_cmd_2)
         print(blast_cmd_3)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        
+
         file_path = config.PATH_CONFIG[
                      'local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + commandDetails_result.command_tool + '/' + commandDetails_result.command_title + '/'
         print("file path is ")
