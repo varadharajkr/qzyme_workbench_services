@@ -978,7 +978,8 @@ class Preliminary_Studies(APIView):
         blast_cmd_1 = "/software/usr/ncbi-blast-2.11.0+/bin/makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
         blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt '6 qseqid sseqid sseq'"
         blast_cmd_3 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out out.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt '7 qseqid length qlen slen qstart qend sstart send evalue'"
-        protein_analysis_computation_script_command = "python generate_protein_analysis_calculations.py "+str(project_id)
+        generate_bokeh_aln_file_command = "python generate_bokeh_aln_file.py "+str(project_id)
+        protein_analysis_computation_script_command = "python generate_protein_analysis_calculations.py "+str(database_values[5])
         print("protein_analysis_computation_script_command")
         print(protein_analysis_computation_script_command)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
@@ -987,6 +988,7 @@ class Preliminary_Studies(APIView):
         print(blast_cmd_1)
         print(blast_cmd_2)
         print(blast_cmd_3)
+        print(generate_bokeh_aln_file_command)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
         file_path = config.PATH_CONFIG[
@@ -1005,6 +1007,8 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += (line.replace('blast_2_cmd', str(blast_cmd_2)))
                 elif 'blast_3_cmd' in line:
                     new_shell_script_lines += (line.replace('blast_3_cmd', str(blast_cmd_3)))
+                elif 'generate_bokeh_aln_file_command' in line:
+                    new_shell_script_lines += (line.replace('generate_bokeh_aln_file_command', str(generate_bokeh_aln_file_command)))
                 elif 'protein_analysis_computation_script_command' in line:
                     new_shell_script_lines += (line.replace('protein_analysis_computation_script_command', str(protein_analysis_computation_script_command)))
                 else:
