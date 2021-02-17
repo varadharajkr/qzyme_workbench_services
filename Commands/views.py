@@ -978,7 +978,8 @@ class Preliminary_Studies(APIView):
         else:blastx_string = "/software/usr/ncbi-blast-2.11.0+/bin/blastx"
         blast_cmd_1 = "/software/usr/ncbi-blast-2.11.0+/bin/makeblastdb -in "+str(database_values[6])+" -dbtype "+str(database_values[3])
         # blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt '6 qseqid sseqid sseq'"
-        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt 4"
+        # blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt 4"
+        blast_cmd_2 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out test0.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt '4 qseqid sseqid sseq'"
         blast_cmd_3 = "time "+str(blastx_string)+" -query "+str(database_values[5])+" -db "+str(database_values[6])+" -out out.txt -evalue "+str(database_values[4])+" -num_threads "+str(database_values[1])+" -max_target_seqs "+str(database_values[7])+" -outfmt '7 qseqid length qlen slen qstart qend sstart send evalue'"
         generate_bokeh_aln_file_command = "/usr/bin/python generate_bokeh_aln_file.py '"+str(database_values[5]+"'")
         protein_analysis_computation_script_command = "python generate_protein_analysis_calculations.py "+str(project_id)
