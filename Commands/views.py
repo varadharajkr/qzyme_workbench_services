@@ -1013,6 +1013,10 @@ class Preliminary_Studies(APIView):
                     new_shell_script_lines += (line.replace('generate_bokeh_aln_file_command', str(generate_bokeh_aln_file_command)))
                 elif 'protein_analysis_computation_script_command' in line:
                     new_shell_script_lines += (line.replace('protein_analysis_computation_script_command', str(protein_analysis_computation_script_command)))
+                elif 'DB_file' in line:
+                    new_shell_script_lines += (line.replace('DB_file', str(database_values[6])))
+                elif 'Query_file' in line:
+                    new_shell_script_lines += (line.replace('Query_file', str(database_values[5])))
                 else:
                     new_shell_script_lines += line
         print("new_shell_script_lines is ")
