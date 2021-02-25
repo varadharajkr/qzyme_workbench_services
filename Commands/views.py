@@ -813,6 +813,72 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
         return False
 
 
+def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_file_name,file_name):
+    print("inside queue_slurm_script_of_thermostability function")
+    print('after generate_slurm_script ************************************************************************')
+    print('before changing directory')
+    print(os.getcwd())
+    print('after changing directory')
+    os.chdir(file_path)
+    print(os.getcwd())
+    print("Converting from windows to unix format")
+    print("perl -p -e 's/\r$//' < "+str(pre_std_file_name)+" > "+str(file_name))
+    os.system("perl -p -e 's/\r$//' < "+str(pre_std_file_name)+" > "+str(file_name))
+    print('queuing **********************************************************************************')
+    cmd = "srun "+ file_path + "/" + str(file_name)
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
+
+    return True
+
+
 @csrf_exempt
 def plot_energy_preparation(user_email_string, inp_command_id,project_id,project_name,command_tool,command_title,user_id='',user_selected_mutation=''):
     group_project_name = get_group_project_name(str(project_id))
@@ -1144,7 +1210,8 @@ class Thermostability(APIView):
             print("HURRRAAAAAAAAAAAAAAYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
             print("type(pdb_file_name) is list")
             print(len(pdb_file_name))
-        file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' +  pdb_file_name[:-4] + '/'
+        file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' + pdb_file_name[:-4] + '/'
+        create_mutate_script_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path']
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
@@ -1159,29 +1226,32 @@ class Thermostability(APIView):
                 print("inside try")
                 shutil.copyfile(os.path.join(source_file_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
                 shutil.copyfile(os.path.join(source_file_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
+                shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
             except Exception as e:
                 print(('exception in copying file of mutation is ', str(e)))
                 pass
-            # print(file_path)
-            # pre_conv_script = 'pre_conv.sh'
-            # conv_script = 'conv.sh'
-            # new_shell_script_lines = ''
-            # print('before opening ', file_path + '/' + pre_conv_script)
-            # with open(file_path + '/' + pre_conv_script, 'r') as source_file:
-            #     print('inside opening ', file_path + '/' + pre_conv_script)
-            #     content = source_file.readlines()
-            #     for line in content:
-            #         if 'QZ_CONV_SCRIPT' in line:
-            #             new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
-            #         else:
-            #             new_shell_script_lines += line
-            # if os.path.exists(file_path + '/' + conv_script):
-            #     print('removing ', file_path + conv_script)
-            #     os.remove(file_path + '/' + conv_script)
-            # # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-            # with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
-            #     new_bash_script.write(new_shell_script_lines + "\n")
-            # primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
+            print(file_path)
+            std_script = 'create_mutate_std.sh'
+            #QZ_MUTATE_SCRIPT
+            mutate_script = 'create_mutate.sh'
+            new_shell_script_lines = ''
+            print('before opening ', file_path + '/' + std_script)
+            with open(file_path + '/' + std_script, 'r') as source_file:
+                print('inside opening ', file_path + '/' + std_script)
+                content = source_file.readlines()
+                for line in content:
+                    if 'QZ_MUTATE_SCRIPT' in line:
+                        new_shell_script_lines += (line.replace('QZ_MUTATE_SCRIPT', str(primary_command_runnable)))
+                    else:
+                        new_shell_script_lines += line
+            if os.path.exists(file_path + '/' + mutate_script):
+                print('removing ', file_path + mutate_script)
+                os.remove(file_path + '/' + mutate_script)
+            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            with open(file_path + '/' + mutate_script, 'w+')as new_bash_script:
+                new_bash_script.write(new_shell_script_lines + "\n")
+            queue_slurm_script_of_thermostability(user_id,project_id,file_path,std_script,mutate_script)
+            primary_command_runnable = ''
 
         elif commandDetails_result.command_title == "Thermostability":
 
