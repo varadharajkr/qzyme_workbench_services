@@ -932,7 +932,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
     return True
 
 
-# TASS
+
 class Preliminary_Studies(APIView):
     def get(self,request):
         pass
@@ -1095,6 +1095,174 @@ class Preliminary_Studies(APIView):
 
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
+def retrieve_project_tool_essentials_values(project_id, key_name):
+    print("inside retrieve_project_tool_essentials_values function")
+    print(("project_id ",str(project_id)))
+    print(("key_name ",key_name))
+    try:
+        print("inside try of retrieve_project_tool_essentials_values block")
+        ProjectToolEssentials_res_value = ProjectToolEssentials.objects.all().filter(project_id=str(project_id),
+                                                                                     key_name=key_name).latest(
+            'entry_time')
+        tool_essential_value = ProjectToolEssentials_res_value.key_values
+    except Exception as e:
+        print("exception in retrieve_project_tool_essentials_values is ")
+        print((str(e)))
+        tool_essential_value = ''
+    return tool_essential_value
+
+
+# TASS
+class Thermostability(APIView):
+    def get(self,request):
+        pass
+
+    def post(self,request):
+        print("INSIDE CLASS Thermostability")
+        #get command details from database
+        inp_command_id = request.POST.get("command_id")
+        commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+        project_id = commandDetails_result.project_id
+        QzwProjectDetails_result = QzwProjectDetails.objects.get(project_id=str(project_id))
+        project_name = QzwProjectDetails_result.project_name
+        user_id = commandDetails_result.user_id
+        QzEmployeeEmail_result = QzEmployeeEmail.objects.get(qz_user_id=user_id)
+        email_id = QzEmployeeEmail_result.email_id
+        dot_Str_val = email_id.split('@')[0]
+        lenght_of_name_with_dots = len(dot_Str_val.split("."))
+        user_email_string = ""
+        for i in range(lenght_of_name_with_dots):
+            user_email_string += dot_Str_val.split(".")[i] + " "
+        QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+        project_name = QzwProjectDetails_res.project_name
+        group_project_name = get_group_project_name(str(project_id))
+        key = 'thermostability_xtc_or_pdb_file'
+        pdb_file_name = retrieve_project_tool_essentials_values(project_id, key)
+        print("type(pdb_file_name)")
+        print(type(pdb_file_name))
+        if type(pdb_file_name) == list:
+            print("HURRRAAAAAAAAAAAAAAYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
+            print("type(pdb_file_name) is list")
+            print(len(pdb_file_name))
+        file_path = config.PATH_CONFIG['shared_folder_path'] + 'Project/' \
+            + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability'] + '/wild_type/' +  pdb_file_name[:-3] + '/'
+        primary_command_runnable = commandDetails_result.primary_command
+        primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
+        primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
+
+        if commandDetails_result.command_title == "Thermostability":
+
+            file_path = config.PATH_CONFIG[
+                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
+            print(file_path)
+            pre_conv_script = 'pre_conv.sh'
+            conv_script = 'conv.sh'
+            new_shell_script_lines = ''
+            print('before opening ', file_path + '/' + pre_conv_script)
+            with open(file_path + '/' + pre_conv_script, 'r') as source_file:
+                print('inside opening ', file_path + '/' + pre_conv_script)
+                content = source_file.readlines()
+                for line in content:
+                    if 'QZ_CONV_SCRIPT' in line:
+                        new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
+                    else:
+                        new_shell_script_lines += line
+            if os.path.exists(file_path + '/' + conv_script):
+                print('removing ', file_path + conv_script)
+                os.remove(file_path + '/' + conv_script)
+            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
+                new_bash_script.write(new_shell_script_lines + "\n")
+            primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
+
+        elif commandDetails_result.command_title == "Thermostability":
+
+            file_path = config.PATH_CONFIG[
+                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
+            print(file_path)
+            pre_conv_script = 'pre_conv.sh'
+            conv_script = 'conv.sh'
+            new_shell_script_lines = ''
+            print('before opening ', file_path + '/' + pre_conv_script)
+            with open(file_path + '/' + pre_conv_script, 'r') as source_file:
+                print('inside opening ', file_path + '/' + pre_conv_script)
+                content = source_file.readlines()
+                for line in content:
+                    if 'QZ_CONV_SCRIPT' in line:
+                        new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
+                    else:
+                        new_shell_script_lines += line
+            if os.path.exists(file_path + '/' + conv_script):
+                print('removing ', file_path + conv_script)
+                os.remove(file_path + '/' + conv_script)
+            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
+                new_bash_script.write(new_shell_script_lines + "\n")
+            primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
+
+
+        print('primary_command_runnable')
+        print(primary_command_runnable)
+
+        os.chdir(file_path)
+
+        print("dirname")
+        print(os.getcwd())
+
+        print("runnable command is")
+        print(primary_command_runnable)
+        os.chdir(file_path)
+        print("working directory after changing CHDIR")
+        print(os.system("pwd"))
+
+        #execute command
+
+        process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
+                                         project_id, commandDetails_result.command_tool,
+                                         commandDetails_result.command_title)
+        out, err = process_return.communicate()
+        process_return.wait()
+        # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
+
+        command_title_folder = commandDetails_result.command_title
+        command_tool_title = commandDetails_result.command_tool
+        print("printing status ofprocess")
+        print(process_return.returncode)
+        print("printing output of process")
+        print(out)
+
+        if process_return.returncode == 0:
+            print("success executing command")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path']+group_project_name+'/'+project_name+'/'+commandDetails_result.command_tool+'/'+command_title_folder+'.log','w+')
+            fileobj.write(out)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success try block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< success except block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_success']
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
+
+        if process_return.returncode != 0:
+            print("error executing command!!")
+            fileobj = open(config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log','w+')
+            fileobj.write(err)
+            try:
+                print("<<<<<<<<<<<<<<<<<<<<<<< try block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< error except block Thermostability  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                status_id = config.CONSTS['status_error']
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+
+            return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
 
 # TASS
