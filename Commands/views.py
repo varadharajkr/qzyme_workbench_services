@@ -1151,30 +1151,37 @@ class Thermostability(APIView):
         primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
 
-        if commandDetails_result.command_title == "Thermostability":
+        if commandDetails_result.command_title == "create_mutation":
 
-            file_path = config.PATH_CONFIG[
-                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
-            print(file_path)
-            pre_conv_script = 'pre_conv.sh'
-            conv_script = 'conv.sh'
-            new_shell_script_lines = ''
-            print('before opening ', file_path + '/' + pre_conv_script)
-            with open(file_path + '/' + pre_conv_script, 'r') as source_file:
-                print('inside opening ', file_path + '/' + pre_conv_script)
-                content = source_file.readlines()
-                for line in content:
-                    if 'QZ_CONV_SCRIPT' in line:
-                        new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
-                    else:
-                        new_shell_script_lines += line
-            if os.path.exists(file_path + '/' + conv_script):
-                print('removing ', file_path + conv_script)
-                os.remove(file_path + '/' + conv_script)
-            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-            with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
-                new_bash_script.write(new_shell_script_lines + "\n")
-            primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
+            destination_file_path = file_path
+            source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
+            try:
+                print("inside try")
+                shutil.copyfile(os.path.join(source_file_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
+                shutil.copyfile(os.path.join(source_file_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
+            except Exception as e:
+                print(('exception in copying file of mutation is ', str(e)))
+                pass
+            # print(file_path)
+            # pre_conv_script = 'pre_conv.sh'
+            # conv_script = 'conv.sh'
+            # new_shell_script_lines = ''
+            # print('before opening ', file_path + '/' + pre_conv_script)
+            # with open(file_path + '/' + pre_conv_script, 'r') as source_file:
+            #     print('inside opening ', file_path + '/' + pre_conv_script)
+            #     content = source_file.readlines()
+            #     for line in content:
+            #         if 'QZ_CONV_SCRIPT' in line:
+            #             new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
+            #         else:
+            #             new_shell_script_lines += line
+            # if os.path.exists(file_path + '/' + conv_script):
+            #     print('removing ', file_path + conv_script)
+            #     os.remove(file_path + '/' + conv_script)
+            # # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            # with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
+            #     new_bash_script.write(new_shell_script_lines + "\n")
+            # primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
 
         elif commandDetails_result.command_title == "Thermostability":
 
