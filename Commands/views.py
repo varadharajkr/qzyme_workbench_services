@@ -1144,8 +1144,7 @@ class Thermostability(APIView):
             print("HURRRAAAAAAAAAAAAAAYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
             print("type(pdb_file_name) is list")
             print(len(pdb_file_name))
-        file_path = config.PATH_CONFIG['shared_folder_path'] +  \
-            + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' +  pdb_file_name[:-4] + '/'
+        file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' +  pdb_file_name[:-4] + '/'
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
