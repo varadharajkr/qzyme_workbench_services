@@ -1212,6 +1212,8 @@ class Thermostability(APIView):
             print(len(pdb_file_name))
         file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' + pdb_file_name[:-4] + '/'
         create_mutate_script_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path']
+        # wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
+        wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+file_path+str(pdb_file_name)
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
@@ -1219,9 +1221,10 @@ class Thermostability(APIView):
         primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
 
         if commandDetails_result.command_title == "create_mutation":
-
+            primary_command_runnable = wild_type_foldex_script + "\n" + primary_command_runnable
             destination_file_path = file_path
             source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
+
             try:
                 print("inside try")
                 shutil.copyfile(os.path.join(source_file_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
