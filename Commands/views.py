@@ -1254,6 +1254,11 @@ class Thermostability(APIView):
                 print('removing ', file_path + mutate_script)
                 os.remove(file_path + '/' + mutate_script)
             # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
+            print("************************************************************")
+            print("************************************************************")
+            print(new_shell_script_lines)
+            print("************************************************************")
+            print("************************************************************")
             with open(file_path + '/' + mutate_script, 'w+')as new_bash_script:
                 new_bash_script.write(new_shell_script_lines + "\n")
             queue_slurm_script_of_thermostability(user_id,project_id,file_path,std_script,mutate_script)
