@@ -1219,20 +1219,20 @@ class Thermostability(APIView):
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
+        destination_file_path = file_path
+        source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
+        try:
+            print("inside try")
+            shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
+            shutil.copyfile(os.path.join(create_mutate_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
+            shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
+            shutil.copyfile(os.path.join(create_mutate_script_path,"rotabase.txt"),os.path.join(destination_file_path,"rotabase.txt"))
+        except Exception as e:
+            print(('exception in copying file of mutation is ', str(e)))
+            pass
 
         if commandDetails_result.command_title == "create_mutation":
-            primary_command_runnable = wild_type_foldex_script + "\n" + primary_command_runnable
-            destination_file_path = file_path
-            source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
-
-            try:
-                print("inside try")
-                shutil.copyfile(os.path.join(source_file_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
-                shutil.copyfile(os.path.join(source_file_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
-                shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
-            except Exception as e:
-                print(('exception in copying file of mutation is ', str(e)))
-                pass
+            primary_command_runnable = primary_command_runnable
             print(file_path)
             std_script = 'create_mutate_std.sh'
             #QZ_MUTATE_SCRIPT
@@ -1245,6 +1245,8 @@ class Thermostability(APIView):
                 for line in content:
                     if 'QZ_MUTATE_SCRIPT' in line:
                         new_shell_script_lines += (line.replace('QZ_MUTATE_SCRIPT', str(primary_command_runnable)))
+                    elif 'wild_type_foldex_script' in line:
+                        new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
                         new_shell_script_lines += line
             if os.path.exists(file_path + '/' + mutate_script):
