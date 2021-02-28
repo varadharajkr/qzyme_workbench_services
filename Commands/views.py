@@ -1271,7 +1271,7 @@ class Thermostability(APIView):
                 for line in new_bash_script.readlines():
                     print(line)
             queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
-            primary_command_runnable = ''
+            primary_command_runnable = 'sh create_mutate.sh'
 
         elif commandDetails_result.command_title == "Thermostability":
 
