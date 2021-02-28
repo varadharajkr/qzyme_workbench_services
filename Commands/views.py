@@ -1264,7 +1264,7 @@ class Thermostability(APIView):
             print("************************************************************")
             print("************************************************************")
             with open(file_path + '/' + mutate_win_script, 'w+')as new_bash_script:
-                print("openened "+file_path + '/' + mutate_script)
+                print("openened "+file_path + '/' + mutate_win_script)
                 new_bash_script.write(new_shell_script_lines + "\n")
                 print("wrote")
             with open(file_path + '/' + mutate_win_script)as new_bash_script:
