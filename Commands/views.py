@@ -1263,11 +1263,11 @@ class Thermostability(APIView):
             print(new_shell_script_lines)
             print("************************************************************")
             print("************************************************************")
-            with open(file_path + '/' + mutate_script, 'w+')as new_bash_script:
+            with open(file_path + '/' + mutate_win_script, 'w+')as new_bash_script:
                 print("openened "+file_path + '/' + mutate_script)
                 new_bash_script.write(new_shell_script_lines + "\n")
                 print("wrote")
-            with open(file_path + '/' + mutate_script)as new_bash_script:
+            with open(file_path + '/' + mutate_win_script)as new_bash_script:
                 for line in new_bash_script.readlines():
                     print(line)
             queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
