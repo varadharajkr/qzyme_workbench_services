@@ -1240,7 +1240,8 @@ class Thermostability(APIView):
             print(file_path)
             std_script = 'create_mutate_std.sh'
             #QZ_MUTATE_SCRIPT
-            mutate_script = 'create_mutate.sh'
+            mutate_win_script = 'create_mutate_windows.sh'
+            mutate_script = 'create_mutate_windows.sh'
             new_shell_script_lines = ''
             print('before opening ', file_path + '/' + std_script)
             with open(file_path + '/' + std_script, 'r') as source_file:
@@ -1269,7 +1270,7 @@ class Thermostability(APIView):
             with open(file_path + '/' + mutate_script)as new_bash_script:
                 for line in new_bash_script.readlines():
                     print(line)
-            queue_slurm_script_of_thermostability(user_id,project_id,file_path,std_script,mutate_script)
+            queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             primary_command_runnable = ''
 
         elif commandDetails_result.command_title == "Thermostability":
