@@ -822,9 +822,10 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
     os.chdir(file_path)
     print(os.getcwd())
     print("Converting from windows to unix format")
-    print("perl -p -e 's/\r$//' < "+str(pre_std_file_name)+" > "+str(file_name))
-    os.system("perl -p -e 's/\r$//' < "+str(pre_std_file_name)+" > "+str(file_name))
+    print("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
+    os.system("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     print('queuing **********************************************************************************')
+    print("sbatch "+ file_path + "/" + str(file_name))
     #cmd = "srun "+ file_path + "/" + str(file_name)
     cmd = "sbatch "+ file_path + "/" + str(file_name)
     print("Submitting Job1 with command: %s" % cmd)
@@ -1212,6 +1213,7 @@ class Thermostability(APIView):
             print("type(pdb_file_name) is list")
             print(len(pdb_file_name))
         file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' + pdb_file_name[:-4] + '/'
+        qz_workbench_script_path = config.PATH_CONFIG['shared_scripts'] + '/' + config.PATH_CONFIG['Thermostability_path']
         create_mutate_script_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path']
         # wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
         wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+file_path+str(pdb_file_name)
@@ -1224,10 +1226,11 @@ class Thermostability(APIView):
         source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
         try:
             print("inside try")
-            shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
-            shutil.copyfile(os.path.join(create_mutate_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
-            shutil.copyfile(os.path.join(create_mutate_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
-            shutil.copyfile(os.path.join(create_mutate_script_path,"rotabase.txt"),os.path.join(destination_file_path,"rotabase.txt"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"matrix_generation.py"),os.path.join(destination_file_path,"matrix_generation.py"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"rotabase.txt"),os.path.join(destination_file_path,"rotabase.txt"))
         except Exception as e:
             print(('exception in copying file of mutation is ', str(e)))
             pass
@@ -1260,7 +1263,7 @@ class Thermostability(APIView):
             print("************************************************************")
             print("************************************************************")
             with open(file_path + '/' + mutate_script, 'w+')as new_bash_script:
-                print("openened")
+                print("openened "+file_path + '/' + mutate_script)
                 new_bash_script.write(new_shell_script_lines + "\n")
                 print("wrote")
             with open(file_path + '/' + mutate_script)as new_bash_script:
