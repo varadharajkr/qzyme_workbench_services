@@ -1241,7 +1241,7 @@ class Thermostability(APIView):
             std_script = 'create_mutate_std.sh'
             #QZ_MUTATE_SCRIPT
             mutate_win_script = 'create_mutate_windows.sh'
-            mutate_script = 'create_mutate_windows.sh'
+            mutate_script = 'create_mutate.sh'
             new_shell_script_lines = ''
             print('before opening ', file_path + '/' + std_script)
             with open(file_path + '/' + std_script, 'r') as source_file:
@@ -1254,9 +1254,9 @@ class Thermostability(APIView):
                         new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
                         new_shell_script_lines += line
-            if os.path.exists(file_path + '/' + mutate_script):
-                print('removing ', file_path + mutate_script)
-                os.remove(file_path + '/' + mutate_script)
+            if os.path.exists(file_path + '/' + mutate_win_script):
+                print('removing ', file_path + mutate_win_script)
+                os.remove(file_path + '/' + mutate_win_script)
             # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
             print("************************************************************")
             print("************************************************************")
