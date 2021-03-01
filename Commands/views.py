@@ -1217,7 +1217,7 @@ class Thermostability(APIView):
         qz_workbench_script_path = config.PATH_CONFIG['shared_scripts'] + '/' + config.PATH_CONFIG['Thermostability_path']
         create_mutate_script_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path']
         # wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
-        wild_type_foldex_script = qz_workbench_script_path+"/foldx --command=Stability --pdb="+file_path+str(pdb_file_name)
+        wild_type_foldex_script = qz_workbench_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
         primary_command_runnable = commandDetails_result.primary_command
         primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
         primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
