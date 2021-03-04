@@ -825,59 +825,59 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
     print("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     os.system("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     
-    # print('queuing **********************************************************************************')
-    # print("sbatch "+ file_path + "/" + str(file_name))
-    # #cmd = "srun "+ file_path + "/" + str(file_name)
-    # cmd = "sbatch "+ file_path + "/" + str(file_name)
-    # print("Submitting Job1 with command: %s" % cmd)
-    # status, jobnum = commands.getstatusoutput(cmd)
-    # print("job id is ", jobnum)
-    # print("status is ", status)
-    # print("job id is ", jobnum)
-    # print("status is ", status)
-    # print(jobnum.split())
-    # lenght_of_split = len(jobnum.split())
-    # index_value = lenght_of_split - 1
-    # print(jobnum.split()[index_value])
-    # job_id = jobnum.split()[index_value]
-    # # save job id
-    # job_id_key_name = "job_id"
-    # entry_time = datetime.now()
-    # try:
-    #     print(
-    #         "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                         project_id=project_id,
-    #                                                         entry_time=entry_time,
-    #                                                         job_id=job_id,
-    #                                                         job_status="1",
-    #                                                         job_title='qzw_create_mutation',
-    #                                                         job_details='creating mutation')
-    #     QzwSlurmJobDetails_save_job_id.save()
-    # except db.OperationalError as e:
-    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     db.close_old_connections()
-    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                         project_id=project_id,
-    #                                                         entry_time=entry_time,
-    #                                                         job_id=job_id,
-    #                                                         job_status="1",
-    #                                                         job_title='qzw_create_mutation',
-    #                                                         job_details='creating mutation')
-    #     QzwSlurmJobDetails_save_job_id.save()
-    #     print("saved")
-    # except Exception as e:
-    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     print("exception is ",str(e))
-    #     pass
-    #     '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                                            project_id=project_id,
-    #                                                                            entry_time=entry_time,
-    #                                                                            values=job_id,
-    #                                                                            job_id=job_id)
-    #     QzwSlurmJobDetails_save_job_id.save()
-    #     print("saved")'''
-    # print('queued')
+    print('queuing **********************************************************************************')
+    print("sbatch "+ file_path + "/" + str(file_name))
+    #cmd = "srun "+ file_path + "/" + str(file_name)
+    cmd = "sbatch "+ file_path + "/" + str(file_name)
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
 
     return True
 
@@ -1271,33 +1271,7 @@ class Thermostability(APIView):
                 for line in new_bash_script.readlines():
                     print(line)
             queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
-            primary_command_runnable = 'sh create_mutate.sh'
-
-        elif commandDetails_result.command_title == "Thermostability":
-
-            file_path = config.PATH_CONFIG[
-                            'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
-            print(file_path)
-            pre_conv_script = 'pre_conv.sh'
-            conv_script = 'conv.sh'
-            new_shell_script_lines = ''
-            print('before opening ', file_path + '/' + pre_conv_script)
-            with open(file_path + '/' + pre_conv_script, 'r') as source_file:
-                print('inside opening ', file_path + '/' + pre_conv_script)
-                content = source_file.readlines()
-                for line in content:
-                    if 'QZ_CONV_SCRIPT' in line:
-                        new_shell_script_lines += (line.replace('QZ_CONV_SCRIPT', str(primary_command_runnable)))
-                    else:
-                        new_shell_script_lines += line
-            if os.path.exists(file_path + '/' + conv_script):
-                print('removing ', file_path + conv_script)
-                os.remove(file_path + '/' + conv_script)
-            # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
-            with open(file_path + '/' + conv_script, 'w+')as new_bash_script:
-                new_bash_script.write(new_shell_script_lines + "\n")
-            primary_command_runnable = re.sub(primary_command_runnable, 'sh conv.sh', primary_command_runnable)
-
+            primary_command_runnable = ''
 
         print('primary_command_runnable')
         print(primary_command_runnable)
