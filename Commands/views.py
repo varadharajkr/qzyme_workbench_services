@@ -1206,23 +1206,22 @@ class Thermostability(APIView):
         project_name = QzwProjectDetails_res.project_name
         group_project_name = get_group_project_name(str(project_id))
         key = 'thermostability_xtc_or_pdb_file'
-        pdb_file_name = retrieve_project_tool_essentials_values(project_id, key)
+        pdb_file_names = retrieve_project_tool_essentials_values(project_id, key)
         print("type(pdb_file_name)")
-        print(type(pdb_file_name))
-        if type(pdb_file_name) == list:
+        print(type(pdb_file_names))
+        if type(pdb_file_names) == list:
             print("HURRRAAAAAAAAAAAAAAYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
             print("type(pdb_file_name) is list")
-            print(len(pdb_file_name))
-        file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/' + pdb_file_name[:-4] + '/'
+            print(len(pdb_file_names))
+        # for pdb_file_name in pdb_file_names.split(","):
+        file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path'] + '/wild_type/'
         qz_workbench_script_path = config.PATH_CONFIG['shared_scripts'] + '/' + config.PATH_CONFIG['Thermostability_path']
         create_mutate_script_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Thermostability_path']
+        wild_type_foldex_script = ''
         # wild_type_foldex_script = create_mutate_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
-        wild_type_foldex_script = qz_workbench_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file=test"
+        for pdb_file_name in pdb_file_names.split(","):
+            wild_type_foldex_script += qz_workbench_script_path+"/foldx --command=Stability --pdb="+str(pdb_file_name)+" --output-file="+pdb_file_name[:-4]+"\n"
         primary_command_runnable = commandDetails_result.primary_command
-        primary_command_runnable = re.sub('sh amber_nvt_equilibrzation.sh', '', primary_command_runnable)
-        primary_command_runnable = re.sub('sh amber_nvt_equilibration.sh', '', primary_command_runnable)
-        primary_command_runnable = re.sub('sh amber_nvt_simulation.sh', '', primary_command_runnable)
-        primary_command_runnable = re.sub('sh TASS_simulation.sh', '', primary_command_runnable)
         destination_file_path = file_path
         source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
         try:
