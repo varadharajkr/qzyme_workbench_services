@@ -10255,22 +10255,22 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
         status = "submitted the job for execution"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 2:
-        if slurm_job == "yes":
-            status = "Preparation of Slurm Script is in progress"
-        else:
-            status = "started to execute"
+        # if slurm_job == "yes":
+        #     status = "Preparation of Slurm Script is in progress"
+        # else:
+        status = "started to execute"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 3:
-        if slurm_job == "yes":
-            status = "Job Submitted Through Slurm"
-        else:
-            status = "executed successfully"
+        # if slurm_job == "yes":
+        #     status = "Job Submitted Through Slurm"
+        # else:
+        status = "executed successfully"
         new_message = ""
     elif status_id == 4:
-        if slurm_job == "yes":
-            status = "Slurm Job Submission failed"
-        else:
-            status = "executed unsuccessful"
+        # if slurm_job == "yes":
+        #     status = "Slurm Job Submission failed"
+        # else:
+        status = "executed unsuccessful"
         new_message = ""
     # if status_id == 2:
     #     status = "started to execute"
