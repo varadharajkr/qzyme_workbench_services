@@ -10269,6 +10269,8 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     slurm_job = "Yes"
     if (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
         slurm_job = "No"
+    if slurm_job == "yes":
+        status = "Job Submitted Through Slurm"
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
