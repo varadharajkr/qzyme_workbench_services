@@ -1273,7 +1273,7 @@ class Thermostability(APIView):
             #queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             #inp_command_id = job_id
-            primary_command_runnable = 'create_mutate.sh'
+            primary_command_runnable = 'sh create_mutate.sh'
 
         print('primary_command_runnable')
         print(primary_command_runnable)
