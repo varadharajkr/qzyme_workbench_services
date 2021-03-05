@@ -1271,7 +1271,7 @@ class Thermostability(APIView):
                 for line in new_bash_script.readlines():
                     print(line)
             boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
-            inp_command_id = job_id
+            #inp_command_id = job_id
             primary_command_runnable = ''
 
         print('primary_command_runnable')
