@@ -879,7 +879,7 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
         print("saved")'''
     print('queued')
 
-    return True
+    return True,job_id
 
 
 @csrf_exempt
@@ -1270,7 +1270,8 @@ class Thermostability(APIView):
             with open(file_path + '/' + mutate_win_script)as new_bash_script:
                 for line in new_bash_script.readlines():
                     print(line)
-            queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
+            boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
+            inp_command_id = job_id
             primary_command_runnable = ''
 
         print('primary_command_runnable')
