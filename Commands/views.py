@@ -10246,18 +10246,30 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     #local_time = entry_time.strftime("%x %X")
     local_time = entry_time.strftime("%m/%d/%Y, %H:%M:%S")
     user_name = str(extract_user_name_from_email(str(email_id)))
+    slurm_job = "Yes"
+    if (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
+        slurm_job = "No"
 
     if status_id == 1:
         status = "submitted the job for execution"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 2:
-        status = "started to execute"
+        if slurm_job == "yes":
+            status = "Preparation of Slurm Script is in progress"
+        else:
+            status = "started to execute"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 3:
-        status = "executed successfully"
+        if slurm_job == "yes":
+            status = "Job Submitted Through Slurm"
+        else:
+            status = "executed successfully"
         new_message = ""
     elif status_id == 4:
-        status = "executed unsuccessful"
+        if slurm_job == "yes":
+            status = "Slurm Job Submission failed"
+        else:
+            status = "executed unsuccessful"
         new_message = ""
     # if status_id == 2:
     #     status = "started to execute"
@@ -10266,11 +10278,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     # elif status_id == 4:
     #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
-    slurm_job = "Yes"
-    if (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
-        slurm_job = "No"
-    if slurm_job == "yes":
-        status = "Job Submitted Through Slurm"
+
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
