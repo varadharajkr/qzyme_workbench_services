@@ -50,7 +50,7 @@ django_logger = logging.getLogger(__name__)
 
 
 # to run command in shell
-def execute_command(command,inp_command_id,user_email_string,project_name,project_id, command_tool,command_title):
+def execute_command(command,inp_command_id,user_email_string,project_name,project_id, command_tool,command_title,job_id=''):
     print('inside execute_command')
     print('command to execute is ',command)
     print('inp command id is ',inp_command_id)
@@ -63,7 +63,7 @@ def execute_command(command,inp_command_id,user_email_string,project_name,projec
     )
     print("execute command in execute command function")
     # process.wait()
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
     return process
 
 
@@ -825,61 +825,61 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
     print("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     os.system("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     
-    #print('queuing **********************************************************************************')
-    #print("sbatch "+ file_path + "/" + str(file_name))
-    #cmd = "srun "+ file_path + "/" + str(file_name)
-    # cmd = "sbatch "+ file_path + "/" + str(file_name)
-    # print("Submitting Job1 with command: %s" % cmd)
-    # status, jobnum = commands.getstatusoutput(cmd)
-    # print("job id is ", jobnum)
-    # print("status is ", status)
-    # print("job id is ", jobnum)
-    # print("status is ", status)
-    # print(jobnum.split())
-    # lenght_of_split = len(jobnum.split())
-    # index_value = lenght_of_split - 1
-    # print(jobnum.split()[index_value])
-    # job_id = jobnum.split()[index_value]
-    # # save job id
-    # job_id_key_name = "job_id"
-    # entry_time = datetime.now()
-    # try:
-    #     print(
-    #         "<<<<<<<<<<<<<<<<<<<<<<< in try of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                         project_id=project_id,
-    #                                                         entry_time=entry_time,
-    #                                                         job_id=job_id,
-    #                                                         job_status="1",
-    #                                                         job_title='qzw_create_mutation',
-    #                                                         job_details='creating mutation')
-    #     QzwSlurmJobDetails_save_job_id.save()
-    # except db.OperationalError as e:
-    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     db.close_old_connections()
-    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                         project_id=project_id,
-    #                                                         entry_time=entry_time,
-    #                                                         job_id=job_id,
-    #                                                         job_status="1",
-    #                                                         job_title='qzw_create_mutation',
-    #                                                         job_details='creating mutation')
-    #     QzwSlurmJobDetails_save_job_id.save()
-    #     print("saved")
-    # except Exception as e:
-    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    #     print("exception is ",str(e))
-    #     pass
-    #     '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-    #                                                                            project_id=project_id,
-    #                                                                            entry_time=entry_time,
-    #                                                                            values=job_id,
-    #                                                                            job_id=job_id)
-    #     QzwSlurmJobDetails_save_job_id.save()
-    #     print("saved")'''
-    # print('queued')
+    print('queuing **********************************************************************************')
+    print("sbatch "+ file_path + "/" + str(file_name))
+    cmd = "srun "+ file_path + "/" + str(file_name)
+    cmd = "sbatch "+ file_path + "/" + str(file_name)
+    print("Submitting Job1 with command: %s" % cmd)
+    status, jobnum = commands.getstatusoutput(cmd)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print("job id is ", jobnum)
+    print("status is ", status)
+    print(jobnum.split())
+    lenght_of_split = len(jobnum.split())
+    index_value = lenght_of_split - 1
+    print(jobnum.split()[index_value])
+    job_id = jobnum.split()[index_value]
+    # save job id
+    job_id_key_name = "job_id"
+    entry_time = datetime.now()
+    try:
+        print(
+            "<<<<<<<<<<<<<<<<<<<<<<< in try of Thermostability JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+    except db.OperationalError as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        db.close_old_connections()
+        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                            project_id=project_id,
+                                                            entry_time=entry_time,
+                                                            job_id=job_id,
+                                                            job_status="1",
+                                                            job_title='qzw_create_mutation',
+                                                            job_details='creating mutation')
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")
+    except Exception as e:
+        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print("exception is ",str(e))
+        pass
+        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                               project_id=project_id,
+                                                                               entry_time=entry_time,
+                                                                               values=job_id,
+                                                                               job_id=job_id)
+        QzwSlurmJobDetails_save_job_id.save()
+        print("saved")'''
+    print('queued')
 
-    return True
+    return True,job_id
 
 
 @csrf_exempt
@@ -1207,6 +1207,7 @@ class Thermostability(APIView):
         group_project_name = get_group_project_name(str(project_id))
         key = 'thermostability_xtc_or_pdb_file'
         pdb_file_names = retrieve_project_tool_essentials_values(project_id, key)
+        job_id = ''
         print("type(pdb_file_name)")
         print(type(pdb_file_names))
         if type(pdb_file_names) == list:
@@ -1273,9 +1274,10 @@ class Thermostability(APIView):
                 for line in new_bash_script.readlines():
                     print(line)
             #queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
-            queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
+            submitted_job_boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             #inp_command_id = job_id
-            primary_command_runnable = 'sh create_mutate.sh'
+            #primary_command_runnable = 'sh create_mutate.sh'
+            primary_command_runnable = ''
 
         print('primary_command_runnable')
         print(primary_command_runnable)
@@ -1295,7 +1297,7 @@ class Thermostability(APIView):
 
         process_return = execute_command(primary_command_runnable, inp_command_id, user_email_string, project_name,
                                          project_id, commandDetails_result.command_tool,
-                                         commandDetails_result.command_title)
+                                         commandDetails_result.command_title,job_id)
         out, err = process_return.communicate()
         process_return.wait()
         # shared_folder_path = config.PATH_CONFIG['shared_folder_path']
@@ -1314,12 +1316,12 @@ class Thermostability(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success try block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< success except block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_success']
-                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
             return JsonResponse({"success": True,'output':out,'process_returncode':process_return.returncode})
 
         if process_return.returncode != 0:
@@ -1329,12 +1331,12 @@ class Thermostability(APIView):
             try:
                 print("<<<<<<<<<<<<<<<<<<<<<<< try block Thermostability >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< error except block Thermostability  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
                 status_id = config.CONSTS['status_error']
-                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
 
             return JsonResponse({"success": False,'output':err,'process_returncode':process_return.returncode})
 
@@ -10224,7 +10226,7 @@ def extract_user_name_from_email(email_id):
     return name_of_employee
 
 
-def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,command_tool,command_title):
+def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,command_tool,command_title,job_id=''):
     print("inside send_non_slurm_email function")
     print("*****************************************************************************************")
     print("inp_command_id is ",inp_command_id)
@@ -10257,22 +10259,22 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
         status = "submitted the job for execution"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 2:
-        # if slurm_job == "yes":
-        #     status = "Preparation of Slurm Script is in progress"
-        # else:
-        status = "started to execute"
+        if slurm_job == "yes":
+            status = "Preparation of Slurm Script is in progress"
+        else:
+            status = "started to execute"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 3:
-        # if slurm_job == "yes":
-        #     status = "Job Submitted Through Slurm"
-        # else:
-        status = "executed successfully"
+        if slurm_job == "yes":
+            status = "Job Submitted Through Slurm"
+        else:
+            status = "executed successfully"
         new_message = ""
     elif status_id == 4:
-        # if slurm_job == "yes":
-        #     status = "Slurm Job Submission failed"
-        # else:
-        status = "executed unsuccessful"
+        if slurm_job == "yes":
+            status = "Slurm Job Submission failed"
+        else:
+            status = "executed unsuccessful"
         new_message = ""
     # if status_id == 2:
     #     status = "started to execute"
@@ -10281,7 +10283,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     # elif status_id == 4:
     #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
-
+    if job_id != '':inp_command_id = job_id
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
@@ -10375,7 +10377,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     #    sys.exit( "mail failed; %s" % "CUSTOM_ERROR" ) # give an error message
 
 
-def update_command_status(inp_command_id,status_id,user_email_string,project_name, project_id,command_tool,command_title):
+def update_command_status(inp_command_id,status_id,user_email_string,project_name, project_id,command_tool,command_title,job_id=''):
     print("updating command execution status")
     #check if process initiated
 
@@ -10425,8 +10427,8 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
     print(updated_status)
     print("updated_status is *********************************************************")
     # VVVVVVVVVVVVVVVVVAAAAAAAAAAAAAAARRRRRRRRRRRRRRRAAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    # if updated_status:
-    #     send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title)
+    if updated_status:
+        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
