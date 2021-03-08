@@ -1239,7 +1239,7 @@ class Thermostability(APIView):
             pass
 
         if commandDetails_result.command_title == "create_mutation":
-            primary_command_runnable = primary_command_runnable
+            primary_command_runnable = primary_command_runnable + project_id
             print(file_path)
             std_script = 'create_mutate_std.sh'
             #QZ_MUTATE_SCRIPT
