@@ -825,61 +825,62 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
     print("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     os.system("perl -p -e 's/\r$//' < "+str(file_path)+str(pre_std_file_name)+" > "+str(file_path)+str(file_name))
     
-    print('queuing **********************************************************************************')
-    print("sbatch "+ file_path + "/" + str(file_name))
-    cmd = "srun "+ file_path + "/" + str(file_name)
-    cmd = "sbatch "+ file_path + "/" + str(file_name)
-    print("Submitting Job1 with command: %s" % cmd)
-    status, jobnum = commands.getstatusoutput(cmd)
-    print("job id is ", jobnum)
-    print("status is ", status)
-    print("job id is ", jobnum)
-    print("status is ", status)
-    print(jobnum.split())
-    lenght_of_split = len(jobnum.split())
-    index_value = lenght_of_split - 1
-    print(jobnum.split()[index_value])
-    job_id = jobnum.split()[index_value]
-    # save job id
-    job_id_key_name = "job_id"
-    entry_time = datetime.now()
-    try:
-        print(
-            "<<<<<<<<<<<<<<<<<<<<<<< in try of Thermostability JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                            project_id=project_id,
-                                                            entry_time=entry_time,
-                                                            job_id=job_id,
-                                                            job_status="1",
-                                                            job_title='qzw_create_mutation',
-                                                            job_details='creating mutation')
-        QzwSlurmJobDetails_save_job_id.save()
-    except db.OperationalError as e:
-        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        db.close_old_connections()
-        QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                            project_id=project_id,
-                                                            entry_time=entry_time,
-                                                            job_id=job_id,
-                                                            job_status="1",
-                                                            job_title='qzw_create_mutation',
-                                                            job_details='creating mutation')
-        QzwSlurmJobDetails_save_job_id.save()
-        print("saved")
-    except Exception as e:
-        print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("exception is ",str(e))
-        pass
-        '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
-                                                                               project_id=project_id,
-                                                                               entry_time=entry_time,
-                                                                               values=job_id,
-                                                                               job_id=job_id)
-        QzwSlurmJobDetails_save_job_id.save()
-        print("saved")'''
-    print('queued')
+    # print('queuing **********************************************************************************')
+    # print("sbatch "+ file_path + "/" + str(file_name))
+    # cmd = "srun "+ file_path + "/" + str(file_name)
+    # cmd = "sbatch "+ file_path + "/" + str(file_name)
+    # print("Submitting Job1 with command: %s" % cmd)
+    # status, jobnum = commands.getstatusoutput(cmd)
+    # print("job id is ", jobnum)
+    # print("status is ", status)
+    # print("job id is ", jobnum)
+    # print("status is ", status)
+    # print(jobnum.split())
+    # lenght_of_split = len(jobnum.split())
+    # index_value = lenght_of_split - 1
+    # print(jobnum.split()[index_value])
+    # job_id = jobnum.split()[index_value]
+    # # save job id
+    # job_id_key_name = "job_id"
+    # entry_time = datetime.now()
+    # try:
+    #     print(
+    #         "<<<<<<<<<<<<<<<<<<<<<<< in try of Thermostability JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+    #                                                         project_id=project_id,
+    #                                                         entry_time=entry_time,
+    #                                                         job_id=job_id,
+    #                                                         job_status="1",
+    #                                                         job_title='qzw_create_mutation',
+    #                                                         job_details='creating mutation')
+    #     QzwSlurmJobDetails_save_job_id.save()
+    # except db.OperationalError as e:
+    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #     db.close_old_connections()
+    #     QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+    #                                                         project_id=project_id,
+    #                                                         entry_time=entry_time,
+    #                                                         job_id=job_id,
+    #                                                         job_status="1",
+    #                                                         job_title='qzw_create_mutation',
+    #                                                         job_details='creating mutation')
+    #     QzwSlurmJobDetails_save_job_id.save()
+    #     print("saved")
+    # except Exception as e:
+    #     print("<<<<<<<<<<<<<<<<<<<<<<< in except of Thermostability  JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #     print("exception is ",str(e))
+    #     pass
+    #     '''QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+    #                                                                            project_id=project_id,
+    #                                                                            entry_time=entry_time,
+    #                                                                            values=job_id,
+    #                                                                            job_id=job_id)
+    #     QzwSlurmJobDetails_save_job_id.save()
+    #     print("saved")'''
+    # print('queued')
 
-    return True,job_id
+    # return True,job_id
+    return True
 
 
 @csrf_exempt
@@ -1231,6 +1232,7 @@ class Thermostability(APIView):
             shutil.copyfile(os.path.join(qz_workbench_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"matrix_generation.py"),os.path.join(destination_file_path,"matrix_generation.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"check_progress_and_view_graph.py"),os.path.join(destination_file_path,"check_progress_and_view_graph.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"rotabase.txt"),os.path.join(destination_file_path,"rotabase.txt"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"generate_mean_variant_plot.py"),os.path.join(destination_file_path,"generate_mean_variant_plot.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"generate_energy_plot.py"),os.path.join(destination_file_path,"generate_energy_plot.py"))
@@ -1274,10 +1276,12 @@ class Thermostability(APIView):
                 for line in new_bash_script.readlines():
                     print(line)
             #queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
-            submitted_job_boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
+            #submitted_job_boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
+            queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             #inp_command_id = job_id
-            #primary_command_runnable = 'sh create_mutate.sh'
-            primary_command_runnable = ''
+            job_id = inp_command_id
+            primary_command_runnable = 'sh create_mutate.sh'
+            #primary_command_runnable = ''
 
         print('primary_command_runnable')
         print(primary_command_runnable)
@@ -10252,7 +10256,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     local_time = entry_time.strftime("%m/%d/%Y, %H:%M:%S")
     user_name = str(extract_user_name_from_email(str(email_id)))
     slurm_job = "Yes"
-    if (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
+    if (command_tool == "Thermostability") or (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
         slurm_job = "No"
 
     if status_id == 1:
