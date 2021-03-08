@@ -1230,7 +1230,7 @@ class Thermostability(APIView):
             shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"matrix_generation.py"),os.path.join(destination_file_path,"matrix_generation.py"))
-            #shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
+            shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutate_std.sh"),os.path.join(destination_file_path,"create_mutate_std.sh"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"rotabase.txt"),os.path.join(destination_file_path,"rotabase.txt"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"generate_mean_variant_plot.py"),os.path.join(destination_file_path,"generate_mean_variant_plot.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"generate_energy_plot.py"),os.path.join(destination_file_path,"generate_energy_plot.py"))
