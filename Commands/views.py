@@ -827,7 +827,7 @@ def queue_slurm_script_of_thermostability(user_id,project_id,file_path,pre_std_f
     
     print('queuing **********************************************************************************')
     print("sbatch "+ file_path + "/" + str(file_name))
-    cmd = "srun "+ file_path + "/" + str(file_name)
+    #cmd = "srun "+ file_path + "/" + str(file_name)
     cmd = "sbatch "+ file_path + "/" + str(file_name)
     print("Submitting Job1 with command: %s" % cmd)
     status, jobnum = commands.getstatusoutput(cmd)
