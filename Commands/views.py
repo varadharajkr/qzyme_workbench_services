@@ -1270,9 +1270,9 @@ class Thermostability(APIView):
                         new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
                         new_shell_script_lines += line
-            if os.path.exists(file_path + '/' + mutate_win_script):
+            if os.path.exists(os.path.join(file_path,mutate_win_script)):
                 print('removing ', file_path + mutate_win_script)
-                os.remove(file_path + '/' + mutate_win_script)
+                os.remove(os.path.join(file_path,mutate_win_script))
             # the below code depits final simulation batch script generation by opening in wb mode for not considering operating system of windows or unix type
             print("************************************************************")
             print("************************************************************")
@@ -1290,7 +1290,7 @@ class Thermostability(APIView):
             submitted_job_boolean_val,job_id = queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             #queue_slurm_script_of_thermostability(user_id,project_id,file_path,mutate_win_script,mutate_script)
             #inp_command_id = job_id
-            job_id = inp_command_id
+            #job_id = inp_command_id
             #primary_command_runnable = 'sh create_mutate.sh'
             primary_command_runnable = ''
             #primary_command_runnable = ''
@@ -10268,7 +10268,8 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     local_time = entry_time.strftime("%m/%d/%Y, %H:%M:%S")
     user_name = str(extract_user_name_from_email(str(email_id)))
     slurm_job = "Yes"
-    if (command_tool == "Thermostability") or (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
+    #if (command_tool == "Thermostability") or (command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
+    if(command_tool == "TASS" and command_title == "gromacs_to_amber") or (command_tool == "CatMecandAutodock" and command_title == "Dockinganddocking_post_analysis") or (command_tool == "CatMecandAutodock" and command_title == "Dockingandmake_gpf_dpf") or (command_tool == "CatMecandAutodock" and command_title == "DockingandPdbtoPdbqt"):
         slurm_job = "No"
 
     if status_id == 1:
