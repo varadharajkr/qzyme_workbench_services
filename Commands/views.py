@@ -1266,6 +1266,8 @@ class Thermostability(APIView):
                         new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
                     elif 'QZ_MUTATE_SCRIPT' in line:
                         new_shell_script_lines += (line.replace('QZ_MUTATE_SCRIPT', str(primary_command_runnable)))
+                    elif 'QZ_PROJECT_ID' in line:
+                        new_shell_script_lines += (line.replace('QZ_PROJECT_ID', str(project_id)))
                     elif 'wild_type_foldex_script' in line:
                         new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
@@ -10444,8 +10446,8 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
     print(updated_status)
     print("updated_status is *********************************************************")
     # VVVVVVVVVVVVVVVVVAAAAAAAAAAAAAAARRRRRRRRRRRRRRRAAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    if updated_status:
-        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
+    # if updated_status:
+    #     send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
