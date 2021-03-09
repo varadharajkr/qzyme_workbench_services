@@ -1204,7 +1204,7 @@ class Thermostability(APIView):
         for i in range(lenght_of_name_with_dots):
             user_email_string += dot_Str_val.split(".")[i] + " "
         QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
-        project_name = QzwProjectDetails_res.project_name
+        project_name = str(QzwProjectDetails_res.project_name)
         group_project_name = get_group_project_name(str(project_id))
         key = 'thermostability_xtc_or_pdb_file'
         pdb_file_names = retrieve_project_tool_essentials_values(project_id, key)
@@ -1268,6 +1268,8 @@ class Thermostability(APIView):
                         new_shell_script_lines += (line.replace('QZ_MUTATE_SCRIPT', str(primary_command_runnable)))
                     elif 'QZ_PROJECT_ID' in line:
                         new_shell_script_lines += (line.replace('QZ_PROJECT_ID', str(project_id)))
+                    elif 'QZ_MUTATION_FILE' in line:
+                        new_shell_script_lines += (line.replace('QZ_MUTATION_FILE', str(project_name+'_mutate.txt')))
                     elif 'wild_type_foldex_script' in line:
                         new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
