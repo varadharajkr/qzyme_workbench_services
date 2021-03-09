@@ -1266,10 +1266,11 @@ class Thermostability(APIView):
                         new_shell_script_lines += (line.replace('QZTHREADS',str(number_of_threads)))
                     elif 'QZ_MUTATE_SCRIPT' in line:
                         new_shell_script_lines += (line.replace('QZ_MUTATE_SCRIPT', str(primary_command_runnable)))
-                    elif 'QZ_PROJECT_ID' in line:
-                        new_shell_script_lines += (line.replace('QZ_PROJECT_ID', str(project_id)))
-                    elif 'QZ_MUTATION_FILE' in line:
-                        new_shell_script_lines += (line.replace('QZ_MUTATION_FILE', str(project_name+'_mutate.txt')))
+                    elif 'QZ_PROJECT_ID' in line or 'QZ_MUTATION_FILE' in line:
+                        # new_shell_script_lines += (line.replace('QZ_PROJECT_ID', str(project_id)))
+                        new_shell_script_lines += line.replace('QZ_PROJECT_ID', str(project_id)).replace('QZ_MUTATION_FILE', str(project_name+'_mutate.txt'))
+                    # elif 'QZ_MUTATION_FILE' in line:
+                    #     new_shell_script_lines += (line.replace('QZ_MUTATION_FILE', str(project_name+'_mutate.txt')))
                     elif 'wild_type_foldex_script' in line:
                         new_shell_script_lines += (line.replace('wild_type_foldex_script', str(wild_type_foldex_script)))
                     else:
