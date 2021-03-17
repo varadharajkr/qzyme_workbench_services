@@ -1231,6 +1231,7 @@ class Thermostability(APIView):
         source_file_path = config.PATH_CONFIG['shared_folder_path'] + group_project_name + '/' + project_name + '/' + config.PATH_CONFIG['Designer_path']
         try:
             print("inside try")
+            ""
             shutil.copyfile(os.path.join(qz_workbench_script_path,"create_mutation.py"),os.path.join(destination_file_path,"create_mutation.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"pymol_mutate.py"),os.path.join(destination_file_path,"pymol_mutate.py"))
             shutil.copyfile(os.path.join(qz_workbench_script_path,"matrix_generation.py"),os.path.join(destination_file_path,"matrix_generation.py"))
@@ -8816,6 +8817,133 @@ class CatMec(APIView):
                 except db.OperationalError as e:
                     print(
                         "<<<<<<<<<<<<<<<<<<<<<<< error except block get_make_complex_parameter_details or make_complex_params or md_run  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
+        elif command_tool_title == "umbrella_sampling_simulation":
+            print('command_tool_title ----------------------\n')
+            print(command_tool_title)
+            user_id = commandDetails_result.user_id
+            inp_command_id = request.POST.get("command_id")
+            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
+            project_id = commandDetails_result.project_id
+            group_project_name = get_group_project_name(str(project_id))
+            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
+            project_name = QzwProjectDetails_res.project_name
+            primary_command_runnable = commandDetails_result.primary_command
+            status_id = config.CONSTS['status_initiated']
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(ppartial_charge_selection_nameroject_id=project_id)
+            # ligand_name = QzwProjectEssentials_res.command_key
+            # print "+++++++++++++++ligand name is++++++++++++"
+            # print ligand_name
+            simulation_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + config.PATH_CONFIG['umbrella_sampling_path']
+
+            ############################################################################################################
+            ##################################US SIMULATION STEP 1 START################################################
+            ############################################################################################################
+            print('after generate_slurm_script ************************************************************************')
+            print('before changing directory')
+            print(os.getcwd())
+            print('after changing directory')
+            os.chdir(simulation_path)
+            print (os.getcwd())
+            print("Converting from windows to unix format")
+            print("perl -p -e 's/\r$//' < pre_simulation_windows.sh > simulation.sh")
+            os.system("perl -p -e 's/\r$//' < pre_simulation_windows.sh > simulation.sh")
+            print('queuing **********************************************************************************')
+            cmd = "sbatch "+ simulation_path + "/" + "simulation.sh"
+            print("Submitting Job1 with command: %s" % cmd)
+            status, jobnum = commands.getstatusoutput(cmd)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print("job id is ", jobnum)
+            print("status is ", status)
+            print(jobnum.split())
+            lenght_of_split = len(jobnum.split())
+            index_value = lenght_of_split - 1
+            print(jobnum.split()[index_value])
+            job_id = jobnum.split()[index_value]
+            initial_string = 'QZW'
+            module_name = config.PATH_CONFIG['umbrella_sampling_step_one_title']
+            job_name = str(initial_string) + '_' + module_name
+            job_detail_string = module_name
+            # save job id
+            job_id_key_name = "job_id"
+            entry_time = datetime.now()
+            try:
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+            except db.OperationalError as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                db.close_old_connections()
+                QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                    project_id=project_id,
+                                                                    entry_time=entry_time,
+                                                                    job_id=job_id,
+                                                                    job_status="1",
+                                                                    job_title=job_name,
+                                                                    job_details=job_detail_string)
+                QzwSlurmJobDetails_save_job_id.save()
+                print("saved")
+            except Exception as e:
+                print("<<<<<<<<<<<<<<<<<<<<<<< in except of MD SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print("exception is ",str(e))
+                pass
+            ############################################################################################################
+            ##################################US SIMULATION STEP 1 END##################################################
+            ############################################################################################################
+            print("primary_command_runnable.........................................")
+            print(primary_command_runnable)
+            print ("execute_command(primary_command_runnable, inp_command_id).......")
+            print (primary_command_runnable, inp_command_id)
+
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            command_title_folder = commandDetails_result.command_title
+
+            out, err = process_return.communicate()
+            process_return.wait()
+            print("process return code is ")
+            print(process_return.returncode)
+            if process_return.returncode == 0:
+                print("inside success")
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(out)
+                try:
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success try block UMBRELLA SAMPLING STEP ONE >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                except db.OperationalError as e:
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< success except block UMBRELLA SAMPLING STEP ONE  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    db.close_old_connections()
+                    status_id = config.CONSTS['status_success']
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
+            if process_return.returncode != 0:
+                print("inside error")
+                fileobj = open(config.PATH_CONFIG[
+                                   'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
+                               'w+')
+                fileobj.write(err)
+                try:
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error try block UMBRELLA SAMPLING STEP ONE >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    status_id = config.CONSTS['status_error']
+                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+                except db.OperationalError as e:
+                    print(
+                        "<<<<<<<<<<<<<<<<<<<<<<< error except block UMBRELLA SAMPLING STEP ONE  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                     db.close_old_connections()
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
