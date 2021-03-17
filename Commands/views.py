@@ -8821,7 +8821,7 @@ class CatMec(APIView):
                     status_id = config.CONSTS['status_error']
                     update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
-        elif command_tool_title == "umbrella_sampling_simulation":
+        elif command_tool_title == "umbrella_sampling_pull_simulation":
             print('command_tool_title ----------------------\n')
             print(command_tool_title)
             user_id = commandDetails_result.user_id
