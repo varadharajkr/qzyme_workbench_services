@@ -8851,7 +8851,7 @@ class CatMec(APIView):
             print (os.getcwd())
             print("Converting from windows to unix format")
             print("perl -p -e 's/\r$//' < pull_windows.mdp > pull.mdp")
-        os.system("perl -p -e 's/\r$//' < pull_windows.mdp > pull.mdp")
+            os.system("perl -p -e 's/\r$//' < pull_windows.mdp > pull.mdp")
             print("perl -p -e 's/\r$//' < pre_simulation_windows.sh > simulation.sh")
             os.system("perl -p -e 's/\r$//' < pre_simulation_windows.sh > simulation.sh")
             print('queuing **********************************************************************************')
