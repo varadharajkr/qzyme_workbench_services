@@ -8998,7 +8998,7 @@ class CatMec(APIView):
             index_value = lenght_of_split - 1
             print(jobnum.split()[index_value])
             job_id = jobnum.split()[index_value]
-            dependant_job_id = job_id
+            dependant_job_id = int(job_id)
             initial_string = 'QZW'
             module_name = config.PATH_CONFIG['umbrella_sampling_step_four_title']
             job_name = str(initial_string) + '_' + module_name
@@ -9039,7 +9039,7 @@ class CatMec(APIView):
             for frm_val in eval(sim_val):
                 print("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
                 os.system("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
-                cmd = "sbatch --dependency=type:" +str(dependant_job_id)+ " " + simulation_path + "production_simulation_"+str(frm_val)+".sh"
+                cmd = "sbatch --dependency=afterok:" +str(dependant_job_id)+ " " + simulation_path + "production_simulation_"+str(frm_val)+".sh"
                 print("Submitting Job1 with command: %s" % cmd)
                 status, jobnum = commands.getstatusoutput(cmd)
                 print("job id is ", jobnum)
