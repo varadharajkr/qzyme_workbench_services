@@ -69,9 +69,10 @@ def execute_command(command,inp_command_id,user_email_string,project_name,projec
 
 # to run command in shell
 def execute_umbrella_sampling_command(command,inp_command_id,user_email_string,project_name,project_id, command_tool,command_title,job_id=''):
-    print('inside execute_command')
+    print('inside execute_umbrella_sampling_command')
     print('command to execute is ',command)
     print('inp command id is ',inp_command_id)
+    print("job_id is ",job_id)
     status_id = config.CONSTS['status_initiated']
     process =Popen(
         args=command,
@@ -10587,7 +10588,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     print("*****************************************************************************************")
     print("inp_command_id is ",inp_command_id)
     print("status_id is ",status_id)
-
+    print("job_id is ",job_id)
     commandDetails_res = commandDetails.objects.all().filter(command_id=inp_command_id).latest(
         'entry_time')
     command_title = commandDetails_res.command_title
@@ -10640,7 +10641,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     # elif status_id == 4:
     #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
-    if job_id != '':inp_command_id = job_id
+    if job_id != '' or slurm_job =="Yes":inp_command_id = job_id
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
