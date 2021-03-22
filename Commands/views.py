@@ -8986,7 +8986,7 @@ class CatMec(APIView):
             # print("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
             # os.system("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
             print('queuing **********************************************************************************')
-            cmd = "sbatch "+ simulation_path + "/" + "simulation.sh"
+            cmd = "sbatch "+ simulation_path + "/" + "extract_pdb.sh"
             print("Submitting Job1 with command: %s" % cmd)
             status, jobnum = commands.getstatusoutput(cmd)
             print("job id is ", jobnum)
