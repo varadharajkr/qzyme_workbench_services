@@ -8981,8 +8981,10 @@ class CatMec(APIView):
             print("Converting from windows to unix format")
             print("perl -p -e 's/\r$//' < production_windows.mdp > production.mdp")
             os.system("perl -p -e 's/\r$//' < production_windows.mdp > production.mdp")
-            print("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
-            os.system("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
+            print("perl -p -e 's/\r$//' < pre_extract_pdb_windows.sh > extract_pdb.sh")
+            os.system("perl -p -e 's/\r$//' < pre_extract_pdb_windows.sh > extract_pdb.sh")
+            # print("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
+            # os.system("perl -p -e 's/\r$//' < pre_production_simulation_windows.sh > production_simulation.sh")
             print('queuing **********************************************************************************')
             cmd = "sbatch "+ simulation_path + "/" + "simulation.sh"
             print("Submitting Job1 with command: %s" % cmd)
@@ -8996,6 +8998,7 @@ class CatMec(APIView):
             index_value = lenght_of_split - 1
             print(jobnum.split()[index_value])
             job_id = jobnum.split()[index_value]
+            dependant_job_id = job_id
             initial_string = 'QZW'
             module_name = config.PATH_CONFIG['umbrella_sampling_step_four_title']
             job_name = str(initial_string) + '_' + module_name
@@ -9028,6 +9031,58 @@ class CatMec(APIView):
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except of Umbrella Sampling production SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 print("exception is ",str(e))
                 pass
+            sim_val = retrieve_project_tool_essentials_values(project_id,'frames_selected_value')
+            print(sim_val)
+            print(type(sim_val))
+            print(eval(sim_val))
+            print(type(eval(sim_val)))
+            for frm_val in eval(sim_val):
+                print("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
+                os.system("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
+                cmd = "sbatch --dependency=type:" +str(dependant_job_id)+ " " + simulation_path + "production_simulation_"+str(frm_val)+".sh"
+                print("Submitting Job1 with command: %s" % cmd)
+                status, jobnum = commands.getstatusoutput(cmd)
+                print("job id is ", jobnum)
+                print("status is ", status)
+                print("job id is ", jobnum)
+                print("status is ", status)
+                print(jobnum.split())
+                lenght_of_split = len(jobnum.split())
+                index_value = lenght_of_split - 1
+                print(jobnum.split()[index_value])
+                job_id = jobnum.split()[index_value]
+                initial_string = 'QZW'
+                module_name = config.PATH_CONFIG['umbrella_sampling_step_four_title']
+                job_name = str(initial_string) + '_' + module_name
+                job_detail_string = module_name
+                # save job id
+                job_id_key_name = "job_id"
+                entry_time = datetime.now()
+                try:
+                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                        project_id=project_id,
+                                                                        entry_time=entry_time,
+                                                                        job_id=job_id,
+                                                                        job_status="1",
+                                                                        job_title=job_name,
+                                                                        job_details=job_detail_string)
+                    QzwSlurmJobDetails_save_job_id.save()
+                except db.OperationalError as e:
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of Umbrella Sampling production SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    db.close_old_connections()
+                    QzwSlurmJobDetails_save_job_id = QzwSlurmJobDetails(user_id=user_id,
+                                                                        project_id=project_id,
+                                                                        entry_time=entry_time,
+                                                                        job_id=job_id,
+                                                                        job_status="1",
+                                                                        job_title=job_name,
+                                                                        job_details=job_detail_string)
+                    QzwSlurmJobDetails_save_job_id.save()
+                    print("saved")
+                except Exception as e:
+                    print("<<<<<<<<<<<<<<<<<<<<<<< in except of Umbrella Sampling production SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                    print("exception is ",str(e))
+                    pass
             ############################################################################################################
             ##################################US SIMULATION STEP 4 END##################################################
             ############################################################################################################
