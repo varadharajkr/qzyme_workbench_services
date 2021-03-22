@@ -67,6 +67,24 @@ def execute_command(command,inp_command_id,user_email_string,project_name,projec
     return process
 
 
+# to run command in shell
+def execute_umbrella_sampling_command(command,inp_command_id,user_email_string,project_name,project_id, command_tool,command_title,job_id=''):
+    print('inside execute_command')
+    print('command to execute is ',command)
+    print('inp command id is ',inp_command_id)
+    status_id = config.CONSTS['status_initiated']
+    process =Popen(
+        args=command,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True
+    )
+    print("execute command in execute command function")
+    # process.wait()
+    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
+    return process
+
+
 def execute_fjs_command(command,inp_command_id,program_path,command_title,user_email_string,project_name, project_id, command_tool):
     print('FJS command to execute is ',command)
     print('FJS inp command id is ',inp_command_id)
@@ -8481,6 +8499,7 @@ class CatMec(APIView):
         command_tool_title = commandDetails_result.command_title
         command_tool = commandDetails_result.command_tool
         group_project_name = get_group_project_name(str(project_id))
+        slurm_job_ids = []
         if command_tool_title == "Replace_Charge":
             print(command_tool_title)
             inp_command_id = request.POST.get("command_id")
@@ -8907,7 +8926,8 @@ class CatMec(APIView):
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
 
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            # process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            process_return = execute_umbrella_sampling_command(job_id,primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -8999,6 +9019,7 @@ class CatMec(APIView):
             print(jobnum.split()[index_value])
             job_id = jobnum.split()[index_value]
             dependant_job_id = int(job_id)
+            slurm_job_ids.append(dependant_job_id)
             initial_string = 'QZW'
             module_name = config.PATH_CONFIG['umbrella_sampling_step_four_title']
             job_name = str(initial_string) + '_' + module_name
@@ -9032,10 +9053,6 @@ class CatMec(APIView):
                 print("exception is ",str(e))
                 pass
             sim_val = retrieve_project_tool_essentials_values(project_id,'frames_selected_value')
-            print(sim_val)
-            print(type(sim_val))
-            print(eval(sim_val))
-            print(type(eval(sim_val)))
             for frm_val in eval(sim_val):
                 print("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
                 os.system("perl -p -e 's/\r$//' < pre_production_simulation_"+str(frm_val)+"_windows.sh > production_simulation_"+str(frm_val)+".sh")
@@ -9051,6 +9068,7 @@ class CatMec(APIView):
                 index_value = lenght_of_split - 1
                 print(jobnum.split()[index_value])
                 job_id = jobnum.split()[index_value]
+                slurm_job_ids.append(dependant_job_id)
                 initial_string = 'QZW'
                 module_name = config.PATH_CONFIG['umbrella_sampling_step_four_title']
                 job_name = str(initial_string) + '_' + module_name
@@ -9090,8 +9108,8 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            # process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
+            process_return = execute_umbrella_sampling_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -10766,8 +10784,8 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
     print(updated_status)
     print("updated_status is *********************************************************")
     # VVVVVVVVVVVVVVVVVAAAAAAAAAAAAAAARRRRRRRRRRRRRRRAAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    # if updated_status:
-    #     send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
+    if updated_status:
+        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
