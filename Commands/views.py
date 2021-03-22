@@ -375,7 +375,6 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
     print("inside TASS_nvt_equilibiration_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
     print("inside TASS_nvt_equilibiration_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -462,6 +461,7 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
                                                                                    job_title=job_name,
                                                                                    job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
         except db.OperationalError as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
@@ -473,6 +473,7 @@ def TASS_nvt_equilibiration_preparation(user_email_string,inp_command_id,project
                                                                 job_title=job_name,
                                                                 job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
             print("saved")
         except Exception as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS EQUILIBRATION  SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -499,7 +500,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
     group_project_name = get_group_project_name(str(project_id))
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
+
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/'+ project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
     print(file_path)
@@ -614,6 +615,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
                                                                                    job_title=job_name,
                                                                                    job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
             print('saved and queued')
         except db.OperationalError as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -626,6 +628,7 @@ def TASS_nvt_simulation_preparation(user_email_string,inp_command_id,project_id,
                                                                 job_title=job_name,
                                                                 job_details=job_detail_string)
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
             print("saved")
         except Exception as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS SIMULATION SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -652,7 +655,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
     print("inside TASS_qmm_mm_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
+
     print("inside TASS_qmm_mm_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+'/' +project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -798,6 +801,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
                                                                                        job_title=job_name,
                                                                                        job_details=job_detail_string)
                 QzwSlurmJobDetails_save_job_id.save()
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
             except db.OperationalError as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 db.close_old_connections()
@@ -809,6 +813,7 @@ def TASS_qmm_mm_preparation(user_email_string,inp_command_id,project_id,project_
                                                                     job_title=job_name,
                                                                     job_details=job_detail_string)
                 QzwSlurmJobDetails_save_job_id.save()
+                update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
                 print("saved")
             except Exception as e:
                 print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS QMM SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -908,7 +913,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
     print("inside plot_energy_preparation function")
     print("user id is ",user_id)
     status_id = config.CONSTS['status_initiated']
-    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title)
+
     print("inside plot_energy_preparation function")
     print('TASS_simulation_path is')
     file_path = config.PATH_CONFIG['local_shared_folder_path'] + group_project_name+'/'+project_name + '/' + command_tool + '/' + user_selected_mutation + '/'
@@ -993,6 +998,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
                                                                                job_title=job_name,
                                                                                job_details=job_detail_string)
         QzwSlurmJobDetails_save_job_id.save()
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
     except db.OperationalError as e:
         print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         db.close_old_connections()
@@ -1004,6 +1010,7 @@ def plot_energy_preparation(user_email_string, inp_command_id,project_id,project
                                                             job_title=job_name,
                                                             job_details=job_detail_string)
         QzwSlurmJobDetails_save_job_id.save()
+        update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, command_tool,command_title,job_id)
         print("saved")
     except Exception as e:
         print("<<<<<<<<<<<<<<<<<<<<<<< in except of TASS PLOT ENERGY JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -1971,6 +1978,7 @@ class analyse_mmpbsa(APIView):
                                                                 job_title=job_title,
                                                                 job_details="CatMec analysis")
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
         except db.OperationalError as e:
             print(
                 "<<<<<<<<<<<<<<<<<<<<<<< in except of CatMec MMPBSA SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -1983,6 +1991,7 @@ class analyse_mmpbsa(APIView):
                                                                 job_title=job_title,
                                                                 job_details="CatMec analysis")
             QzwSlurmJobDetails_save_job_id.save()
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
         except Exception as e:
             print(
                 "<<<<<<<<<<<<<<<<<<<<<<< in except of CatMec MMPBSA SLURM JOB SCHEDULING >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -1993,12 +2002,12 @@ class analyse_mmpbsa(APIView):
             print("<<<<<<<<<<<<<<<<<<<<<<< error try block CatMec MMPBSA >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             status_id = config.CONSTS['status_success']
 
-            update_command_status(inp_command_id, status_id, user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
         except db.OperationalError as e:
             print("<<<<<<<<<<<<<<<<<<<<<<< error except block CatMec MMPBSA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             db.close_old_connections()
             status_id = config.CONSTS['status_success']
-            update_command_status(inp_command_id, status_id, user_email_string)
+            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
         return JsonResponse({"success": True})
 
 
@@ -8927,8 +8936,8 @@ class CatMec(APIView):
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
 
-            # process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-            process_return = execute_umbrella_sampling_command(job_id,primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
+            # process_return = execute_umbrella_sampling_command(job_id,primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,job_id)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -9109,8 +9118,8 @@ class CatMec(APIView):
             print(primary_command_runnable)
             print ("execute_command(primary_command_runnable, inp_command_id).......")
             print (primary_command_runnable, inp_command_id)
-            # process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-            process_return = execute_umbrella_sampling_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
+            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
+            # process_return = execute_umbrella_sampling_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
             command_title_folder = commandDetails_result.command_title
 
             out, err = process_return.communicate()
@@ -10617,19 +10626,19 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
         status = "submitted the job for execution"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 2:
-        if slurm_job == "yes":
+        if slurm_job == "Yes":
             status = "Preparation of Slurm Script is in progress"
         else:
             status = "started to execute"
         new_message = "you will receive another completion notification email update, after the job is executed"
     elif status_id == 3:
-        if slurm_job == "yes":
+        if slurm_job == "Yes":
             status = "Job Submitted Through Slurm"
         else:
             status = "executed successfully"
         new_message = ""
     elif status_id == 4:
-        if slurm_job == "yes":
+        if slurm_job == "Yes":
             status = "Slurm Job Submission failed"
         else:
             status = "executed unsuccessful"
@@ -10641,7 +10650,7 @@ def send_non_slurm_email(inp_command_id,status_id,project_name,project_id,comman
     # elif status_id == 4:
     #     status = "executed unsuccessful"
     entry_time = str(datetime.now())
-    if job_id != '' or slurm_job =="Yes":inp_command_id = job_id
+    if job_id != '':inp_command_id = job_id
     #table_design = "<html><head><style>td,th{border: 1px solid;padding: 8px;}</style></head><body><table><tr><th><center>User Name</center></th><th><center>Job Name</center></th><th><center>Status</center></th><th><center>Time</th></tr><tr><td>" + user_email_string + "</td><td>" + command_title + "</td><td style='color:red'>" + status + "</td><td>" + entry_time + "</td></tr></table></body></html>"
     table_design = """
     <html>
