@@ -8324,7 +8324,8 @@ class CatMecandAutodock(APIView):
                 pre_docking_script = 'pre_docking.sh'
                 windows_docking_script = 'pre_docking_windows_format.sh'
                 job_name = str(initial_string) + '_' + module_name
-                server_value = 'allcpu'
+                # server_value = 'allcpu'
+                server_value = 'qzyme2'
 
                 enzyme_key = 'enzyme_file'
                 ligand_key = 'ligand_file'
