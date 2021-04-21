@@ -10796,8 +10796,7 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
     print("updated_status is *********************************************************")
     # VVVVVVVVVVVVVVVVVAAAAAAAAAAAAAAARRRRRRRRRRRRRRRAAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     if updated_status:
-        pass
-        #send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
+        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
