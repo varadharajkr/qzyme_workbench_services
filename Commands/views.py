@@ -9164,89 +9164,6 @@ class CatMec(APIView):
                     update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
                 return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
 
-        elif command_tool_title == "umbrella_sampling_histogram_graph":
-            print('command_tool_title ----------------------\n')
-            print(command_tool_title)
-            user_id = commandDetails_result.user_id
-            inp_command_id = request.POST.get("command_id")
-            commandDetails_result = commandDetails.objects.get(command_id=inp_command_id)
-            project_id = commandDetails_result.project_id
-            group_project_name = get_group_project_name(str(project_id))
-            QzwProjectDetails_res = QzwProjectDetails.objects.get(project_id=project_id)
-            project_name = QzwProjectDetails_res.project_name
-            primary_command_runnable = commandDetails_result.primary_command
-            status_id = config.CONSTS['status_initiated']
-            update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-            # QzwProjectEssentials_res = QzwProjectEssentials.objects.get(ppartial_charge_selection_nameroject_id=project_id)
-            # ligand_name = QzwProjectEssentials_res.command_key
-            # print "+++++++++++++++ligand name is++++++++++++"
-            # print ligand_name
-            simulation_path = config.PATH_CONFIG['local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + config.PATH_CONFIG['umbrella_sampling_path'] + 'production'
-
-            ############################################################################################################
-            ##################################US SIMULATION STEP 5 START################################################
-            ############################################################################################################
-            print('after generate_slurm_script ************************************************************************')
-            print('before changing directory')
-            print(os.getcwd())
-            print('after changing directory')
-            os.chdir(simulation_path)
-            print (os.getcwd())
-
-            print("primary_command_runnable.........................................")
-            print(primary_command_runnable)
-            print ("execute_command(primary_command_runnable, inp_command_id).......")
-            print (primary_command_runnable, inp_command_id)
-            qz_workbench_script_path = config.PATH_CONFIG['shared_scripts'] + '/' + config.PATH_CONFIG['umbrella_sampling_path'] +
-            shutil.copyfile()
-            process_return = execute_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
-            # process_return = execute_umbrella_sampling_command(primary_command_runnable, inp_command_id,user_email_string,project_name,project_id, commandDetails_result.command_tool,commandDetails_result.command_title,slurm_job_ids)
-            command_title_folder = commandDetails_result.command_title
-
-            out, err = process_return.communicate()
-            process_return.wait()
-            print("process return code is ")
-            print(process_return.returncode)
-            if process_return.returncode == 0:
-                print("inside success")
-                fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
-                               'w+')
-                fileobj.write(out)
-                try:
-                    print(
-                        "<<<<<<<<<<<<<<<<<<<<<<< success try block UMBRELLA SAMPLING STEP FOUR >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-                except db.OperationalError as e:
-                    print(
-                        "<<<<<<<<<<<<<<<<<<<<<<< success except block UMBRELLA SAMPLING STEP FOUR  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    status_id = config.CONSTS['status_success']
-                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-                return JsonResponse({"success": True, 'output': out, 'process_returncode': process_return.returncode})
-
-            if process_return.returncode != 0:
-                print("inside error")
-                fileobj = open(config.PATH_CONFIG[
-                                   'local_shared_folder_path'] +group_project_name+"/"+ project_name + '/' + commandDetails_result.command_tool + '/' + command_title_folder + '.log',
-                               'w+')
-                fileobj.write(err)
-                try:
-                    print(
-                        "<<<<<<<<<<<<<<<<<<<<<<< error try block UMBRELLA SAMPLING STEP FOUR >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-                except db.OperationalError as e:
-                    print(
-                        "<<<<<<<<<<<<<<<<<<<<<<< error except block UMBRELLA SAMPLING STEP FOUR  >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                    db.close_old_connections()
-                    status_id = config.CONSTS['status_error']
-                    update_command_status(inp_command_id, status_id, user_email_string, project_name, project_id, commandDetails_result.command_tool,commandDetails_result.command_title)
-                return JsonResponse({"success": False, 'output': err, 'process_returncode': process_return.returncode})
-            ############################################################################################################
-            ##################################US SIMULATION STEP 5 END##################################################
-            ############################################################################################################
 
         elif command_tool_title == "MD_Simulation":
             print(command_tool_title)
@@ -10880,7 +10797,8 @@ def update_command_status(inp_command_id,status_id,user_email_string,project_nam
     print("updated_status is *********************************************************")
     # VVVVVVVVVVVVVVVVVAAAAAAAAAAAAAAARRRRRRRRRRRRRRRAAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     if updated_status:
-        send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
+        pass
+        #send_non_slurm_email(inp_command_id, status_id, project_name, project_id,command_tool,command_title,job_id)
     print("result of update command execution status")
     print(QzwProjectDetails_update_res)
     return True
