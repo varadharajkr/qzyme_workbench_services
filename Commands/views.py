@@ -1432,7 +1432,6 @@ class TASS(APIView):
         user_selected_mutation = str(ProjectToolEssentials_res_mutation_selection.key_values[1:-1].strip("'"))
 
         if commandDetails_result.command_title == "gromacs_to_amber":
-
             file_path = config.PATH_CONFIG[
                             'local_shared_folder_path'] + group_project_name + '/' + project_name + '/' + str(commandDetails_result.command_tool) + '/' + user_selected_mutation + '/'
             print(file_path)
